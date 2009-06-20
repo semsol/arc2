@@ -5,8 +5,7 @@ license:  http://arc.semsol.org/license
 
 class:    ARC2 SPARQL Parser
 author:   Benjamin Nowack
-version:  2009-03-05 (Addition: dedicated xIRI_REF method)
- *        2009-05-28: switch from getScriptURI to getRequestURI in parse()
+version:  2009-05-28: switch from getScriptURI to getRequestURI in parse()
 */
 
 ARC2::inc('TurtleParser');
