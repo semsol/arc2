@@ -5,7 +5,7 @@ license:  http://arc.semsol.org/license
 
 class:    ARC2 RDF Serializer
 author:   Benjamin Nowack
-version:  2008-09-11 (Addition: "raw" parameter)
+version:  2009-06-22 (Tweak: moved getPName to merged method in ARC2_Class)
 */
 
 ARC2::inc('Class');
@@ -22,29 +22,14 @@ class ARC2_RDFSerializer extends ARC2_Class {
 
   function __init() {
     parent::__init();
-    $this->ns_count = 0;
-    $this->ns = $this->v('ns', array(), $this->a);
-    $this->nsp = array();
     foreach ($this->ns as $k => $v) {
       $this->nsp[$v] = $k;
     }
-    $this->nsp['http://www.w3.org/1999/02/22-rdf-syntax-ns#'] = 'rdf';
-    $this->used_ns = array('http://www.w3.org/1999/02/22-rdf-syntax-ns#');
   }
 
   /*  */
   
-  function getPrefix($ns) {
-    if (!isset($this->nsp[$ns])) {
-      $this->ns['ns' . $this->ns_count] = $ns;
-      $this->nsp[$ns] = 'ns' . $this->ns_count;
-      $this->ns_count++;
-    }
-    $this->used_ns = !in_array($ns, $this->used_ns) ? array_merge($this->used_ns, array($ns)) : $this->used_ns;
-    return $this->nsp[$ns];
-  }
-
-  function getPName($v) {
+  function xgetPName($v) {/* moved to merged getPName in ARC2_CLass */
     if (preg_match('/^([a-z0-9\_\-]+)\:([a-z\_][a-z0-9\_\-]*)$/i', $v, $m) && isset($this->ns[$m[1]])) {
       $this->used_ns = !in_array($this->ns[$m[1]], $this->used_ns) ? array_merge($this->used_ns, array($this->ns[$m[1]])) : $this->used_ns;
       return $v;

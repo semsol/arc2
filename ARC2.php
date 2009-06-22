@@ -5,27 +5,29 @@ license:  http://arc.semsol.org/license
 
 class:    ARC2 core class (static, not instantiated)
 author:   Benjamin Nowack
-version:  2009-03-05 (
+version:  2009-06-22 (
                       Tweak in ARC2_TurtleParser
                       Addition in ARC2_SPARQLParser
                       Tweak ARC2_Reader
                       Addition in ARC2_AtomParser
                       Addition in ARC2_StoreDeleteQueryHandler
+                      Tweaks in ARC2_RDFSerializer
+                      Tweaks in ARC2_Class
 )
 */
 
 class ARC2 {
 
   function getVersion() {
-    return '2009-03-05';
+    return '2009-06-22';
   }
 
   /*  */
   
   function setStatic($val) {
     static $arc_static = '';
-    if ($val) $arc_static = $val;
-    if (!$val) return $arc_static;
+    if ($val) $arc_static = $val;   /* set */
+    if (!$val) return $arc_static;  /* get */
   }
   
   function getStatic() {

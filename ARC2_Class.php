@@ -5,8 +5,9 @@ license:  http://arc.semsol.org/license
 
 class:    ARC2 base class
 author:   Benjamin Nowack
-version:  2009-03-31 (Addition: resetErrors method)
- * 2009-05-28: switch from getScriptURI to getRequestURI in init()
+version:  2009-03-31 (Addition: resetErrors method
+          2009-05-28 switch from getScriptURI to getRequestURI in init()
+          2009-06-22 refactored PName methods
 */
 
 class ARC2_Class {
@@ -24,6 +25,11 @@ class ARC2_Class {
 
   function __init() {/* base, time_limit */
     $this->inc_path = ARC2::getIncPath();
+    $this->ns_count = 0;
+    $this->nsp = array('http://www.w3.org/1999/02/22-rdf-syntax-ns#' => 'rdf');
+    $this->used_ns = array('http://www.w3.org/1999/02/22-rdf-syntax-ns#');
+    $this->ns = $this->v('ns', array(), $this->a);
+
     $this->base = $this->v('base', ARC2::getRequestURI(), $this->a);
     $this->errors = array();
     $this->warnings = array();
@@ -99,24 +105,70 @@ class ARC2_Class {
 
   /*  */
 
+  function getPName($v, $connector = ':') {
+    /* is already a pname */
+    if ($ns = $this->getPNameNamespace($v)) {
+      if (!in_array($ns, $this->used_ns)) $this->used_ns[] = $ns;
+      return $v;
+    }
+    /* new pname */
+    if ($parts = $this->splitURI($v)) {
+      /* known prefix */
+      foreach ($this->ns as $prefix => $ns) {
+        if ($parts[0] == $ns) {
+          return $prefix . $connector . $parts[1];
+        }
+      }
+      /* new prefix */
+      $prefix = $this->getPrefix($parts[0]);
+      return $prefix . $connector . $parts[1];
+    }
+    return $v;
+  }
+
+  function getPNameNamespace($v) {
+    if (!preg_match('/^([a-z0-9\_\-]+)\:([a-z0-9\_\-\.\%]*)$/i', $v, $m)) return 0;
+    if (!isset($this->ns[$m[1]])) return 0;
+    return $this->ns[$m[1]];
+  }
+
+  function getPrefix($ns) {
+    if (!isset($this->nsp[$ns])) {
+      $this->ns['ns' . $this->ns_count] = $ns;
+      $this->nsp[$ns] = 'ns' . $this->ns_count;
+      $this->ns_count++;
+    }
+    if (!in_array($ns, $this->used_ns)) $this->used_ns[] = $ns;
+    return $this->nsp[$ns];
+  }
+
   function expandPName($v) {
-    if (!isset($this->ns) && isset($this->a['ns'])) $this->ns = $this->a['ns'];
     if (preg_match('/^([a-z0-9\_\-]+)\:([a-z0-9\_\-]+)$/i', $v, $m) && isset($this->ns[$m[1]])) {
       return $this->ns[$m[1]] . $m[2];
     }
     return $v;
   }
 
-  function getPName($v, $connector = ':') {
-    if (!isset($this->ns) && isset($this->a['ns'])) $this->ns = $this->a['ns'];
-    if ($parts = $this->splitURI($v)) {
-      foreach ($this->ns as $p => $ns) {
-        if ($parts[0] == $ns) {
-          return $p . $connector . $parts[1];
+  function expandPNames($index) {
+    $r = array();
+    foreach ($index as $s => $ps) {
+      $s = $this->expandPName($s);
+      $r[$s] = array();
+      foreach ($ps as $p => $os) {
+        $p = $this->expandPName($p);
+        if (!is_array($os)) $os = array($os);
+        foreach ($os as $i => $o) {
+          if (!is_array($o)) {
+            $o_val = $this->expandPName($o);
+            $o_type = preg_match('/^[a-z]+\:[^\s]+$/si', $o_val) ? 'uri' : 'literal';
+            $o = array('value' => $o_val, 'type' => $o_type);
+          }
+          $os[$i] = $o;
         }
+        $r[$s][$p] = $os;
       }
     }
-    return $v;
+    return $r;
   }
 
   /*  */
@@ -126,7 +178,7 @@ class ARC2_Class {
     if (preg_match("/^[a-z0-9\_]+\:/i", $path)) {/* abs path or bnode */
       return $path;
     }
-    if (preg_match('/^\$\{/', $path)) {/* placeholder, assume abs URI */
+    if (preg_match('/^\$\{.*\}/', $path)) {/* placeholder, assume abs URI */
       return $path;
     }
     if (preg_match("/^\/\//", $path)) {/* net path, assume http */
