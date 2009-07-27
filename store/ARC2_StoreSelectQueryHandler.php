@@ -5,7 +5,7 @@ license:  http://arc.semsol.org/license
 
 class:    ARC2 RDF Store SELECT Query Handler
 author:   Benjamin Nowack
-version:  2009-02-13 (Tweak: removed "cid" references)
+version:  2009-07-17 Fix: missing brackets in getExpressionSQL
 */
 
 ARC2::inc('StoreQueryHandler');
@@ -1089,7 +1089,7 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler {
         $r = $keep ? $r : '';
       }
     }
-    return $r;
+    return $r ? '(' . $r . ')' : $r;
   }
   
   function detectExpressionValueType($pattern_ids) {

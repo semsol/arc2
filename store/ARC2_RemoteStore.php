@@ -5,7 +5,8 @@ license:  http://arc.semsol.org/license
 
 class:    ARC2 Remote RDF Store
 author:   Benjamin Nowack
-version:  2008-09-15 (Addition: support for "store_read_key" and "store_write_key" config options)
+version:  2009-07-23 Addition: automatic PREFIX injection
+                     Addition: getResourceLabel method
 */
 
 ARC2::inc('Class');
@@ -81,7 +82,7 @@ class ARC2_RemoteStore extends ARC2_Class {
       return $r['result'];
     }
     if ($result_format == 'rows') {
-      return $r['result']['rows'] ? $r['result']['rows'] : array();
+      return $this->v('rows', array(), $r['result']);
     }
     if ($result_format == 'row') {
       return $r['result']['rows'] ? $r['result']['rows'][0] : array();
@@ -93,6 +94,19 @@ class ARC2_RemoteStore extends ARC2_Class {
     /* ep */
     $ep = $this->v('remote_store_endpoint', 0, $this->a);
     if (!$ep) return false;
+    /* prefixes */
+    $ns = isset($this->a['ns']) ? $this->a['ns'] : array();
+    $added_prefixes = array();
+    $prologue = '';
+    foreach ($ns as $k => $v) {
+      $k = rtrim($k, ':');
+      if (in_array($k, $added_prefixes)) continue;
+      if (preg_match('/(^|\s)' . $k . ':/s', $q) && !preg_match('/PREFIX\s+' . $k . '\:/is', $q)) {
+        $prologue .=  "\n" . 'PREFIX ' . $k . ': <' . $v . '>';
+      }
+      $added_prefixes[] = $k;
+    }
+    $q = $prologue . "\n" . $q;
     /* http verb */
     $mthd = in_array($qt, array('load', 'insert', 'delete')) ? 'POST' : 'GET';
     /* reader */
@@ -152,5 +166,26 @@ class ARC2_RemoteStore extends ARC2_Class {
   function optimizeTables() {}
   
   /*  */
+
+  function getResourceLabel($res, $unnamed_label = 'An unnamed resource') {
+    if (!isset($this->resource_labels)) $this->resource_labels = array();
+    if (isset($this->resource_labels[$res])) return $this->resource_labels[$res];
+    if (!preg_match('/^[a-z0-9\_]+\:[^\s]+$/si', $res)) return $res;/* literal */
+    $r = '';
+    if (preg_match('/^\_\:/', $res)) {
+      return $unnamed_label;
+    }
+    $row = $this->query('SELECT ?o WHERE { <' . $res . '> ?p ?o . FILTER(REGEX(str(?p), "(label|name)$", "i"))}', 'row');
+    if ($row) {
+      $r = $row['o'];
+    }
+    else {
+      $r = preg_replace("/^(.*[\/\#])([^\/\#]+)$/", '\\2', str_replace('#self', '', $res));
+      $r = str_replace('_', ' ', $r);
+      $r = preg_replace('/([a-z])([A-Z])/e', '"\\1 " . strtolower("\\2")', $r);
+    }
+    $this->resource_labels[$res] = $r;
+    return $r;
+  }
 
 }

@@ -13,6 +13,8 @@ version:  2009-06-22 (
                       Addition in ARC2_StoreDeleteQueryHandler
                       Tweaks in ARC2_RDFSerializer
                       Tweaks in ARC2_Class
+                      Additions in ARC2_RemoteStore
+                      Tweak in ARC2_SPARQLScriptProcessor
 )
 */
 

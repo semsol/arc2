@@ -8,6 +8,8 @@ author:   Benjamin Nowack
 version:  2009-03-31 (Addition: resetErrors method
           2009-05-28 switch from getScriptURI to getRequestURI in init()
           2009-06-22 refactored PName methods
+          2009-07-20 added toDataURI/fromDataURI
+          2009-07-27 fixed root calculation bug in calcURI
 */
 
 class ARC2_Class {
@@ -116,6 +118,7 @@ class ARC2_Class {
       /* known prefix */
       foreach ($this->ns as $prefix => $ns) {
         if ($parts[0] == $ns) {
+          if (!in_array($ns, $this->used_ns)) $this->used_ns[] = $ns;
           return $prefix . $connector . $parts[1];
         }
       }
@@ -191,7 +194,7 @@ class ARC2_Class {
       return $base;
     }
     $path = preg_replace("/^\.\//", '', $path);
-    $root = preg_match('/(^[a-z0-9]+\:[\/]{1,2}[^\/]+)[\/|$]/i', $base, $m) ? $m[1] : $base; /* w/o trailing slash */
+    $root = preg_match('/(^[a-z0-9]+\:[\/]{1,3}[^\/]+)[\/|$]/i', $base, $m) ? $m[1] : $base; /* w/o trailing slash */
     $base .= ($base == $root) ? '/' : '';
     if (preg_match('/^\//', $path)) {/* leading slash */
       return $root . $path;
@@ -312,6 +315,14 @@ class ARC2_Class {
 
   function toUTF8($v) {
     return $this->adjust_utf8 ? ARC2::toUTF8($v) : $v;
+  }
+
+  function toDataURI($v) {
+    return 'data:text/plain;charset=utf-8,' . rawurlencode($v);
+  }
+
+  function fromDataURI($v) {
+    return str_replace('data:text/plain;charset=utf-8,', '', rawurldecode($v));
   }
 
   /*  */

@@ -5,7 +5,7 @@ license:  http://arc.semsol.org/license
 
 class:    ARC2 SPARQLScript Processor
 author:   
-version:  2008-10-08 (Tweak: GET/POST placeholders have to be uppercase now)
+version:  2009-07-09 (Tweak: improved PREFIX injection)
 */
 
 ARC2::inc('Class');
@@ -294,7 +294,9 @@ class ARC2_SPARQLScriptProcessor extends ARC2_Class {
     foreach ($ns as $k => $v) {
       $k = rtrim($k, ':');
       if (in_array($k, $added_prefixes)) continue;
-      $prologue .= (strpos($q, $k . ':') !== false) ? "\n" . 'PREFIX ' . $k . ': <' . $v . '>' : '';
+      if (preg_match('/(^|\s)' . $k . ':/s', $q) && !preg_match('/PREFIX\s+' . $k . '\:/is', $q)) {
+        $prologue .= "\n" . 'PREFIX ' . $k . ': <' . $v . '>';
+      }
       $added_prefixes[] = $k;
     }
     $q = $prologue . "\n" . $q;
