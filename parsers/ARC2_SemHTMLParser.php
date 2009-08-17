@@ -121,6 +121,7 @@ class ARC2_SemHTMLParser extends ARC2_LegacyXMLParser {
       $rest = $this->processData($rest . $d);
     }
     $this->reader->closeStream();
+    unset($this->reader);
     return $this->done();
   }
   

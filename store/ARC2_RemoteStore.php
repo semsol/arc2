@@ -134,7 +134,9 @@ class ARC2_RemoteStore extends ARC2_Class {
       $resp .= $d;
     }
     $reader->closeStream();
-    if ($ers = $reader->getErrors()) return array('errors' => $ers);
+    $ers = $reader->getErrors();
+    unset($this->reader);
+    if ($ers) return array('errors' => $ers);
 		$mappings = array('rdfxml' => 'RDFXML', 'sparqlxml' => 'SPARQLXMLResult', 'turtle' => 'Turtle');
     if (!$format || !isset($mappings[$format])) {
       return $resp;

@@ -1,11 +1,12 @@
 <?php
-/*
-homepage: http://arc.semsol.org/
-license:  http://arc.semsol.org/license
-
-class:    ARC2 RDF Store SELECT Query Handler
-author:   Benjamin Nowack
-version:  2009-07-17 Fix: missing brackets in getExpressionSQL
+/**
+ * ARC2 RDF Store SELECT Query Handler
+ *
+ * @license   http://arc.semsol.org/license
+ * @author    Benjamin Nowack
+ * @version   2009-08-17 Tweak: added \s to REGEX/LIKE check
+ *            2009-07-17 Fix: missing brackets in getExpressionSQL
+ *
 */
 
 ARC2::inc('StoreQueryHandler');
@@ -1025,9 +1026,13 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler {
         /* might be an alias */
         $r = 1;
         foreach ($this->infos['query']['result_vars'] as $r_var) {
-          if ($r_var['alias'] == $var) $r = 'alias';
+          //if ($r_var['alias'] == $var) $r = 'alias';
+          //if ($r_var['alias'] == $var) $r = 0;
+          break;
         }
-        return 1;
+        /* filter */
+        //if (in_array('filter', $types)) $r = 0;
+        if ($r) return $r;
       }
     }
     return 0;
@@ -1481,7 +1486,7 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler {
       if (!$sub_r_1 || !$sub_r_2) return '';
       $opt = ($sub_r_3 == 'i') ? '' : 'BINARY ';
       /* use like for simple patterns */
-      if (!$opt && preg_match('/^\"(\^)?([a-z0-9\_\-]+)(\$)?\"$/i', $sub_r_2, $m)) {
+      if (!$opt && preg_match('/^\"(\^)?([a-z0-9\_\-\s]+)(\$)?\"$/is', $sub_r_2, $m)) {
         $sub_r_2 = $m[1] ? $m[2] : '%' . $m[2];
         $sub_r_2 .= isset($m[3]) && $m[3] ? '' : '%';
         return $sub_r_1 . $op . ' LIKE "' . $sub_r_2 . '"';

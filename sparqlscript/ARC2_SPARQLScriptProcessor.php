@@ -539,6 +539,7 @@ class ARC2_SPARQLScriptProcessor extends ARC2_Class {
       $resp .= $d;
     }
     $reader->closeStream();
+    unset($this->reader);
     return array('value_type' => 'http_response', 'value' => $resp);
   }
   

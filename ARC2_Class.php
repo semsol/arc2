@@ -25,7 +25,12 @@ class ARC2_Class {
     $this->__construct($a, $caller);
   }
 
+  function __destruct() {
+    //echo "\ndestructing " . get_class($this);
+  }
+
   function __init() {/* base, time_limit */
+    if (!$_POST && isset($GLOBALS['HTTP_RAW_POST_DATA'])) parse_str($GLOBALS['HTTP_RAW_POST_DATA'], $_POST); /* php5 bug */
     $this->inc_path = ARC2::getIncPath();
     $this->ns_count = 0;
     $this->nsp = array('http://www.w3.org/1999/02/22-rdf-syntax-ns#' => 'rdf');
@@ -145,8 +150,12 @@ class ARC2_Class {
     return $this->nsp[$ns];
   }
 
-  function expandPName($v) {
-    if (preg_match('/^([a-z0-9\_\-]+)\:([a-z0-9\_\-]+)$/i', $v, $m) && isset($this->ns[$m[1]])) {
+  function expandPName($v, $connector = ':') {
+    $re = '/^([a-z0-9\_\-]+)\:([a-z0-9\_\-]+)$/i';
+    if ($connector == '-') {
+      $re = '/^([a-z0-9\_]+)\-([a-z0-9\_\-]+)$/i';
+    }
+    if (preg_match($re, $v, $m) && isset($this->ns[$m[1]])) {
       return $this->ns[$m[1]] . $m[2];
     }
     return $v;
@@ -237,7 +246,39 @@ class ARC2_Class {
   }
 
   /*  */
-  
+
+  function toIndex($v) {
+    if (is_array($v)) {
+      if (isset($v[0]) && isset($v[0]['s'])) return ARC::getSimpleIndex($v, 0);
+      return $v;
+    }
+    $parser = ARC2::getRDFParser($this->a);
+    if ($v && !preg_match('/\s/', $v)) {/* assume graph URI */
+      $parser->parse($v);
+    }
+    else {
+      $parser->parse('', $v);
+    }
+    return $parser->getSimpleIndex(0);
+  }
+
+  function toTriples($v) {
+    if (is_array($v)) {
+      if (isset($v[0]) && isset($v[0]['s'])) return $v;
+      return ARC2::getTriplesFromIndex($v);
+    }
+    $parser = ARC2::getRDFParser($this->a);
+    if ($v && !preg_match('/\s/', $v)) {/* assume graph URI */
+      $parser->parse($v);
+    }
+    else {
+      $parser->parse('', $v);
+    }
+    return $parser->getTriples();
+  }
+
+  /*  */
+
   function toNTriples($v, $ns = '', $raw = 0) {
     ARC2::inc('NTriplesSerializer');
     if (!$ns) $ns = isset($this->a['ns']) ? $this->a['ns'] : array();
@@ -313,18 +354,23 @@ class ARC2_Class {
 
   /*  */
 
-  function toUTF8($v) {
-    return $this->adjust_utf8 ? ARC2::toUTF8($v) : $v;
+  function toUTF8($str) {
+    return $this->adjust_utf8 ? ARC2::toUTF8($str) : $str;
   }
 
-  function toDataURI($v) {
-    return 'data:text/plain;charset=utf-8,' . rawurlencode($v);
+  function toDataURI($str) {
+    return 'data:text/plain;charset=utf-8,' . rawurlencode($str);
   }
 
-  function fromDataURI($v) {
-    return str_replace('data:text/plain;charset=utf-8,', '', rawurldecode($v));
+  function fromDataURI($str) {
+    return str_replace('data:text/plain;charset=utf-8,', '', rawurldecode($str));
   }
 
-  /*  */
+  /* prevent SQL injections via SPARQL REGEX */
+
+  function checkRegex($str) {
+    return addslashes($str);
+  }
   
+  /*  */
 }

@@ -153,6 +153,7 @@ class ARC2_TurtleParser extends ARC2_RDFParser {
     $sub_v = count($more_triples) ? $sub_v2 : $sub_v;
     $buffer = $sub_v;
     $this->reader->closeStream();
+    unset($this->reader);
     return $this->done();
   }
 

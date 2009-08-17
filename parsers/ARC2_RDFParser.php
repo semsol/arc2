@@ -29,6 +29,7 @@ class ARC2_RDFParser extends ARC2_Class {
     $this->skip_dupes = $this->v('skip_dupes', false, $this->a);
     $this->bnode_prefix = $this->v('bnode_prefix', 'arc'.substr(md5(uniqid(rand())), 0, 4).'b', $this->a);
     $this->bnode_id = 0;
+    $this->format = '';
   }
 
   /*  */
@@ -60,6 +61,7 @@ class ARC2_RDFParser extends ARC2_Class {
     if (!$format || !isset($mappings[$format])) {
       return $this->addError('No parser available for "' . $format . '".');
     }
+    $this->format = $format;
     /* format parser */
     $suffix = $mappings[$format] . 'Parser';
     ARC2::inc($suffix);

@@ -76,6 +76,7 @@ class ARC2_RDFXMLParser extends ARC2_RDFParser {
     $this->target_encoding = xml_parser_get_option($this->xml_parser, XML_OPTION_TARGET_ENCODING);
     xml_parser_free($this->xml_parser);
     $this->reader->closeStream();
+    unset($this->reader);
     return $this->done();
   }
   

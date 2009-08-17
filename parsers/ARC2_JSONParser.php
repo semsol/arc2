@@ -50,6 +50,7 @@ class ARC2_JSONParser extends ARC2_RDFParser {
       $doc .= $d;
     }
     $this->reader->closeStream();
+    unset($this->reader);
     $doc = preg_replace('/^[^\{]*(.*\})[^\}]*$/is', '\\1', $doc);
     $this->unparsed_code = $doc;
     list($this->struct, $rest) = $this->extractObject($doc);

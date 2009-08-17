@@ -51,7 +51,8 @@ class ARC2 {
     );
     foreach ($dirs as $k => $dir) {
       if (preg_match('/' . $k . '/i', $f)) {
-        return $r .= $dir . '/';
+        $r .= $dir . '/';
+        return $r;
       }
     }
     return $r;
@@ -226,7 +227,7 @@ class ARC2 {
     }
     return $r;
   }
-  
+
   function getMergedIndex() {
     $r = array();
     foreach (func_get_args() as $index) {
@@ -382,12 +383,16 @@ class ARC2 {
     return ARC2::getComponent('Store', $a);
   }
 
+  function getStoreEndpoint($a = '') {
+    return ARC2::getComponent('StoreEndpoint', $a);
+  }
+
   function getRemoteStore($a = '') {
     return ARC2::getComponent('RemoteStore', $a);
   }
 
-  function getStoreEndpoint($a = '') {
-    return ARC2::getComponent('StoreEndpoint', $a);
+  function getMemStore($a = '') {
+    return ARC2::getComponent('MemStore', $a);
   }
   
   /* serializers */
