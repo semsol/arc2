@@ -1,27 +1,18 @@
 <?php
-/*
-homepage: http://arc.semsol.org/
-license:  http://arc.semsol.org/license
-
-class:    ARC2 core class (static, not instantiated)
-author:   Benjamin Nowack
-version:  2009-06-22 (
-                      Tweak in ARC2_TurtleParser
-                      Addition in ARC2_SPARQLParser
-                      Tweak ARC2_Reader
-                      Addition in ARC2_AtomParser
-                      Addition in ARC2_StoreDeleteQueryHandler
-                      Tweaks in ARC2_RDFSerializer
-                      Tweaks in ARC2_Class
-                      Additions in ARC2_RemoteStore
-                      Tweak in ARC2_SPARQLScriptProcessor
-)
+/**
+ * ARC2 core class (static, not instantiated)
+ *
+ * @author Benjamin Nowack
+ * @license <http://arc.semsol.org/license>
+ * @homepage <http://arc.semsol.org/>
+ * @package ARC2
+ * @version 2009-08-21 /rev8
 */
 
 class ARC2 {
 
   function getVersion() {
-    return '2009-06-22';
+    return '2009-08-21';
   }
 
   /*  */

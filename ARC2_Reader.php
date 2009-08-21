@@ -5,9 +5,7 @@ license:  http://arc.semsol.org/license
 
 class:    ARC2 Web Reader
 author:   Benjamin Nowack
-version:  2009-04-20 (Tweak: Improved timeout handling
- * 2009-05-28: Tweak: support for port in http hedaer (thx to Roan O'Sullivan)
- * )
+version:  2009-08-17
 */
 
 ARC2::inc('Class');

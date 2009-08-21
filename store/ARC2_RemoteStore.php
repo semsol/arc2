@@ -5,8 +5,7 @@ license:  http://arc.semsol.org/license
 
 class:    ARC2 Remote RDF Store
 author:   Benjamin Nowack
-version:  2009-07-23 Addition: automatic PREFIX injection
-                     Addition: getResourceLabel method
+version:  2009-07-23
 */
 
 ARC2::inc('Class');

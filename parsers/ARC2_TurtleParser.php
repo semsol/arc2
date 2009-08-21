@@ -5,7 +5,7 @@ license:  http://arc.semsol.org/license
 
 class:    ARC2 SPARQL-enhanced Turtle Parser
 author:   Benjamin Nowack
-version:  2009-03-05 (Tweak: xIRI_REF is less strict now, the SPARQLParser got its own check)
+version:  2009-08-04
 */
 
 ARC2::inc('RDFParser');
