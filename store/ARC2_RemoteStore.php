@@ -70,7 +70,7 @@ class ARC2_RemoteStore extends ARC2_Class {
     $t1 = ARC2::mtime();
     if (!$errs = $p->getErrors()) {
       $qt = $infos['query']['type'];
-      $r = array('query_type' => $qt, 'result' => $this->runQuery($q, $qt));
+      $r = array('query_type' => $qt, 'result' => $this->runQuery($q, $qt, $infos));
     }
     else {
       $r = array('result' => '');
@@ -90,23 +90,17 @@ class ARC2_RemoteStore extends ARC2_Class {
     return $r;
   }
 
-  function runQuery($q, $qt = '') {
+  function runQuery($q, $qt = '', $infos = '') {
     /* ep */
     $ep = $this->v('remote_store_endpoint', 0, $this->a);
     if (!$ep) return false;
     /* prefixes */
-    $ns = isset($this->a['ns']) ? $this->a['ns'] : array();
-    $added_prefixes = array();
-    $prologue = '';
-    foreach ($ns as $k => $v) {
-      $k = rtrim($k, ':');
-      if (in_array($k, $added_prefixes)) continue;
-      if (preg_match('/(^|\s)' . $k . ':/s', $q) && !preg_match('/PREFIX\s+' . $k . '\:/is', $q)) {
-        $prologue .=  "\n" . 'PREFIX ' . $k . ': <' . $v . '>';
-      }
-      $added_prefixes[] = $k;
+    $q = $this->completeQuery($q);
+    /* special handling */
+    $mthd = 'run' . $this->camelCase($qt) . 'Query';
+    if (method_exists($this, $mthd)) {
+      return $this->$mthd($q, $infos);
     }
-    $q = $prologue . "\n" . $q;
     /* http verb */
     $mthd = in_array($qt, array('load', 'insert', 'delete')) ? 'POST' : 'GET';
     /* reader */

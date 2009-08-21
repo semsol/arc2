@@ -290,16 +290,7 @@ class ARC2_SPARQLScriptProcessor extends ARC2_Class {
     $q = $this->replacePlaceholders($block['query'], 'query');
     /* prefixes */
     $ns = isset($this->a['ns']) ? array_merge($this->a['ns'], $block['prefixes']) : $block['prefixes'];
-    $added_prefixes = array();
-    foreach ($ns as $k => $v) {
-      $k = rtrim($k, ':');
-      if (in_array($k, $added_prefixes)) continue;
-      if (preg_match('/(^|\s)' . $k . ':/s', $q) && !preg_match('/PREFIX\s+' . $k . '\:/is', $q)) {
-        $prologue .= "\n" . 'PREFIX ' . $k . ': <' . $v . '>';
-      }
-      $added_prefixes[] = $k;
-    }
-    $q = $prologue . "\n" . $q;
+    $q = $prologue . "\n" . $this->completeQuery($q, $ns);
     $this->env['query_log'][] = '(' . $ep_uri . ') ' . $q;
     if ($store = $this->getStore($ep_uri)) {
       $sub_r = $this->v('is_remote', '', $store) ? $store->query($q, '', $ep_uri) : $store->query($q);

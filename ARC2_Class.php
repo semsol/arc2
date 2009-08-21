@@ -247,9 +247,15 @@ class ARC2_Class {
 
   /*  */
 
+  function getResource($uri) {
+    $res = ARC2::getResource($this->a);
+    $res->setURI($uri);
+    return $res;
+  }
+  
   function toIndex($v) {
     if (is_array($v)) {
-      if (isset($v[0]) && isset($v[0]['s'])) return ARC::getSimpleIndex($v, 0);
+      if (isset($v[0]) && isset($v[0]['s'])) return ARC2::getSimpleIndex($v, 0);
       return $v;
     }
     $parser = ARC2::getRDFParser($this->a);
@@ -350,6 +356,21 @@ class ARC2_Class {
       $r .= "@prefix " . $k . ": <" .$v. "> .\n";
     }
     return $r;
+  }
+  
+  function completeQuery($q, $ns = '') {
+    if (!$ns) $ns = isset($this->a['ns']) ? $this->a['ns'] : array();
+    $added_prefixes = array();
+    $prologue = '';
+    foreach ($ns as $k => $v) {
+      $k = rtrim($k, ':');
+      if (in_array($k, $added_prefixes)) continue;
+      if (preg_match('/(^|\s)' . $k . ':/s', $q) && !preg_match('/PREFIX\s+' . $k . '\:/is', $q)) {
+        $prologue .= "\n" . 'PREFIX ' . $k . ': <' . $v . '>';
+      }
+      $added_prefixes[] = $k;
+    }
+    return $prologue . "\n" . $q;
   }
 
   /*  */

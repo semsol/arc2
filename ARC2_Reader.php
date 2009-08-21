@@ -33,8 +33,9 @@ class ARC2_Reader extends ARC2_Class {
     $this->format = $this->v('format', false, $this->a);
     $this->redirects = array();
     $this->stream_id = '';
-    $this->timeout = $this->v('reader_timeout', 30, $this->a);;
-
+    $this->timeout = $this->v('reader_timeout', 30, $this->a);
+    $this->response_headers = array();
+    $this->digest_auth = 0;
   }
 
   /*  */
@@ -83,6 +84,20 @@ class ARC2_Reader extends ARC2_Class {
       foreach ($creds as $pattern => $cred) {
         $regex = '/' . preg_replace('/([\:\/\.\?])/', '\\\\\1', $pattern) . '/';
         if (preg_match($regex, $path)) {
+          /* digest */
+          if (strpos($cred, '::')) {
+            $this->digest_auth = 1;
+            $h = $this->v('www-authenticate', '', $this->getResponseHeaders());
+            /* 401 received */
+            if ($h && preg_match('/Digest/i', $h)) {
+              /* Digest realm="$realm", nonce="$nonce", qop="auth", opaque="$opaque" */
+              foreach (array('realm', 'nonce', 'qop', 'opaque') as $k) {
+                $$k = preg_match('/' . $k . '=\"([^\"]+)\"/i', $h, $m) ? $m[1] : '';
+              }
+              
+            }
+          }
+          /* basic */
           $this->setCustomHeaders('Authorization: Basic ' . base64_encode($cred));
         }
       }
@@ -183,6 +198,7 @@ class ARC2_Reader extends ARC2_Class {
     }
     /* response headers */
     $h = array();
+    $this->response_headers = $h;
     if (!$this->ping_only) {
       do {
         $line = trim(fgets($s, 256));
@@ -201,11 +217,13 @@ class ARC2_Reader extends ARC2_Class {
       $h['format'] = strtolower(preg_replace('/^([^\s]+).*$/', '\\1', $this->v('content-type', '', $h)));
       $h['encoding'] = preg_match('/(utf\-8|iso\-8859\-1|us\-ascii)/', $this->v('content-type', '', $h), $m) ? strtoupper($m[1]) : '';
       $h['encoding'] = preg_match('/charset=\s*([^\s]+)/si', $this->v('content-type', '', $h), $m) ? strtoupper($m[1]) : $h['encoding'];
+      $this->response_headers = $h;
       /* result */
       if ($info['timed_out']) {
         return $this->addError('Connection timed out after ' . $this->timeout . ' seconds');
       }
       if ($v = $this->v('error', 0, $h)) {
+        /* */
         //return $this->addError($error);
         return $this->addError($error . ' "' . (!feof($s) ? trim(strip_tags(fread($s, 64))) . '..."' : ''));
       }
@@ -287,6 +305,13 @@ class ARC2_Reader extends ARC2_Class {
   }
     
   /*  */
+
+  function getResponseHeaders() {
+    if (isset($this->stream) && isset($this->stream['headers'])) {
+      return $this->stream['headers'];
+    }
+    return $this->response_headers;
+  }
   
   function getEncoding($default = 'UTF-8') {
     return $this->v1('encoding', $default, $this->stream['headers']);

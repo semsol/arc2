@@ -323,8 +323,14 @@ class ARC2 {
     return new $cls($a, new stdClass());
   }
   
+  /* resource */
+
+  function getResource($a = '') {
+    return ARC2::getComponent('Resource', $a);
+  }
+
   /* parsers */
-  
+
   function getParser($prefix, $a = '') {
     return ARC2::getComponent($prefix . 'Parser', $a);
   }

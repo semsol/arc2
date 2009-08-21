@@ -57,9 +57,11 @@ class ARC2_RdfaExtractor extends ARC2_RDFExtractor {
   /*  */
 
   function processNode($n, $ct, $level) {
+    if ($n['tag']=='cdata' || $n['tag']=='comment') return null; /* patch by tobyink */
     $ts_added = 0;
     /* step 1 */
     $lct = array();
+    $lct['prev_s'] = $this->v('prev_s', $this->v('p_s', '', $ct), $ct);
     $lct['recurse'] = 1;
     $lct['skip'] = 0;
     $lct['new_s'] = '';
@@ -76,7 +78,7 @@ class ARC2_RdfaExtractor extends ARC2_RDFExtractor {
     $rev_uris = $this->getAttributeURIs($n, $ct, $lct, 'rev');
     if (!$rel_uris && !$rev_uris) {
       foreach (array('about', 'src', 'resource', 'href') as $attr) {
-        if (isset($n['a'][$attr]) && (list($uri, $sub_v) = $this->xURI($n['a'][$attr], $lct['base'], $lct['ns'])) && $uri) {
+        if (isset($n['a'][$attr]) && (list($uri, $sub_v) = $this->xURI($n['a'][$attr], $lct['base'], $lct['ns'], '', $lct)) && $uri) {
           $lct['new_s'] = $uri;
           break;
         }
@@ -90,14 +92,15 @@ class ARC2_RdfaExtractor extends ARC2_RDFExtractor {
         }
         elseif ($ct['p_o']) {
           $lct['new_s'] = $ct['p_o'];
-          $lct['skip'] = 1;
+          //$lct['skip'] = 1;
+          if(!isset($n['a']['property'])) $lct['skip'] = 1;/* patch by masaka */
         }
       }
     }
     /* step 5 */
     else {
       foreach (array('about', 'src') as $attr) {
-        if (isset($n['a'][$attr]) && (list($uri, $sub_v) = $this->xURI($n['a'][$attr], $lct['base'], $lct['ns'])) && $uri) {
+        if (isset($n['a'][$attr]) && (list($uri, $sub_v) = $this->xURI($n['a'][$attr], $lct['base'], $lct['ns'], '', $lct)) && $uri) {
           $lct['new_s'] = $uri;
           break;
         }
@@ -114,7 +117,7 @@ class ARC2_RdfaExtractor extends ARC2_RDFExtractor {
         }
       }
       foreach (array('resource', 'href') as $attr) {
-        if (isset($n['a'][$attr]) && (list($uri, $sub_v) = $this->xURI($n['a'][$attr], $lct['base'], $lct['ns'])) && $uri) {
+        if (isset($n['a'][$attr]) && (list($uri, $sub_v) = $this->xURI($n['a'][$attr], $lct['base'], $lct['ns'], '', $lct)) && $uri) {
           $lct['cur_o_res'] = $uri;
           break;
         }
@@ -181,7 +184,8 @@ class ARC2_RdfaExtractor extends ARC2_RDFExtractor {
       }
     }
     /* step 10 */
-    if ($new_s = $lct['new_s']) {// ? 
+    if (!$lct['skip'] && ($new_s = $lct['new_s'])) {
+    //if ($new_s = $lct['new_s']) {
       if ($uris = $this->getAttributeURIs($n, $ct, $lct, 'property')) {
         foreach ($uris as $uri) {
           $lct['cur_o_lit'] = $this->getCurrentObjectLiteral($n, $lct, $ct);
@@ -202,6 +206,7 @@ class ARC2_RdfaExtractor extends ARC2_RDFExtractor {
       }
     }
     /* step 11 (10) */
+    $complete_triples = 0;
     if ($lct['recurse']) {
       if ($lct['skip']) {
         $new_ct = array_merge($ct, array('base' => $lct['base'], 'lang' => $lct['lang'], 'ns' => $lct['ns']));
@@ -217,7 +222,6 @@ class ARC2_RdfaExtractor extends ARC2_RDFExtractor {
         );
       }
       $sub_nodes = $this->getSubNodes($n);
-      $complete_triples = 0;
       foreach ($sub_nodes as $sub_node) {
         if ($this->processNode($sub_node, $new_ct, $level+1)) {
           $complete_triples = 1;
@@ -267,7 +271,7 @@ class ARC2_RdfaExtractor extends ARC2_RDFExtractor {
     $r = array();
     foreach ($vals as $val) {
       if(!trim($val)) continue;
-      if ((list($uri, $sub_v) = $this->xURI(trim($val), $lct['base'], $lct['ns'], $attr)) && $uri) {
+      if ((list($uri, $sub_v) = $this->xURI(trim($val), $lct['base'], $lct['ns'], $attr, $lct)) && $uri) {
         $r[] = $uri;
       }
     }
@@ -279,12 +283,18 @@ class ARC2_RdfaExtractor extends ARC2_RDFExtractor {
   function getCurrentObjectLiteral($n, $lct, $ct) {
     $xml_val = $this->getContent($n);
     $plain_val = $this->getPlainContent($n);
+    if (function_exists('html_entity_decode')) {
+      $plain_val = html_entity_decode($plain_val, ENT_QUOTES);
+    }
     $dt = $this->v('datatype', '', $n['a']);
-    list($dt_uri, $sub_v) = $this->xURI($dt, $lct['base'], $lct['ns']);
+    list($dt_uri, $sub_v) = $this->xURI($dt, $lct['base'], $lct['ns'], '', $lct);
     $dt = $dt ? $dt_uri : $dt;
     $r = array('value' => '', 'lang' => $lct['lang'], 'datatype' => $dt);
     if (isset($n['a']['content'])) {
       $r['value'] = $n['a']['content'];
+      if (function_exists('html_entity_decode')) {
+        $r['value'] = html_entity_decode($r['value'], ENT_QUOTES);
+      }
     }
     elseif ($xml_val == $plain_val) {
       $r['value'] = $plain_val;
@@ -319,18 +329,18 @@ class ARC2_RdfaExtractor extends ARC2_RDFExtractor {
   
   /*  */
   
-  function xURI($v, $base, $ns, $attr_type = '') {
+  function xURI($v, $base, $ns, $attr_type = '', $lct = '') {
     if ((list($sub_r, $sub_v) = $this->xBlankCURIE($v, $base, $ns)) && $sub_r) {
       return array($sub_r, $sub_v);
     }
-    if ((list($sub_r, $sub_v) = $this->xSafeCURIE($v, $base, $ns)) && $sub_r) {
+    if ((list($sub_r, $sub_v) = $this->xSafeCURIE($v, $base, $ns, $lct)) && $sub_r) {
       return array($sub_r, $sub_v);
     }
     if ((list($sub_r, $sub_v) = $this->xCURIE($v, $base, $ns)) && $sub_r) {
       return array($sub_r, $sub_v);
     }
-    if (preg_match('/^(rel|rev)$/', $attr_type) && preg_match('/^\s*(alternate|appendix|bookmark|cite|chapter|contents|copyright|glossary|help|icon|index|last|license|meta|next|p3pv1|prev|role|section|stylesheet|subsection|start|up)(\s|$)/s', $v, $m)) {
-      return array('http://www.w3.org/1999/xhtml/vocab#' . $m[1], preg_replace('/^\s*' . $m[1]. '/s', '', $v));
+    if (preg_match('/^(rel|rev)$/', $attr_type) && preg_match('/^\s*(alternate|appendix|bookmark|cite|chapter|contents|copyright|glossary|help|icon|index|last|license|meta|next|p3pv1|prev|role|section|stylesheet|subsection|start|up)(\s|$)/is', $v, $m)) {
+      return array('http://www.w3.org/1999/xhtml/vocab#' . strtolower($m[1]), preg_replace('/^\s*' . $m[1]. '/is', '', $v));
     }
     if (preg_match('/^(rel|rev)$/', $attr_type) && preg_match('/^[a-z0-9\.]+$/i', $v)) {
       return array(0, $v);
@@ -349,7 +359,12 @@ class ARC2_RdfaExtractor extends ARC2_RDFExtractor {
     return array(0, $v);
   }
   
-  function xSafeCURIE($v, $base, $ns) {
+  function xSafeCURIE($v, $base, $ns, $lct = '') {
+    /* empty */
+    if ($sub_r = $this->x('\[\]', $v)) {
+      $r = $lct ? $lct['prev_s'] : $base;/* should be current subject value */
+      return $sub_r[1] ? array($r, $sub_r[1]) : array($r, '');
+    }
     if ($sub_r = $this->x('\[([^\:]*)\:([^\]]*)\]', $v)) {
       if (!$sub_r[1]) return array('http://www.w3.org/1999/xhtml/vocab#' . $sub_r[2], '');
       if (isset($ns[$sub_r[1]])) {
@@ -360,7 +375,7 @@ class ARC2_RdfaExtractor extends ARC2_RDFExtractor {
   }
   
   function xCURIE($v, $base, $ns) {
-    if ($sub_r = $this->x('([a-z0-9\-\_]*)\:([a-z0-9\-\_\.]+)', $v)) {
+    if ($sub_r = $this->x('([a-z0-9\-\_]*)\:([^\s]+)', $v)) {
       if (!$sub_r[1]) return array('http://www.w3.org/1999/xhtml/vocab#' . $sub_r[2], '');
       if (isset($ns[$sub_r[1]])) {
         return array($ns[$sub_r[1]] . $sub_r[2], '');
