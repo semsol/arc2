@@ -1,14 +1,11 @@
 <?php
-/*
-homepage: http://arc.semsol.org/
-license:  http://arc.semsol.org/license
-
-class:    ARC2 RDF Store Table Manager
-author:   Benjamin Nowack
-version:  2009-02-13 (Tweak: removed cid column
-                      Addition: store_indexes config option
-                      Addition: extendColumns() method, changes mediumint to int
-          )
+/**
+ * ARC2 RDF Store Table Manager
+ *
+ * @license   http://arc.semsol.org/license
+ * @author    Benjamin Nowack
+ * @version   2009-09-07 Tweak: store_engine_type is a config option
+ *
 */
 
 ARC2::inc('Store');
@@ -25,6 +22,7 @@ class ARC2_StoreTableManager extends ARC2_Store {
 
   function __init() {/* db_con */
     parent::__init();
+    $this->engine_type = $this->v('store_engine_type', 'MyISAM', $this->a);
   }
 
   /*  */
@@ -33,7 +31,7 @@ class ARC2_StoreTableManager extends ARC2_Store {
     $v = $this->getDBVersion();
     $r = "";
     $r .= (($v < '04-01-00') && ($v >= '04-00-18')) ? 'ENGINE' : (($v >= '04-01-02') ? 'ENGINE' : 'TYPE');
-    $r .= "=MyISAM";
+    $r .= "=" . $this->engine_type;
     $r .= ($v >= '04-00-00') ? " CHARACTER SET utf8" : "";
     $r .= ($v >= '04-01-00') ? " COLLATE utf8_unicode_ci" : "";
     $r .= " DELAY_KEY_WRITE = 1";

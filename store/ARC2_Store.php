@@ -265,7 +265,7 @@ class ARC2_Store extends ARC2_Class {
     $infos = array('query' => array('url' => $g, 'target_graph' => $g));
     ARC2::inc('StoreLoadQueryHandler');
     $h =& new ARC2_StoreLoadQueryHandler($this->a, $this);
-    $r = $h->runQuery($infos, $doc, $keep_bnode_ids); 
+    $r = $h->runQuery($infos, $doc, $keep_bnode_ids);
     $this->processTriggers('insert', $infos);
     return $r;
   }
@@ -377,8 +377,16 @@ class ARC2_Store extends ARC2_Class {
     $cls = 'ARC2_Store' . ucfirst($type) . 'QueryHandler';
     $h =& new $cls($this->a, $this);
     $ticket = 1;
+    $r = array();
     if ($q && ($type == 'select')) $ticket = $this->getQueueTicket($q);
-    $r = $ticket ? $h->runQuery($infos, $keep_bnode_ids) : array();
+    if ($ticket) {
+      if ($type == 'load') {/* the LoadQH supports raw data as 2nd parameter */
+        $r = $h->runQuery($infos, '', $keep_bnode_ids);
+      }
+      else {
+        $r = $h->runQuery($infos, $keep_bnode_ids);
+      }
+    }
     if ($q && ($type == 'select')) $this->removeQueueTicket($ticket);
     $trigger_r = $this->processTriggers($type, $infos);
     return $r;

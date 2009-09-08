@@ -23,6 +23,7 @@ class ARC2_Resource extends ARC2_Class {
     $this->uri = '';
     $this->index = array();
     $this->fetched = array();
+    $this->store = '';
   }
 
   /*  */
@@ -36,22 +37,34 @@ class ARC2_Resource extends ARC2_Class {
     $this->index[$s] = $props;
   }
 
+  function setStore($store) {
+    $this->store = $store;
+  }
+
   /*  */
 
-  function fetchData($uri) {
+  function fetchData($uri = '') {
+    if (!$uri) $uri = $this->uri;
     if (!$uri) return 0;
     if (in_array($uri, $this->fetched)) return 0;
     $this->index[$uri] = array();
-    $this->index = ARC2::getMergedIndex($this->index, $this->toIndex($uri));
+    if ($this->store) {
+      $index = $this->store->query('DESCRIBE <' . $uri . '>', 'raw');
+    }
+    else {
+      $index = $this->toIndex($uri);
+    }
+    $this->index = ARC2::getMergedIndex($this->index, $index);
     $this->fetched[] = $uri;
   }
 
   /*  */
   
-  function getProps($p, $s = '') {
+  function getProps($p = '', $s = '') {
     if (!$s) $s = $this->uri;
     if (!$s) return array();
     if (!isset($this->index[$s])) $this->fetchData($s);
+    if (!$p) return $this->index[$s];
     return $this->v($this->expandPName($p), array(), $this->index[$s]);
   }
 
@@ -63,6 +76,15 @@ class ARC2_Resource extends ARC2_Class {
   function getPropValue($p, $s = '') {
     $prop = $this->getProp($p, $s);
     return $prop ? $prop['value'] : '';
+  }
+
+  function getPropValues($p, $s = '') {
+    $r = array();
+    $props = $this->getProps($p, $s);
+    foreach ($props as $prop) {
+      $r[] = $prop['value'];
+    }
+    return $r;
   }
 
   function hasPropValue($p, $o, $s = '') {

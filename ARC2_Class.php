@@ -242,9 +242,15 @@ class ARC2_Class {
 
   /*  */
 
-  function getResource($uri) {
+  function getResource($uri, $store_or_props = '') {
     $res = ARC2::getResource($this->a);
     $res->setURI($uri);
+    if (is_array($store_or_props)) {
+      $res->setProps($store_or_props);
+    }
+    else {
+      $res->setStore($store_or_props);
+    }
     return $res;
   }
   

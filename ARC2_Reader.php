@@ -77,27 +77,50 @@ class ARC2_Reader extends ARC2_Class {
     }
   }
 
-  function setCredentials($path) {
-    if ($creds = $this->v('arc_reader_credentials', array(), $this->a)) {
-      foreach ($creds as $pattern => $cred) {
-        $regex = '/' . preg_replace('/([\:\/\.\?])/', '\\\\\1', $pattern) . '/';
-        if (preg_match($regex, $path)) {
-          /* digest */
-          if (strpos($cred, '::')) {
-            $this->digest_auth = 1;
-            $h = $this->v('www-authenticate', '', $this->getResponseHeaders());
-            /* 401 received */
-            if ($h && preg_match('/Digest/i', $h)) {
-              /* Digest realm="$realm", nonce="$nonce", qop="auth", opaque="$opaque" */
-              foreach (array('realm', 'nonce', 'qop', 'opaque') as $k) {
-                $$k = preg_match('/' . $k . '=\"([^\"]+)\"/i', $h, $m) ? $m[1] : '';
-              }
-              
-            }
+  function setCredentials($url) {
+    if (!$creds = $this->v('arc_reader_credentials', array(), $this->a))  return 0;
+    foreach ($creds as $pattern => $cred) {
+      $regex = '/' . preg_replace('/([\:\/\.\?])/', '\\\\\1', $pattern) . '/';
+      if (!preg_match($regex, $url)) continue;
+      $parts = parse_url($url);
+      $path = $this->v1('path', '/', $parts);
+      /* Basic auth */
+      $auth = 'Basic ' . base64_encode($cred);
+      /* Digest auth */
+      if (preg_match('/(.*)\:\:(.*)/', $cred, $m)) {
+        $username = $m[1];
+        $pwd = $m[2];
+        $auth = '';
+        $h = $this->v('www-authenticate', '', $this->getResponseHeaders());
+        /* 401 received */
+        if ($h && preg_match('/Digest/i', $h)) {
+          $auth = 'Digest ';
+          /* Digest realm="$realm", nonce="$nonce", qop="auth", opaque="$opaque" */
+          $ks = array('realm', 'nonce', 'opaque');/* skipping qop, assuming "auth" */
+          $qop = 'auth';
+          foreach ($ks as $i => $k) {
+            $$k = preg_match('/' . $k . '=\"?([^\"]+)\"?/i', $h, $m) ? $m[1] : '';
+            $auth .= ($i ? ', ' : '') . $k . '="' . $$k . '"';
           }
-          /* basic */
-          $this->setCustomHeaders('Authorization: Basic ' . base64_encode($cred));
+          $ha1 = md5($username . ':' . $realm . ':' . $pwd);
+          $ha2 = md5($this->http_method . ':' . $path);
+          $nc = '0001';     /* @@todo proper request counting */
+          $cnonce = '0123'; /* @@todo proper request counting */
+          $resp = md5($ha1 . ':' . $nonce . ':' . $nc . ':' . $cnonce . ':' . $qop . ':' . $ha2);
+          $auth .= ', username="' . $username . '"' .
+            ', uri="' . $path . '"' .
+            ', qop=' . $qop . '' .
+            ', nc=' . $nc .
+            ', cnonce="' . $cnonce . '"' .  /* @@todo proper request counting */
+            ', uri="' . $path . '"' .
+            ', response="' . $resp . '"' .
+          '';
         }
+      }
+      /* add header */
+      if ($auth) {
+        $this->setCustomHeaders('Authorization: ' . $auth);
+        break;
       }
     }
   }
@@ -220,11 +243,18 @@ class ARC2_Reader extends ARC2_Class {
       if ($info['timed_out']) {
         return $this->addError('Connection timed out after ' . $this->timeout . ' seconds');
       }
+      /* error */
       if ($v = $this->v('error', 0, $h)) {
-        /* */
-        //return $this->addError($error);
+        /* digest auth */
+        /* 401 received */
+        if (preg_match('/Digest/i', $this->v('www-authenticate', '', $h)) && !$this->digest_auth) {
+          $this->setCredentials($url);
+          $this->digest_auth = 1;
+          return $this->getHTTPSocket($url);
+        }
         return $this->addError($error . ' "' . (!feof($s) ? trim(strip_tags(fread($s, 64))) . '..."' : ''));
       }
+      /* redirect */
       if ($this->v('redirect', 0, $h) && ($new_url = $this->v1('location', 0, $h))) {
         fclose($s);
         $this->redirects[$url] = $new_url;

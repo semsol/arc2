@@ -95,7 +95,7 @@ class ARC2_RemoteStore extends ARC2_Class {
     if (!$ep) return false;
     /* prefixes */
     $q = $this->completeQuery($q);
-    /* special handling */
+    /* custom handling */
     $mthd = 'run' . $this->camelCase($qt) . 'Query';
     if (method_exists($this, $mthd)) {
       return $this->$mthd($q, $infos);

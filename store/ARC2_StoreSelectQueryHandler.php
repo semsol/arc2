@@ -4,8 +4,7 @@
  *
  * @license   http://arc.semsol.org/license
  * @author    Benjamin Nowack
- * @version   2009-08-17 Tweak: added \s to REGEX/LIKE check
- *            2009-07-17 Fix: missing brackets in getExpressionSQL
+ * @version   2009-09-07 Tweak: store_engine_type is a config option
  *
 */
 
@@ -26,6 +25,7 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler {
     $this->store =& $this->caller;
     $con = $this->store->getDBCon();
     $this->handler_type = 'select';
+    $this->engine_type = $this->v('store_engine_type', 'MyISAM', $this->a);
   }
 
   /*  */
@@ -92,8 +92,8 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler {
     //$tmp_sql = 'CREATE TABLE ' . $tmp_tbl . ' ( ' . $this->getTempTableDef($tmp_tbl, $q_sql) . ') '; /* mysql sometimes chokes on temp */
     $v = $this->store->getDBVersion();
     $tmp_sql .= (($v < '04-01-00') && ($v >= '04-00-18')) ? 'ENGINE' : (($v >= '04-01-02') ? 'ENGINE' : 'TYPE');
-    //$tmp_sql .= ($v < '04-01-00') ? '=MYISAM' : '=MEMORY';/* HEAP doesn't support AUTO_INCREMENT */
-    $tmp_sql .= '=MYISAM';/* HEAP doesn't support AUTO_INCREMENT, and MySQL breaks on MEMORY sometimes */
+    //$tmp_sql .= ($v < '04-01-00') ? '=' . $this->engine_type : '=MEMORY';/* HEAP doesn't support AUTO_INCREMENT */
+    $tmp_sql .= '=' . $this->engine_type;/* HEAP doesn't support AUTO_INCREMENT, and MySQL breaks on MEMORY sometimes */
     if (!mysql_query($tmp_sql, $con) && !mysql_query(str_replace('CREATE TEMPORARY', 'CREATE', $tmp_sql), $con)) {
       return $this->addError(mysql_error($con));
     }
