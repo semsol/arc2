@@ -1,14 +1,12 @@
 <?php
-/*
-homepage: http://arc.semsol.org/
-license:  http://arc.semsol.org/license
-
-class:    ARC2 RDF Store LOAD Query Handler
-author:   Benjamin Nowack
-version:  2009-02-13 (Tweak: removed "cid" references
-                      Addition: column checks
-                      Addition: store_write_buffer config option
-)
+/**
+ * ARC2 RDF Store LOAD Query Handler
+ *
+ * @author Benjamin Nowack
+ * @license <http://arc.semsol.org/license>
+ * @homepage <http://arc.semsol.org/>
+ * @package ARC2
+ * @version 2009-09-23
 */
 
 ARC2::inc('StoreQueryHandler');
