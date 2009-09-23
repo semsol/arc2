@@ -29,6 +29,7 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler {
     $this->write_buffer_size = $this->v('store_write_buffer', 2500, $this->a);
     $this->keep_time_limit = $this->v('keep_time_limit', 0, $this->a);
     $this->split_threshold = $this->v('store_split_threshold', 0, $this->a);
+    $this->has_pcre_unicode = @preg_match('/\pL/u', 'test');
   }
 
   /*  */
@@ -263,6 +264,29 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler {
     if (preg_match('/^[0-9]{1,2}\s+[a-z]+\s+[0-9]{4}/i', $val) && ($uts = strtotime($val)) && ($uts !== -1)) {
       return date("Y-m-d\TH:i:s", $uts);
     }
+    /* xsd date (e.g. 2009-05-28T18:03:38+09:00 2009-05-28T18:03:38GMT) */
+    if (preg_match('/^([0-9]{4}\-[0-9]{2}\-[0-9]{2}\T)([0-9\:]+)?([0-9\+\-\:\Z]+)?(\s*[a-z]{2,3})?$/si', $val, $m)) {
+      /* yyyy-mm-dd */
+      $val = $m[1];
+      /* hh:ss */
+      if ($m[2]) {
+        $val .= $m[2];
+        /* timezone offset */
+        if ($m[3] != 'Z') {
+          $uts = strtotime(str_replace('T', ' ', $val));
+          if (preg_match('/([\+\-])([0-9]{2})\:?([0-9]{2})$/', $m[3], $sub_m)) {
+            $diff_mins = (3600 * ltrim($sub_m[2], '0')) + ltrim($sub_m[3], '0');
+            $uts = ($m[1] == '-') ? $uts + $diff_mins : $uts - $diff_mins;
+            $val = date('Y-m-d\TH:i:s\Z', $uts);
+          }
+        }
+        else {
+          $val .= 'Z';
+        }
+      }
+      return $val;
+    }
+    /* fallback & backup w/o UTC calculation, to be removed in later revision */
     if (preg_match('/^[0-9]{4}[0-9\-\:\T\Z\+]+([a-z]{2,3})?$/i', $val)) {
       return $val;
     }
@@ -276,8 +300,10 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler {
       }
       return $val;
     }
-		/* any other string: remove tags, linebreaks etc.  */
-    $val = substr(trim(preg_replace('/[\W\s]+/is', '-', strip_tags($val))), 0, 35);
+		/* any other string: remove tags, linebreaks etc., but keep MB-chars  */
+    //$val = substr(trim(preg_replace('/[\W\s]+/is', '-', strip_tags($val))), 0, 35);
+    $re = $this->has_pcre_unicode ? '/[\PL\s]+/isu' : '/[\s\'\"\´\`]+/is';
+    $val = substr(trim(preg_replace($re, '-', strip_tags($val))), 0, 35);
     return $this->toUTF8($val);
   }
   

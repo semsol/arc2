@@ -1,10 +1,12 @@
 <?php
-/*
-homepage: http://arc.semsol.org/
-license:  http://arc.semsol.org/license
-
-class:    ARC2 base class
-author:   Benjamin Nowack
+/**
+ * ARC2 base class
+ *
+ * @author Benjamin Nowack
+ * @license <http://arc.semsol.org/license>
+ * @homepage <http://arc.semsol.org/>
+ * @package ARC2
+ * @version 2009-09-23
 */
 
 class ARC2_Class {
@@ -36,6 +38,7 @@ class ARC2_Class {
     $this->errors = array();
     $this->warnings = array();
     $this->adjust_utf8 = $this->v('adjust_utf8', 0, $this->a);
+    $this->max_errors = $this->v('max_errors', 25, $this->a);
   }
 
   /*  */
@@ -80,6 +83,9 @@ class ARC2_Class {
     if ($this->caller && method_exists($this->caller, 'addError')) {
       $glue = strpos($v, ' in ') ? ' via ' : ' in ';
       $this->caller->addError($v . $glue . get_class($this));
+    }
+    if (count($this->errors) > $this->max_errors) {
+      die('Too many errors: ' . print_r($this->errors, 1));
     }
     return false;
   }
