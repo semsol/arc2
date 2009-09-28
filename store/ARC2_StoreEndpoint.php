@@ -1,11 +1,12 @@
 <?php
-/*
-homepage: http://arc.semsol.org/
-license:  http://arc.semsol.org/license
-
-class:    ARC2 SPARQL Endpoint
-author:   Benjamin Nowack
-version:  2008-09-03 (Addition: support for "sql" and "infos" result formats (activate the former via "endpoint_enable_sql_output"))
+/**
+ * ARC2 SPARQL Endpoint
+ *
+ * @author Benjamin Nowack
+ * @license <http://arc.semsol.org/license>
+ * @homepage <http://arc.semsol.org/>
+ * @package ARC2
+ * @version 2009-09-28
 */
 
 ARC2::inc('Store');
