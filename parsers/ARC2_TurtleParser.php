@@ -5,7 +5,7 @@ license:  http://arc.semsol.org/license
 
 class:    ARC2 SPARQL-enhanced Turtle Parser
 author:   Benjamin Nowack
-version:  2009-08-04
+version:  2009-10-05
 */
 
 ARC2::inc('RDFParser');
@@ -143,7 +143,7 @@ class ARC2_TurtleParser extends ARC2_RDFParser {
       $loops++;
       $buffer = $sub_v;
       if ($loops > 100) {/* most probably a parser or code bug, might also be a huge object value, though */
-        $this->addError('too many loops: ' . $loops);
+        $this->addError('too many loops: ' . $loops . '. Could not parse "' . substr($buffer, 0, 200) . '..."');
         break;
       }
     }
@@ -631,7 +631,7 @@ class ARC2_TurtleParser extends ARC2_RDFParser {
     if (($r = $this->x('\<(\$\{[^\>]*\})\>', $v)) && ($sub_r = $this->xPlaceholder($r[1]))) {
       return array($r[1], $r[2]);
     }
-    elseif ($r = $this->x('\<([^\<\>\s]*)\>', $v)) {
+    elseif ($r = $this->x('\<([^\s][^\<\>]*)\>', $v)) {
       return array($r[1] ? $r[1] : true, $r[2]);
     }
     return array(0, $v);

@@ -5,7 +5,7 @@ license:  http://arc.semsol.org/license
 
 class:    ARC2 SPARQL Parser
 author:   Benjamin Nowack
-version:  2009-05-28: switch from getScriptURI to getRequestURI in parse()
+version:  2009-10-05
 */
 
 ARC2::inc('TurtleParser');
@@ -767,7 +767,7 @@ class ARC2_SPARQLParser extends ARC2_TurtleParser {
     if (($r = $this->x('\<(\$\{[^\>]*\})\>', $v)) && ($sub_r = $this->xPlaceholder($r[1]))) {
       return array($r[1], $r[2]);
     }
-    elseif ($r = $this->x('\<([^\<\>\"\|\^`\s]*)\>', $v)) {
+    elseif ($r = $this->x('\<([^\<\>\s\"\|\^`]*)\>', $v)) {
       return array($r[1] ? $r[1] : true, $r[2]);
     }
     return array(0, $v);
