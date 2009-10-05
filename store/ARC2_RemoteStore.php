@@ -40,8 +40,7 @@ class ARC2_RemoteStore extends ARC2_Class {
   function drop() {}
   
   function insert($doc, $g, $keep_bnode_ids = 0) {
-    $doc = is_array($doc) ? $this->toTurtle($doc) : $doc;
-    return $this->query('INSERT INTO <' . $g . '> { ' . $doc . ' }');
+    return $this->query('INSERT INTO <' . $g . '> { ' . $this->toNTriples($doc, '', 1) . ' }');
   }
   
   function delete($doc, $g) {
@@ -49,8 +48,7 @@ class ARC2_RemoteStore extends ARC2_Class {
       return $this->query('DELETE FROM <' . $g . '>');
     }
     else {
-      $doc = is_array($doc) ? $this->toTurtle($doc) : $doc;
-      return $this->query('DELETE FROM <' . $g . '> { ' . $doc . ' }');
+      return $this->query('DELETE FROM <' . $g . '> { ' . $this->toNTriples($doc, '', 1) . ' }');
     }
   }
   

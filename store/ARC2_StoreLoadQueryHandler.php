@@ -6,7 +6,7 @@
  * @license <http://arc.semsol.org/license>
  * @homepage <http://arc.semsol.org/>
  * @package ARC2
- * @version 2009-09-23
+ * @version 2009-10-05
 */
 
 ARC2::inc('StoreQueryHandler');
@@ -28,6 +28,7 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler {
     $this->keep_time_limit = $this->v('keep_time_limit', 0, $this->a);
     $this->split_threshold = $this->v('store_split_threshold', 0, $this->a);
     $this->has_pcre_unicode = @preg_match('/\pL/u', 'test');
+    $this->strip_mb_comp_str = $this->v('store_strip_mb_comp_str', 0, $this->a);
   }
 
   /*  */
@@ -301,7 +302,11 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler {
 		/* any other string: remove tags, linebreaks etc., but keep MB-chars  */
     //$val = substr(trim(preg_replace('/[\W\s]+/is', '-', strip_tags($val))), 0, 35);
     $re = $this->has_pcre_unicode ? '/[\PL\s]+/isu' : '/[\s\'\"\´\`]+/is';
-    $val = substr(trim(preg_replace($re, '-', strip_tags($val))), 0, 35);
+    $val = trim(preg_replace($re, '-', strip_tags($val)));
+    $val = function_exists("mb_substr") ? mb_substr($val, 0, 35) : substr($val, 0, 35);
+    if ($this->strip_mb_comp_str) {
+      $val = urldecode(preg_replace('/\%[0-9A-F]{2}/', '', urlencode($val)));
+    }
     return $this->toUTF8($val);
   }
   
