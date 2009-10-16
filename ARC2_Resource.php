@@ -32,6 +32,10 @@ class ARC2_Resource extends ARC2_Class {
     $this->uri = $uri;
   }
 
+  function setIndex($index) {
+    $this->index = $index;
+  }
+
   function setProps($props, $s = '') {
     if (!$s) $s = $this->uri;
     $this->index[$s] = $props;

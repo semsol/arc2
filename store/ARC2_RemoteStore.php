@@ -82,6 +82,7 @@ class ARC2_RemoteStore extends ARC2_Class {
       return $this->v('rows', array(), $r['result']);
     }
     if ($result_format == 'row') {
+      if (!isset($r['result']['rows'])) return array();
       return $r['result']['rows'] ? $r['result']['rows'][0] : array();
     }
     return $r;
