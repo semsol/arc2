@@ -1,11 +1,11 @@
 <?php
-/*
-homepage: http://arc.semsol.org/
-license:  http://arc.semsol.org/license
-
-class:    ARC2 Remote RDF Store
-author:   Benjamin Nowack
-version:  2009-07-23
+/**
+ * ARC2 Remote RDF Store
+ *
+ * @author Benjamin Nowack <bnowack@semsol.com>
+ * @license http://arc.semsol.org/license
+ * @package ARC2
+ * @version 2009-10-16
 */
 
 ARC2::inc('Class');

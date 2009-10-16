@@ -2,8 +2,10 @@
 /**
  * ARC2 Resource object
  *
- * @version 2009-08-17
- *
+ * @author Benjamin Nowack <bnowack@semsol.com>
+ * @license http://arc.semsol.org/license
+ * @package ARC2
+ * @version 2009-10-16
 */
 
 ARC2::inc('Class');

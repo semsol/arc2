@@ -1,11 +1,11 @@
 <?php
-/*
-homepage: http://arc.semsol.org/
-license:  http://arc.semsol.org/license
-
-function: format detection
-author:   Benjamin Nowack
-version:  2009-02-09 (Tweak: basic multi-line ntriples/turtle is now supported)
+/**
+ * ARC2 format detection function
+ *
+ * @author Benjamin Nowack <bnowack@semsol.com>
+ * @license http://arc.semsol.org/license
+ * @package ARC2
+ * @version 2009-10-16
 */
 
 function ARC2_getFormat($v, $mtype = '', $ext = '') {
