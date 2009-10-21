@@ -631,6 +631,9 @@ class ARC2_TurtleParser extends ARC2_RDFParser {
     if (($r = $this->x('\<(\$\{[^\>]*\})\>', $v)) && ($sub_r = $this->xPlaceholder($r[1]))) {
       return array($r[1], $r[2]);
     }
+    elseif ($r = $this->x('\<\>', $v)) {
+      return array(true, $r[1]);
+    }
     elseif ($r = $this->x('\<([^\s][^\<\>]*)\>', $v)) {
       return array($r[1] ? $r[1] : true, $r[2]);
     }
