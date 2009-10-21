@@ -451,8 +451,8 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler {
               if ($is_s || $is_o) {
                 $r .= ', ' . $nl . '    NULL AS `' . $var_name . ' type`';
               }
-              /* lang_dt / always add it in UNION queries, the var may be used as subject and object */
-              if ($is_o || ($is_s && $this->is_union_query)) {
+              /* lang_dt / always add it in UNION queries, the var may be used as s/p/o */
+              if ($is_o || $this->is_union_query) {
                 $r .= ', ' . $nl . '    NULL AS `' . $var_name . ' lang_dt`';
               }
             }
