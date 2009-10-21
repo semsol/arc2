@@ -6,7 +6,7 @@
  * @license <http://arc.semsol.org/license>
  * @homepage <http://arc.semsol.org/>
  * @package ARC2
- * @version 2009-09-28
+ * @version 2009-10-19
 */
 
 ARC2::inc('Store');
@@ -328,6 +328,7 @@ class ARC2_StoreEndpoint extends ARC2_Store {
       'sql' => ($this->allow_sql ? 'Plain' : 'xSQL'),
       'infos' => 'Plain',
       'htmltab' => 'HTMLTable',
+      'tsv' => 'TSV',
     );
     if ($f = $this->getResultFormat($formats, 'xml')) {
       $m = 'get' . $f . 'SelectResultDoc';
@@ -479,7 +480,7 @@ class ARC2_StoreEndpoint extends ARC2_Store {
       </html>
     ';
   }
-  
+
   function getHTMLTableRows($rows, $vars) {
     $r = '';
     foreach ($rows as $row) {
@@ -493,6 +494,31 @@ class ARC2_StoreEndpoint extends ARC2_Store {
       $r .= '<tr>' . $rr . '</tr>';
     }
     return $r ? $r : '<em>No results found</em>';
+  }
+
+  function getTSVSelectResultDoc($r) {
+    $this->setHeader('content-type', 'Content-Type: text/plain; charset=utf-8');
+    $vars = $r['result']['variables'];
+    $rows = $r['result']['rows'];
+    $dur = $r['query_time'];
+    return $this->getTSVRows($rows, $vars);
+  }
+
+  function getTSVRows($rows, $vars) {
+    $r = '';
+    $delim = "\t";
+    $esc_delim = "\\t";
+    foreach ($rows as $row) {
+      $hr = '';
+      $rr = '';
+      foreach ($vars as $var) {
+        $hr .= $r ? '' : ($hr ? $delim . $var : $var);
+        $val = isset($row[$var]) ? str_replace($delim, $esc_delim, $row[$var]) : '';
+        $rr .= $rr ? $delim . $val : $val;
+      }
+      $r .= $hr . "\n" . $rr;
+    }
+    return $r ? $r : 'No results found';
   }
 
   /* ASK */
@@ -1017,6 +1043,7 @@ class ARC2_StoreEndpoint extends ARC2_Store {
               <option value="infos" ' . ($sel == 'infos' ? $sel_code : '') . '>Query Structure</option>
               ' . ($this->allow_sql ? '<option value="sql" ' . ($sel == 'sql' ? $sel_code : '') . '>SQL</option>' : '') . '
               <option value="htmltab" ' . ($sel == 'htmltab' ? $sel_code : '') . '>HTML Table</option>
+              <option value="tsv" ' . ($sel == 'tsv' ? $sel_code : '') . '>TSV</option>
             </select>
           </dd>
           

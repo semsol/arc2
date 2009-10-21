@@ -42,7 +42,7 @@ class ARC2_SPARQLPlusParser extends ARC2_SPARQLParser {
   function xResultVar($v) {
     $aggregate = '';
     /* aggregate */
-    if ($sub_r = $this->x('(AVG|COUNT|MAX|MIN|SUM)\s*\(\s*([^\)]+)\)\s+AS\s+([^\s]+)', $v)) {
+    if ($sub_r = $this->x('\(?(AVG|COUNT|MAX|MIN|SUM)\s*\(\s*([^\)]+)\)\s+AS\s+([^\s\)]+)\)?', $v)) {
       $aggregate = $sub_r[1];
       $result_var = $sub_r[3];
       $v = $sub_r[2] . $sub_r[4];
@@ -195,9 +195,9 @@ class ARC2_SPARQLPlusParser extends ARC2_SPARQLParser {
         $proceed = 0;
         if ((list($sub_r, $sub_v) = $this->xVar($sub_v)) && $sub_r) {
           $r[] = $sub_r;
+          $proceed = 1;
           if ($sub_r = $this->x('\,', $sub_v)) {
             $sub_v = $sub_r[1];
-            $proceed = 1;
           }
         }
       } while ($proceed);

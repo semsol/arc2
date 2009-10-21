@@ -424,6 +424,7 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler {
         $this->addError('Result variable "' .$var_name. '" not used in query.');
       }
       if ($tbl_alias) {
+        /* aggregate */
         if ($var['aggregate']) {
           $conv_code = '';
           if (strtolower($var['aggregate']) != 'count') {
@@ -437,17 +438,36 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler {
             $added[$var['alias']] = 1;
           }
         }
+        /* normal var */
         else {
           if (!isset($added[$var_name])) {
             $r .= $r ? ',' . $nl . '  ' : '  ';
             $r .= $tbl_alias . ' AS `' . $var_name . '`';
+            $is_s = ($col == 's');
+            $is_p = ($col == 'p');
+            $is_o = ($col == 'o');
             if ($tbl_alias == 'NULL') {
-              $r .= (in_array($col, array('s', 'o'))) ? ', ' . $nl . '    ' .$tbl_alias . ' AS `' . $var_name . ' type`' : '';
-              $r .= (in_array($col, array('o'))) ? ', ' . $nl . '    ' .$tbl_alias . ' AS `' . $var_name . ' lang_dt`' : '';
+              /* type */
+              if ($is_s || $is_o) {
+                $r .= ', ' . $nl . '    NULL AS `' . $var_name . ' type`';
+              }
+              /* lang_dt / always add it in UNION queries, the var may be used as subject and object */
+              if ($is_o || ($is_s && $this->is_union_query)) {
+                $r .= ', ' . $nl . '    NULL AS `' . $var_name . ' lang_dt`';
+              }
             }
             else {
-              $r .= (in_array($col, array('s', 'o'))) ? ', ' . $nl . '    ' .$tbl_alias . '_type AS `' . $var_name . ' type`' : '';
-              $r .= (in_array($col, array('o'))) ? ', ' . $nl . '    ' .$tbl_alias . '_lang_dt AS `' . $var_name . ' lang_dt`' : ', ' . $nl . '    NULL AS `' . $var_name . ' lang_dt`';
+              /* type */
+              if ($is_s || $is_o) {
+                $r .= ', ' . $nl . '    ' .$tbl_alias . '_type AS `' . $var_name . ' type`';
+              }
+              /* lang_dt / always add it in UNION queries, the var may be used as subject and object */
+              if ($is_o) {
+                $r .= ', ' . $nl . '    ' .$tbl_alias . '_lang_dt AS `' . $var_name . ' lang_dt`';
+              }
+              elseif ($this->is_union_query) {
+                $r .= ', ' . $nl . '    NULL AS `' . $var_name . ' lang_dt`';
+              }
             }
             $added[$var_name] = 1;
           }

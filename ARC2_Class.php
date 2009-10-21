@@ -85,7 +85,7 @@ class ARC2_Class {
       $this->caller->addError($v . $glue . get_class($this));
     }
     if (count($this->errors) > $this->max_errors) {
-      die('Too many errors: ' . print_r($this->errors, 1));
+      die('Too many errors (limit: ' . $this->max_errors . '): ' . print_r($this->errors, 1));
     }
     return false;
   }
