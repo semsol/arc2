@@ -1,11 +1,12 @@
 <?php
-/*
-homepage: http://arc.semsol.org/
-license:  http://arc.semsol.org/license
-
-class:    ARC2 RDF Serializer
-author:   Benjamin Nowack
-version:  2009-06-22 (Tweak: moved getPName to merged method in ARC2_Class)
+/**
+ * ARC2 RDF Serializer
+ *
+ * @author Benjamin Nowack
+ * @license <http://arc.semsol.org/license>
+ * @homepage <http://arc.semsol.org/>
+ * @package ARC2
+ * @version 2009-11-09
 */
 
 ARC2::inc('Class');

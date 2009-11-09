@@ -155,6 +155,7 @@ class ARC2_RSSParser extends ARC2_LegacyXMLParser {
       /* val */
       $v = $info['cdata'];
       if (!$v) $v = $this->v('url', '', $info['a']);
+      if (!$v) $v = $this->v('href', '', $info['a']);
       /* prop */
       if ($k) {
         /* enclosure handling */

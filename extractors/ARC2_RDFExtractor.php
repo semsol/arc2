@@ -153,7 +153,7 @@ class ARC2_RDFExtractor extends ARC2_Class {
   
   /*  */
   
-  function getPlainContent($n, $trim = 1) {
+  function getPlainContent($n, $trim = 1, $use_img_alt = 1) {
     if ($n['tag'] == 'comment') {
       $r = '';
     }
@@ -164,17 +164,17 @@ class ARC2_RDFExtractor extends ARC2_Class {
       $r = $n['cdata'];
       $sub_nodes = $this->getSubNodes($n);
       foreach ($sub_nodes as $sub_n) {
-        $r .= $this->getPlainContent($sub_n, 0);
+        $r .= $this->getPlainContent($sub_n, 0, $use_img_alt);
       }
     }
-    elseif (($n['tag'] == 'img') && isset($n['a']['alt'])) {
+    elseif (($n['tag'] == 'img') && $use_img_alt && isset($n['a']['alt'])) {
       $r = $n['a']['alt'];
     }
     else {
       $r = '';
       $sub_nodes = $this->getSubNodes($n);
       foreach ($sub_nodes as $sub_n) {
-        $r .= $this->getPlainContent($sub_n, 0);
+        $r .= $this->getPlainContent($sub_n, 0, $use_img_alt);
       }
     }
     $r = preg_replace('/\s/s', ' ', $r);

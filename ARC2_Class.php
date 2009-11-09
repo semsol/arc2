@@ -6,7 +6,7 @@
  * @license <http://arc.semsol.org/license>
  * @homepage <http://arc.semsol.org/>
  * @package ARC2
- * @version 2009-09-23
+ * @version 2009-11-09
 */
 
 class ARC2_Class {
@@ -320,6 +320,13 @@ class ARC2_Class {
     return (isset($v[0]) && isset($v[0]['s'])) ? $ser->getSerializedTriples($v) : $ser->getSerializedIndex($v);
   }
 
+  function toRSS10($v, $ns = '') {
+    ARC2::inc('RSS10Serializer');
+    if (!$ns) $ns = isset($this->a['ns']) ? $this->a['ns'] : array();
+    $ser = new ARC2_RSS10Serializer(array_merge($this->a, array('ns' => $ns)), $this);
+    return (isset($v[0]) && isset($v[0]['s'])) ? $ser->getSerializedTriples($v) : $ser->getSerializedIndex($v);
+  }
+
   function toLegacyXML($v, $ns = '') {
     ARC2::inc('LegacyXMLSerializer');
     if (!$ns) $ns = isset($this->a['ns']) ? $this->a['ns'] : array();
@@ -397,7 +404,7 @@ class ARC2_Class {
   /* prevent SQL injections via SPARQL REGEX */
 
   function checkRegex($str) {
-    return addslashes($str);
+    return addslashes($str); // @@todo extend
   }
   
   /*  */

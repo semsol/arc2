@@ -282,7 +282,7 @@ class ARC2_RdfaExtractor extends ARC2_RDFExtractor {
 
   function getCurrentObjectLiteral($n, $lct, $ct) {
     $xml_val = $this->getContent($n);
-    $plain_val = $this->getPlainContent($n);
+    $plain_val = $this->getPlainContent($n, 0, 0);
     if (function_exists('html_entity_decode')) {
       $plain_val = html_entity_decode($plain_val, ENT_QUOTES);
     }

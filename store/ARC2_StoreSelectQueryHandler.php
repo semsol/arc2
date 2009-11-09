@@ -447,7 +447,7 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler {
             $is_p = ($col == 'p');
             $is_o = ($col == 'o');
             if ($tbl_alias == 'NULL') {
-              /* type */
+              /* type / add in UNION queries? */
               if ($is_s || $is_o) {
                 $r .= ', ' . $nl . '    NULL AS `' . $var_name . ' type`';
               }
@@ -461,7 +461,7 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler {
               if ($is_s || $is_o) {
                 $r .= ', ' . $nl . '    ' .$tbl_alias . '_type AS `' . $var_name . ' type`';
               }
-              /* lang_dt / always add it in UNION queries, the var may be used as subject and object */
+              /* lang_dt / always add it in UNION queries, the var may be used as s/p/o */
               if ($is_o) {
                 $r .= ', ' . $nl . '    ' .$tbl_alias . '_lang_dt AS `' . $var_name . ' lang_dt`';
               }

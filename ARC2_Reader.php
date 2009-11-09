@@ -1,11 +1,12 @@
 <?php
-/*
-homepage: http://arc.semsol.org/
-license:  http://arc.semsol.org/license
-
-class:    ARC2 Web Reader
-author:   Benjamin Nowack
-version:  2009-08-17
+/**
+ * ARC2 Web CLient
+ *
+ * @author Benjamin Nowack
+ * @license <http://arc.semsol.org/license>
+ * @homepage <http://arc.semsol.org/>
+ * @package ARC2
+ * @version 2009-11-09
 */
 
 ARC2::inc('Class');
@@ -200,6 +201,16 @@ class ARC2_Reader extends ARC2_Class {
     /* connect */
     if ($this->useProxy($url)) {
       $s = @fsockopen($this->a['proxy_host'], $this->a['proxy_port'], $errno, $errstr, $this->timeout);
+    }
+    elseif (($parts['scheme'] == 'https') && function_exists('stream_socket_client')) {
+      // SSL options via config array, code by Hannes Muehleisen (muehleis@informatik.hu-berlin.de)
+  	  $context = stream_context_create();
+      foreach ($this->a as $k => $v) {
+        if (preg_match('/^arc_reader_ssl_(.+)$/', $k, $m)) {
+          stream_context_set_option($context, 'ssl', $m[1], $v);
+        }
+      }
+      $s = stream_socket_client('ssl://' . $parts['host'] . ':' . $parts['port'], $errno, $errstr, $this->timeout, STREAM_CLIENT_CONNECT, $context);
     }
     elseif ($parts['scheme'] == 'https') {
       $s = @fsockopen('ssl://' . $parts['host'], $parts['port'], $errno, $errstr, $this->timeout);

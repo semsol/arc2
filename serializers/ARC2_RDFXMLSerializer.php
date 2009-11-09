@@ -1,11 +1,12 @@
 <?php
-/*
-homepage: http://arc.semsol.org/
-license:  http://arc.semsol.org/license
-
-class:    ARC2 RDF/XML Serializer
-author:   Benjamin Nowack
-version:  2009-02-12 (Fix: scheme-detection: scheme must have at least 2 chars, thanks to Eric Schoonover)
+/**
+ * ARC2 RDF/XML Serializer
+ *
+ * @author Benjamin Nowack
+ * @license <http://arc.semsol.org/license>
+ * @homepage <http://arc.semsol.org/>
+ * @package ARC2
+ * @version 2009-11-09
 */
 
 ARC2::inc('RDFSerializer');
@@ -24,6 +25,8 @@ class ARC2_RDFXMLSerializer extends ARC2_RDFSerializer {
     parent::__init();
     $this->content_header = 'application/rdf+xml';
     $this->pp_containers = $this->v('serializer_prettyprint_containers', 0, $this->a);
+    $this->default_ns = $this->v('serializer_default_ns', '', $this->a);
+    $this->type_nodes = $this->v('serializer_type_nodes', 0, $this->a);
   }
 
   /*  */
@@ -72,6 +75,13 @@ class ARC2_RDFXMLSerializer extends ARC2_RDFSerializer {
     }
     return '>' . htmlspecialchars($v['value']);
   }
+
+  function getPName($v, $connector = ':') {
+    if ($this->default_ns && (strpos($v, $this->default_ns) === 0)) {
+      return substr($v, strlen($this->default_ns));
+    }
+    return parent::getPName($v, $connector);
+  }
   
   function getHead() {
     $r = '';
@@ -83,6 +93,10 @@ class ARC2_RDFXMLSerializer extends ARC2_RDFSerializer {
       $r .= $first_ns ? ' ' : $nl . '  ';
       $r .= 'xmlns:' . $this->nsp[$v] . '="' .$v. '"';
       $first_ns = 0;
+    }
+    if ($this->default_ns) {
+      $r .= $first_ns ? ' ' : $nl . '  ';
+      $r .= 'xmlns="' . $this->default_ns . '"';
     }
     $r .= '>';
     return $r;
@@ -102,6 +116,7 @@ class ARC2_RDFXMLSerializer extends ARC2_RDFSerializer {
       $r .= $r ? $nl . $nl : '';
       $s = $this->getTerm($raw_s, 's');
       $tag = 'rdf:Description';
+      list($tag, $ps) = $this->getNodeTag($ps);
       $sub_ps = 0;
       /* pretty containers */
       if ($this->pp_containers && ($ctag = $this->getContainerTag($ps))) {
@@ -136,6 +151,16 @@ class ARC2_RDFXMLSerializer extends ARC2_RDFSerializer {
       return $r;
     }
     return $this->getHead() . $nl . $nl . $r . $this->getFooter();
+  }
+
+  function getNodeTag($ps) {
+    if (!$this->type_nodes) return array('rdf:Description', $ps);
+    $rdf = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#';
+    $types = $this->v($rdf . 'type', array(), $ps);
+    if (!$types) return array('rdf:Description', $ps);
+    $type = array_shift($types);
+    $ps[$rdf . 'type'] = $types;
+    return array($this->getPName($type['value']), $ps);
   }
 
   /*  */

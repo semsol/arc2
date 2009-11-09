@@ -6,13 +6,13 @@
  * @license <http://arc.semsol.org/license>
  * @homepage <http://arc.semsol.org/>
  * @package ARC2
- * @version 2009-10-21
+ * @version 2009-11-09
 */
 
 class ARC2 {
 
   function getVersion() {
-    return '2009-10-21';
+    return '2009-11-09';
   }
 
   /*  */
@@ -136,6 +136,7 @@ class ARC2 {
     $parts = preg_match('/^(.*[\/\#])([^\/\#]+)$/', $v, $m) ? array($m[1], $m[2]) : array($v);
     $specials = array(
       'http://www.w3.org/XML/1998/namespace',
+      'http://www.w3.org/2005/Atom',
       //'http://www.w3.org/1999/xhtml',
     );
     foreach ($specials as $ns) {
@@ -416,6 +417,10 @@ class ARC2 {
 
   function getPOSHRDFSerializer($a = '') {
     return ARC2::getSer('POSHRDF', $a);
+  }
+
+  function getRSS10Serializer($a = '') {
+    return ARC2::getSer('RSS10', $a);
   }
 
   /* sparqlscript */

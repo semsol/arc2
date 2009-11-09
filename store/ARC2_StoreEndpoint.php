@@ -88,7 +88,7 @@ class ARC2_StoreEndpoint extends ARC2_Store {
     if (!$this->isSetUp()) {
       if ($auto_setup) {
         $this->setUp();
-        return $this->handleRequest(0, $q);
+        return $this->handleRequest(0);
       }
       else {
         $this->setHeader('http', 'HTTP/1.1 400 Bad Request');
