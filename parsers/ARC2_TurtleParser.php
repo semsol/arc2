@@ -1,11 +1,12 @@
 <?php
-/*
-homepage: http://arc.semsol.org/
-license:  http://arc.semsol.org/license
-
-class:    ARC2 SPARQL-enhanced Turtle Parser
-author:   Benjamin Nowack
-version:  2009-10-05
+/**
+ * ARC2 SPARQL-enhanced Turtle Parser
+ *
+ * @author Benjamin Nowack
+ * @license <http://arc.semsol.org/license>
+ * @homepage <http://arc.semsol.org/>
+ * @package ARC2
+ * @version 2009-11-16
 */
 
 ARC2::inc('RDFParser');
@@ -37,8 +38,8 @@ class ARC2_TurtleParser extends ARC2_RDFParser {
     while (preg_match('/^\s*(\#[^\xd\xa]*)(.*)$/si', $v, $m)) {/* comment removal */
       $v = $m[2];
     }
-    $this->unparsed_code = (strlen($this->unparsed_code) > strlen($v)) ? $v : $this->unparsed_code;
     return ARC2::x($re, $v, $options);
+    //$this->unparsed_code = ($sub_r && count($sub_r)) ? $sub_r[count($sub_r) - 1] : '';
   }
 
   function createBnodeID(){
@@ -152,8 +153,15 @@ class ARC2_TurtleParser extends ARC2_RDFParser {
     }
     $sub_v = count($more_triples) ? $sub_v2 : $sub_v;
     $buffer = $sub_v;
+    $this->unparsed_code = $buffer;
     $this->reader->closeStream();
     unset($this->reader);
+    /* remove trailing comments */
+    while (preg_match('/^\s*(\#[^\xd\xa]*)(.*)$/si', $this->unparsed_code, $m)) $this->unparsed_code = $m[2];
+    if ($this->unparsed_code && !$this->getErrors()) {
+      $rest = preg_replace('/[\x0a|\x0d]/i', ' ', substr($this->unparsed_code, 0, 30));
+      if (trim($rest)) $this->addError('Could not parse "' . $rest . '"');
+    }
     return $this->done();
   }
 

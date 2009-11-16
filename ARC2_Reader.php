@@ -216,7 +216,7 @@ class ARC2_Reader extends ARC2_Class {
       $s = @fsockopen('ssl://' . $parts['host'], $parts['port'], $errno, $errstr, $this->timeout);
     }
     elseif ($parts['scheme'] == 'http') {
-      $s = fsockopen($parts['host'], $parts['port'], $errno, $errstr, $this->timeout);
+      $s = @fsockopen($parts['host'], $parts['port'], $errno, $errstr, $this->timeout);
     }
     if (!$s) {
       return $this->addError('Socket error: Could not connect to "' . $url . '" (proxy: ' . ($this->useProxy($url) ? '1' : '0') . '): ' . $errstr);
@@ -243,7 +243,16 @@ class ARC2_Reader extends ARC2_Class {
           $h['redirect'] = ($m[1] == '3') ? true : false;
         }
         elseif (preg_match('/^([^\:]+)\:\s*(.*)$/', $line, $m)) {/* header */
-          $h[strtolower($m[1])] = trim($m[2]);
+          $h_name = strtolower($m[1]);
+          if (!isset($h[$h_name])) {/* 1st value */
+            $h[$h_name] = trim($m[2]);
+          }
+          elseif (!is_array($h[$h_name])) {/* 2nd value */
+            $h[$h_name] = array($h[$h_name], trim($m[2]));
+          }
+          else {/* more values */
+            $h[$h_name][] = trim($m[2]);
+          }
         }
       } while(!$info['timed_out'] && !feof($s) && $line);
       $h['format'] = strtolower(preg_replace('/^([^\s]+).*$/', '\\1', $this->v('content-type', '', $h)));
