@@ -6,7 +6,7 @@
  * @license <http://arc.semsol.org/license>
  * @homepage <http://arc.semsol.org/>
  * @package ARC2
- * @version 2009-11-09
+ * @version 2009-11-24
 */
 
 ARC2::inc('Class');
@@ -233,7 +233,7 @@ class ARC2_Reader extends ARC2_Class {
     $this->response_headers = $h;
     if (!$this->ping_only) {
       do {
-        $line = trim(fgets($s, 256));
+        $line = trim(fgets($s, 4096));
         $info = stream_get_meta_data($s);
         if (preg_match("/^HTTP[^\s]+\s+([0-9]{1})([0-9]{2})(.*)$/i", $line, $m)) {/* response code */
           $error = in_array($m[1], array('4', '5')) ? $m[1] . $m[2] . ' ' . $m[3] : '';
