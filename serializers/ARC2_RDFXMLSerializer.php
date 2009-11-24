@@ -6,7 +6,8 @@
  * @license <http://arc.semsol.org/license>
  * @homepage <http://arc.semsol.org/>
  * @package ARC2
- * @version 2009-11-09
+ * @version 2009-11-23
+ * 
 */
 
 ARC2::inc('RDFSerializer');
@@ -160,6 +161,7 @@ class ARC2_RDFXMLSerializer extends ARC2_RDFSerializer {
     if (!$types) return array('rdf:Description', $ps);
     $type = array_shift($types);
     $ps[$rdf . 'type'] = $types;
+    if (!is_array($type)) $type = array('value' => $type);
     return array($this->getPName($type['value']), $ps);
   }
 

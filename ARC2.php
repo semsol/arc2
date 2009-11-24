@@ -6,13 +6,13 @@
  * @license <http://arc.semsol.org/license>
  * @homepage <http://arc.semsol.org/>
  * @package ARC2
- * @version 2009-11-16
+ * @version 2009-11-24
 */
 
 class ARC2 {
 
   function getVersion() {
-    return '2009-11-16';
+    return '2009-11-24';
   }
 
   /*  */
@@ -133,21 +133,25 @@ class ARC2 {
   /*  */
 
   function splitURI($v) {
-    $parts = preg_match('/^(.*[\/\#])([^\/\#]+)$/', $v, $m) ? array($m[1], $m[2]) : array($v);
-    $specials = array(
-      'http://www.w3.org/XML/1998/namespace',
-      'http://www.w3.org/2005/Atom',
-      //'http://www.w3.org/1999/xhtml',
-    );
-    foreach ($specials as $ns) {
-      if (!$parts[0]) continue;
-      if (strpos($ns, $parts[0]) === 0) {
-        $suffix = substr($ns, strrpos($ns, '/')+1);
-        $parts[0] .= $suffix;
-        $parts[1] = substr($parts[1], strlen($suffix));
+    /* the following namespaces lead to conflated URIs,
+     * we have to set the split position manually
+    */
+    if (strpos($v, 'www.w3.org')) {
+      $specials = array(
+        'http://www.w3.org/XML/1998/namespace',
+        'http://www.w3.org/2005/Atom',
+        'http://www.w3.org/1999/xhtml',
+      );
+      foreach ($specials as $ns) {
+        if (strpos($v, $ns) === 0) {
+          return array($ns, substr($v, strlen($ns)));
+        }
       }
     }
-    return $parts;
+    /* auto-splitting on / or # */
+    $re = '^(.*[\/\#])([^\/\#]+)$';
+    //$re = '^(.*?)([A-Z_a-z][-A-Z_a-z0-9.]*)$';
+    return preg_match('/' . $re . '/', $v, $m) ? array($m[1], $m[2]) : array($v);
   }
   
   /*  */

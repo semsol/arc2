@@ -2,9 +2,11 @@
 /**
  * ARC2 RDF Store SELECT Query Handler
  *
- * @license   http://arc.semsol.org/license
  * @author    Benjamin Nowack
- * @version   2009-09-07 Tweak: store_engine_type is a config option
+ * @license   http://arc.semsol.org/license
+ * @homepage <http://arc.semsol.org/>
+ * @package ARC2
+ * @version   2009-11-19
  *
 */
 
@@ -88,6 +90,7 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler {
     }
     /* create intermediate table */
     $tmp_tbl = $this->store->getTablePrefix() . '_Q' . md5($q_sql . time() . uniqid(rand()));
+    if (strlen($tmp_tbl) > 64) $tmp_tbl = 'Q' . md5($tmp_tbl);
     $tmp_sql = 'CREATE TEMPORARY TABLE ' . $tmp_tbl . ' ( ' . $this->getTempTableDef($tmp_tbl, $q_sql) . ') ';
     //$tmp_sql = 'CREATE TABLE ' . $tmp_tbl . ' ( ' . $this->getTempTableDef($tmp_tbl, $q_sql) . ') '; /* mysql sometimes chokes on temp */
     $v = $this->store->getDBVersion();
