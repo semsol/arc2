@@ -6,7 +6,7 @@
  * @license <http://arc.semsol.org/license>
  * @homepage <http://arc.semsol.org/>
  * @package ARC2
- * @version 2009-10-05
+ * @version 2009-11-25
 */
 
 ARC2::inc('StoreQueryHandler');
@@ -363,10 +363,7 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler {
         mysql_query($this->sql_buffers[$tbl], $con);
         /* table error */
         if ($er = mysql_error($con)) {
-          $this->addError('Error detected (possibly auto-fixed): ' . $er . ' (' . $this->sql_buffers[$tbl] . ')');
-          if (preg_match('/\/([a-z0-9\_\-]+)\' .+ should be repaired/i', $er, $m)) {
-            mysql_query('REPAIR TABLE ' . rawurlencode($m[1]), $con);
-          }
+          $this->autoRepairTable($er, $con);
         }
         unset($this->sql_buffers[$tbl]);
         if ($this->log_inserts) {
@@ -392,6 +389,26 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler {
       }
     }
     return 1;
+  }
+
+  function autoRepairTable($er, $con) {
+    $this->addError('MySQL error: ' . $er);
+    if (preg_match('/Table \'[^\']+\/([a-z0-9\_\-]+)\' .*(crashed|repair)/i', $er, $m)) {
+      $rs = mysql_query('REPAIR TABLE ' . rawurlencode($m[1]), $con);
+      $msg = $rs ? mysql_fetch_array($rs) : array();
+      if ($this->v('Msg_type', 'error', $msg) == 'error') {
+        /* auto-reset */
+        if ($this->v('store_reset_on_table_crash', 0, $this->a)) {
+          $this->store->drop();
+          $this->store->setUp();
+        }
+        else {
+          $er = $this->v('Msg_text', 'unknown error', $msg);
+          $this->addError('Auto-repair failed on ' . rawurlencode($m[1]) . ': ' . $er);
+        }
+        //die("Fatal errors: \n" . print_r($this->getErrors(), 1));
+      }
+    }
   }
 
   /* speed log */

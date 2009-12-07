@@ -1,11 +1,12 @@
 <?php
-/*
-homepage: http://arc.semsol.org/
-license:  http://arc.semsol.org/license
-
-class:    ARC2 RDF Store
-author:   Benjamin Nowack
-version:  2009-02-13 (Tweak: removed Inferencer calls)
+/**
+ * ARC2 RDF Store
+ *
+ * @author Benjamin Nowack <bnowack@semsol.com>
+ * @license http://arc.semsol.org/license
+ * @homepage <http://arc.semsol.org/>
+ * @package ARC2
+ * @version 2009-11-25
 */
 
 ARC2::inc('Class');
@@ -457,7 +458,7 @@ class ARC2_Store extends ARC2_Class {
 
   /*  */
 
-  function optimizeTables($level = 2) {/* 1: triple + g2t, 2: triple + *2val, 3: all tables */
+  function processTables($level = 2, $operation = 'optimize') {/* 1: triple + g2t, 2: triple + *2val, 3: all tables */
     $con = $this->getDBCon();
     $pre = $this->getTablePrefix();
     $tbls = $this->getTables();
@@ -465,11 +466,23 @@ class ARC2_Store extends ARC2_Class {
     foreach ($tbls as $tbl) {
       if (($level < 3) && preg_match('/(backup|setting)$/', $tbl)) continue;
       if (($level < 2) && preg_match('/(val)$/', $tbl)) continue;
-      $sql .= $sql ? ', ' : 'OPTIMIZE TABLE ';
+      $sql .= $sql ? ', ' : strtoupper($operation) . ' TABLE ';
       $sql .= $pre . $tbl;
     }
     mysql_query($sql, $con);
     if ($err = mysql_error($con)) $this->addError($err . ' in ' . $sql);
+  }
+
+  function optimizeTables($level = 2) {
+    return $this->processTables($level, 'optimize');
+  }
+
+  function checkTables($level = 2) {
+    return $this->processTables($level, 'check');
+  }
+
+  function repairTables($level = 2) {
+    return $this->processTables($level, 'repair');
   }
 
   /*  */

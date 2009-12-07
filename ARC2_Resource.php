@@ -4,8 +4,9 @@
  *
  * @author Benjamin Nowack <bnowack@semsol.com>
  * @license http://arc.semsol.org/license
+ * @homepage <http://arc.semsol.org/>
  * @package ARC2
- * @version 2009-10-16
+ * @version 2009-11-26
 */
 
 ARC2::inc('Class');
@@ -41,6 +42,19 @@ class ARC2_Resource extends ARC2_Class {
   function setProps($props, $s = '') {
     if (!$s) $s = $this->uri;
     $this->index[$s] = $props;
+  }
+
+  function setProp($p, $os, $s = '') {
+    if (!$s) $s = $this->uri;
+    /* single plain value */
+    if (!is_array($os)) $os = array('value' => $os, 'type' => 'literal');
+    /* single array value */
+    if (isset($os['value'])) $os = array($os);
+    /* list of values */
+    foreach ($os as $i => $o) {
+      if (!is_array($o)) $os[i] = array('value' => $o, 'type' => 'literal');
+    }
+    $this->index[$s][$this->expandPName($p)] = $os;
   }
 
   function setStore($store) {

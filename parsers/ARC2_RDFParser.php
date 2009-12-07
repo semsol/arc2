@@ -1,11 +1,12 @@
 <?php
-/*
-homepage: http://arc.semsol.org/
-license:  http://arc.semsol.org/license
-
-class:    ARC2 RDF Parser (generic)
-author:   Benjamin Nowack
-version:  2008-09-30 (Addition: Support for Atom)
+/**
+ * ARC2 RDF Parser (generic)
+ *
+ * @author Benjamin Nowack <bnowack@semsol.com>
+ * @license http://arc.semsol.org/license
+ * @homepage <http://arc.semsol.org/>
+ * @package ARC2
+ * @version 2009-12-03
 */
 
 ARC2::inc('Class');
@@ -23,6 +24,7 @@ class ARC2_RDFParser extends ARC2_Class {
   function __init() {/* proxy_host, proxy_port, proxy_skip, http_accept_header, http_user_agent_header, max_redirects, reader, skip_dupes */
     parent::__init();
     $this->a['format'] = $this->v('format', false, $this->a);
+    $this->keep_time_limit = $this->v('keep_time_limit', 0, $this->a);
     $this->triples = array();
     $this->t_count = 0;
     $this->added_triples = array();

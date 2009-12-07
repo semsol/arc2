@@ -1,11 +1,12 @@
 <?php
-/*
-homepage: http://arc.semsol.org/
-license:  http://arc.semsol.org/license
-
-class:    ARC2 RDF/XML Parser
-author:   Benjamin Nowack
-version:  2008-07-17 (Tweak: Moved createBnodeID method to parent class)
+/**
+ * ARC2 RDF/XML Parser
+ *
+ * @author Benjamin Nowack <bnowack@semsol.com>
+ * @license http://arc.semsol.org/license
+ * @homepage <http://arc.semsol.org/>
+ * @package ARC2
+ * @version 2009-12-03
 */
 
 ARC2::inc('RDFParser');
@@ -50,6 +51,7 @@ class ARC2_RDFXMLParser extends ARC2_RDFParser {
     /* parse */
     $first = true;
     while ($d = $this->reader->readStream()) {
+      if (!$this->keep_time_limit) @set_time_limit($this->v('time_limit', 60, $this->a));
       if ($iso_fallback && $first) {
         $d = '<?xml version="1.0" encoding="ISO-8859-1"?>' . "\n" . preg_replace('/^\<\?xml [^\>]+\?\>\s*/s', '', $d);
         $first = false;

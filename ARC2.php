@@ -6,13 +6,13 @@
  * @license <http://arc.semsol.org/license>
  * @homepage <http://arc.semsol.org/>
  * @package ARC2
- * @version 2009-11-24
+ * @version 2009-12-07
 */
 
 class ARC2 {
 
   function getVersion() {
-    return '2009-11-24';
+    return '2009-12-07';
   }
 
   /*  */
@@ -149,9 +149,11 @@ class ARC2 {
       }
     }
     /* auto-splitting on / or # */
-    $re = '^(.*[\/\#])([^\/\#]+)$';
     //$re = '^(.*?)([A-Z_a-z][-A-Z_a-z0-9.]*)$';
-    return preg_match('/' . $re . '/', $v, $m) ? array($m[1], $m[2]) : array($v);
+    if (preg_match('/^(.*[\/\#])([^\/\#]+)$/', $v, $m)) return array($m[1], $m[2]);
+    /* auto-splitting on last special char, e.g. urn:foo:bar */
+    if (preg_match('/^(.*[\:\/])([^\:\/]+)$/', $v, $m)) return array($m[1], $m[2]);
+    return array($v, '');
   }
   
   /*  */
@@ -308,7 +310,7 @@ class ARC2 {
 
   /*  */
 
-  function getComponent($name, $a = '') {
+  function getComponent($name, $a = '', $caller = '') {
     ARC2::inc($name);
     $prefix = 'ARC2';
     if (preg_match('/^([^\_]+)\_(.+)$/', $name, $m)) {
@@ -316,7 +318,8 @@ class ARC2 {
       $name = $m[2];
     }
     $cls = $prefix . '_' . $name;
-    return new $cls($a, new stdClass());
+    if (!$caller) $caller = new stdClass();
+    return new $cls($a, $caller);
   }
   
   /* resource */
@@ -381,8 +384,8 @@ class ARC2 {
 
   /* store */
 
-  function getStore($a = '') {
-    return ARC2::getComponent('Store', $a);
+  function getStore($a = '', $caller = '') {
+    return ARC2::getComponent('Store', $a, $caller);
   }
 
   function getStoreEndpoint($a = '') {
