@@ -127,6 +127,7 @@ class ARC2_RemoteStore extends ARC2_Class {
     }
     $reader->closeStream();
     $ers = $reader->getErrors();
+    $this->a['reader_auth_infos'] = $reader->getAuthInfos();
     unset($this->reader);
     if ($ers) return array('errors' => $ers);
 		$mappings = array('rdfxml' => 'RDFXML', 'sparqlxml' => 'SPARQLXMLResult', 'turtle' => 'Turtle');

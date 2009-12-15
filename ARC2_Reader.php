@@ -35,6 +35,7 @@ class ARC2_Reader extends ARC2_Class {
     $this->timeout = $this->v('reader_timeout', 30, $this->a);
     $this->response_headers = array();
     $this->digest_auth = 0;
+    $this->auth_infos = $this->v('reader_auth_infos', array(), $this->a);
   }
 
   /*  */
@@ -92,30 +93,42 @@ class ARC2_Reader extends ARC2_Class {
         $username = $m[1];
         $pwd = $m[2];
         $auth = '';
-        $h = $this->v('www-authenticate', '', $this->getResponseHeaders());
+        $hs = $this->getResponseHeaders();
         /* 401 received */
+        $h = $this->v('www-authenticate', '', $hs);
         if ($h && preg_match('/Digest/i', $h)) {
           $auth = 'Digest ';
           /* Digest realm="$realm", nonce="$nonce", qop="auth", opaque="$opaque" */
           $ks = array('realm', 'nonce', 'opaque');/* skipping qop, assuming "auth" */
-          $qop = 'auth';
           foreach ($ks as $i => $k) {
             $$k = preg_match('/' . $k . '=\"?([^\"]+)\"?/i', $h, $m) ? $m[1] : '';
             $auth .= ($i ? ', ' : '') . $k . '="' . $$k . '"';
+            $this->auth_infos[$k] = $$k;
           }
+          $this->auth_infos['auth'] = $auth;
+          $this->auth_infos['request_count'] = 1;
+        }
+        /* 401 or repeated request */
+        if ($this->v('auth', 0, $this->auth_infos)) {
+          $qop = 'auth';
+          $auth = $this->auth_infos['auth'];
+          $rc = $this->auth_infos['request_count'];
+          $realm = $this->auth_infos['realm'];
+          $nonce = $this->auth_infos['nonce'];
           $ha1 = md5($username . ':' . $realm . ':' . $pwd);
           $ha2 = md5($this->http_method . ':' . $path);
-          $nc = '0001';     /* @@todo proper request counting */
-          $cnonce = '0123'; /* @@todo proper request counting */
+          $nc = dechex($rc);
+          $cnonce = dechex($rc * 2);
           $resp = md5($ha1 . ':' . $nonce . ':' . $nc . ':' . $cnonce . ':' . $qop . ':' . $ha2);
           $auth .= ', username="' . $username . '"' .
             ', uri="' . $path . '"' .
             ', qop=' . $qop . '' .
             ', nc=' . $nc .
-            ', cnonce="' . $cnonce . '"' .  /* @@todo proper request counting */
+            ', cnonce="' . $cnonce . '"' .
             ', uri="' . $path . '"' .
             ', response="' . $resp . '"' .
           '';
+          $this->auth_infos['request_count'] = $rc + 1;
         }
       }
       /* add header */
@@ -367,6 +380,10 @@ class ARC2_Reader extends ARC2_Class {
 
   function getRedirects() {
     return $this->redirects;
+  }
+
+  function getAuthInfos() {
+    return $this->auth_infos;
   }
   
   /*  */

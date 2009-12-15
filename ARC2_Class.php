@@ -44,7 +44,7 @@ class ARC2_Class {
   /*  */
   
   function v($name, $default = false, $o = false) {/* value if set */
-    $o = ($o !== false) ? $o : $this;
+    if ($o === false) $o =& $this;
     if (is_array($o)) {
       return isset($o[$name]) ? $o[$name] : $default;
     }
@@ -52,7 +52,7 @@ class ARC2_Class {
   }
   
   function v1($name, $default = false, $o = false) {/* value if 1 (= not empty) */
-    $o = ($o !== false) ? $o : $this;
+    if ($o === false) $o =& $this;
     if (is_array($o)) {
       return (isset($o[$name]) && $o[$name]) ? $o[$name] : $default;
     }
@@ -60,7 +60,7 @@ class ARC2_Class {
   }
   
   function m($name, $a = false, $default = false, $o = false) {/* call method */
-    $o = ($o !== false) ? $o : $this;
+    if ($o === false) $o =& $this;
     return method_exists($o, $name) ? $o->$name($a) : $default;
   }
 

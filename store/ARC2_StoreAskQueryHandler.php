@@ -42,7 +42,7 @@ class ARC2_StoreAskQueryHandler extends ARC2_StoreSelectQueryHandler {
 
   /*  */
   
-  function getFinalQueryResult($q_sql, $vars, $tmp_tbl) {
+  function getFinalQueryResult($q_sql, $tmp_tbl) {
     $con = $this->store->getDBCon();
     $rs = mysql_query('SELECT success FROM ' . $tmp_tbl, $con);
     $r = ($row = mysql_fetch_array($rs)) ? $row['success'] : 0;
