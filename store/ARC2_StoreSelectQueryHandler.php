@@ -4,9 +4,9 @@
  *
  * @author    Benjamin Nowack
  * @license   http://arc.semsol.org/license
- * @homepage <http://arc.semsol.org/>
- * @package ARC2
- * @version   2009-11-19
+ * @homepage  <http://arc.semsol.org/>
+ * @package   ARC2
+ * @version   2009-12-15
  *
 */
 

@@ -1,11 +1,12 @@
 <?php
-/*
-homepage: http://arc.semsol.org/
-license:  http://arc.semsol.org/license
-
-class:    ARC2 RDF Store ASK Query Handler
-author:   Benjamin Nowack
-version:  2007-09-18
+/**
+ * ARC2 SPARQL ASK query handler
+ *
+ * @author Benjamin Nowack
+ * @license <http://arc.semsol.org/license>
+ * @homepage <http://arc.semsol.org/>
+ * @package ARC2
+ * @version 2009-12-15
 */
 
 ARC2::inc('StoreSelectQueryHandler');

@@ -5,7 +5,7 @@
  * @author Benjamin Nowack <bnowack@semsol.com>
  * @license http://arc.semsol.org/license
  * @package ARC2
- * @version 2009-10-16
+ * @version 2009-12-08
 */
 
 ARC2::inc('Class');

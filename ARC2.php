@@ -12,7 +12,7 @@
 class ARC2 {
 
   function getVersion() {
-    return '2009-12-07';
+    return '2009-12-15';
   }
 
   /*  */
