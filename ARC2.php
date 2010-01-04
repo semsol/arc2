@@ -6,13 +6,13 @@
  * @license <http://arc.semsol.org/license>
  * @homepage <http://arc.semsol.org/>
  * @package ARC2
- * @version 2009-12-07
+ * @version 2010-01-04
 */
 
 class ARC2 {
 
   function getVersion() {
-    return '2009-12-15';
+    return '2010-01-04';
   }
 
   /*  */
@@ -133,7 +133,7 @@ class ARC2 {
   /*  */
 
   function splitURI($v) {
-    /* the following namespaces lead to conflated URIs,
+    /* the following namespaces may lead to conflated URIs,
      * we have to set the split position manually
     */
     if (strpos($v, 'www.w3.org')) {
@@ -144,7 +144,10 @@ class ARC2 {
       );
       foreach ($specials as $ns) {
         if (strpos($v, $ns) === 0) {
-          return array($ns, substr($v, strlen($ns)));
+          $local_part = substr($v, strlen($ns));
+          if (!preg_match('/^[\/\#]/', $local_part)) {
+            return array($ns, $local_part);
+          }
         }
       }
     }

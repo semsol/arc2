@@ -6,7 +6,7 @@
  * @license   http://arc.semsol.org/license
  * @homepage  <http://arc.semsol.org/>
  * @package   ARC2
- * @version   2009-12-15
+ * @version   2010-01-04
  *
 */
 
@@ -1069,7 +1069,7 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler {
       elseif (preg_match('/^T([^\s]+\.)g (.*)$/s', $r, $m)) {/* graph filter */
         return 'G' . $m[1] . 't ' . $m[2];
       }
-      elseif (preg_match('/^\(?V[^\s]+_g\.val .*$/s', $r, $m)) {/* graph value filter, @@improveMe */
+      elseif (preg_match('/^\(*V[^\s]+_g\.val .*$/s', $r, $m)) {/* graph value filter, @@improveMe */
         //return $r;
       }
       else {
