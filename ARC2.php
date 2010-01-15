@@ -6,13 +6,13 @@
  * @license <http://arc.semsol.org/license>
  * @homepage <http://arc.semsol.org/>
  * @package ARC2
- * @version 2010-01-04
+ * @version 2010-01-15
 */
 
 class ARC2 {
 
   function getVersion() {
-    return '2010-01-04';
+    return '2010-01-15';
   }
 
   /*  */

@@ -6,7 +6,7 @@
  * @license <http://arc.semsol.org/license>
  * @homepage <http://arc.semsol.org/>
  * @package ARC2
- * @version 2009-11-25
+ * @version 2010-01-14
 */
 
 ARC2::inc('StoreQueryHandler');
@@ -275,7 +275,7 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler {
           $uts = strtotime(str_replace('T', ' ', $val));
           if (preg_match('/([\+\-])([0-9]{2})\:?([0-9]{2})$/', $m[3], $sub_m)) {
             $diff_mins = (3600 * ltrim($sub_m[2], '0')) + ltrim($sub_m[3], '0');
-            $uts = ($m[1] == '-') ? $uts + $diff_mins : $uts - $diff_mins;
+            $uts = ($sub_m[1] == '-') ? $uts + $diff_mins : $uts - $diff_mins;
             $val = date('Y-m-d\TH:i:s\Z', $uts);
           }
         }
