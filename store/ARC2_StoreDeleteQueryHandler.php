@@ -1,11 +1,12 @@
 <?php
-/*
-homepage: http://arc.semsol.org/
-license:  http://arc.semsol.org/license
-
-class:    ARC2 RDF Store DELETE Query Handler
-author:   Benjamin Nowack
-version:  2009-06-15 (Addition: cleanValueTables method)
+/**
+ * ARC2 RDF Store DELETE Query Handler
+ *
+ * @author Benjamin Nowack <bnowack@semsol.com>
+ * @license http://arc.semsol.org/license
+ * @homepage <http://arc.semsol.org/>
+ * @package ARC2
+ * @version 2010-02-23
 */
 
 ARC2::inc('StoreQueryHandler');
@@ -103,8 +104,15 @@ class ARC2_StoreDeleteQueryHandler extends ARC2_StoreQueryHandler {
         }
         else {
           $term_id = $this->getTermID($t[$term], $term);
-          $q .= $q ? ' AND ' : '';
-          $q .= 'T.' . $term . '=' . $term_id;
+          $q .= ($q ? ' AND ' : '') . 'T.' . $term . '=' . $term_id;
+          /* explicit lang/dt restricts the matching */
+          if ($term == 'o') {
+            $o_lang = $this->v1('o_lang', '', $t);
+            $o_lang_dt = $this->v1('o_datatype', $o_lang, $t);
+            if ($o_lang_dt) {
+              $q .= ($q ? ' AND ' : '') . 'T.o_lang_dt=' . $this->getTermID($o_lang_dt, 'lang_dt');
+            }
+          }
         }
       }
       if ($skip) {

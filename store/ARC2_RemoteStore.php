@@ -5,7 +5,7 @@
  * @author Benjamin Nowack <bnowack@semsol.com>
  * @license http://arc.semsol.org/license
  * @package ARC2
- * @version 2009-12-08
+ * @version 2010-02-23
 */
 
 ARC2::inc('Class');
@@ -144,16 +144,26 @@ class ARC2_RemoteStore extends ARC2_Class {
     /* ask|load|insert|delete */
     if (in_array($qt, array('ask', 'load', 'insert', 'delete'))) {
       $bid = $parser->getBooleanInsertedDeleted();
-      switch ($qt) {
-        case 'ask': return $bid['boolean'];
-        default: return $bid;
+      if ($qt == 'ask') {
+        $r = $bid['boolean'];
+      }
+      else {
+        $r = $bid;
       }
     }
     /* select */
-    if (($qt == 'select') && !method_exists($parser, 'getRows')) return $resp;
-    if ($qt == 'select') return array('rows' => $parser->getRows(), 'variables' => $parser->getVariables());
+    elseif (($qt == 'select') && !method_exists($parser, 'getRows')) {
+      $r = $resp;
+    }
+    elseif ($qt == 'select') {
+      $r = array('rows' => $parser->getRows(), 'variables' => $parser->getVariables());
+    }
     /* any other */
-    return $parser->getSimpleIndex(0);
+    else {
+      $r = $parser->getSimpleIndex(0);
+    }
+    unset($parser);
+    return $r;
   }
   
   /*  */

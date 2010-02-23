@@ -6,7 +6,7 @@
  * @license <http://arc.semsol.org/license>
  * @homepage <http://arc.semsol.org/>
  * @package ARC2
- * @version 2009-11-16
+ * @version 2010-02-16
 */
 
 ARC2::inc('RDFParser');
@@ -831,7 +831,7 @@ class ARC2_TurtleParser extends ARC2_RDFParser {
         $proceed = 1;
       }
       elseif ($r) {
-        if (($sub_r = $this->x('(\.)', $sub_v)) && !preg_match('/^\s/s', $sub_r[2])) {
+        if (($sub_r = $this->x('(\.)', $sub_v)) && !preg_match('/^[\s\}]/s', $sub_r[2])) {
           $r .= $sub_r[1];
           $sub_v = $sub_r[2];
         }

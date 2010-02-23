@@ -6,7 +6,7 @@
  * @license   http://arc.semsol.org/license
  * @homepage  <http://arc.semsol.org/>
  * @package   ARC2
- * @version   2010-01-04
+ * @version   2010-02-12
  *
 */
 
@@ -108,10 +108,10 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler {
     $con = $this->store->getDBCon();
     $v = $this->store->getDBVersion();
     if ($this->cache_results) {
-      $tbl = $this->store->getTablePrefix() . '_Q' . md5($q_sql);
+      $tbl = $this->store->getTablePrefix() . 'Q' . md5($q_sql);
     }
     else {
-      $tbl = $this->store->getTablePrefix() . '_Q' . md5($q_sql . time() . uniqid(rand()));
+      $tbl = $this->store->getTablePrefix() . 'Q' . md5($q_sql . time() . uniqid(rand()));
     }
     if (strlen($tbl) > 64) $tbl = 'Q' . md5($tbl);
     $tmp_sql = 'CREATE TEMPORARY TABLE ' . $tbl . ' ( ' . $this->getTempTableDef($tbl, $q_sql) . ') ';
@@ -121,9 +121,7 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler {
       return $this->addError(mysql_error($con));
     }
     mysql_unbuffered_query('INSERT INTO ' . $tbl . ' ' . "\n" . $q_sql, $con);
-    if ($er = mysql_error($con)) {
-      return $this->addError($er);
-    }
+    if ($er = mysql_error($con)) $this->addError($er);
     return $tbl;
   }
 

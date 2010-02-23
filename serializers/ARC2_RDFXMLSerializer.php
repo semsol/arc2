@@ -6,7 +6,7 @@
  * @license <http://arc.semsol.org/license>
  * @homepage <http://arc.semsol.org/>
  * @package ARC2
- * @version 2009-12-03
+ * @version 2010-01-30
  * 
 */
 
@@ -79,7 +79,8 @@ class ARC2_RDFXMLSerializer extends ARC2_RDFSerializer {
 
   function getPName($v, $connector = ':') {
     if ($this->default_ns && (strpos($v, $this->default_ns) === 0)) {
-      return substr($v, strlen($this->default_ns));
+      $pname = substr($v, strlen($this->default_ns));
+      if (!preg_match('/\//', $pname)) return $pname;
     }
     return parent::getPName($v, $connector);
   }

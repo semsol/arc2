@@ -6,7 +6,7 @@
  * @license <http://arc.semsol.org/license>
  * @homepage <http://arc.semsol.org/>
  * @package ARC2
- * @version 2009-12-08
+ * @version 2010-02-17
 */
 
 class ARC2_Class {
@@ -68,10 +68,16 @@ class ARC2_Class {
 
   function camelCase($v, $lc_first = 0) {
     $r = ucfirst($v);
-    while (preg_match('/^(.*)[\-\_ ](.*)$/', $r, $m)) {
+    while (preg_match('/^(.*)[^a-z0-9](.*)$/si', $r, $m)) {
       $r = $m[1] . ucfirst($m[2]);
     }
-    return $lc_first ? strtolower(substr($r, 0, 1)) . substr($r, 1) : $r;
+    return $lc_first && !preg_match('/[A-Z]/', $r[1]) ? strtolower($r[0]) . substr($r, 1) : $r;
+  }
+
+  function deCamelCase($v, $uc_first = 0) {
+    $r = str_replace('_', ' ', $v);
+    $r = preg_replace('/([a-z])([A-Z])/e', '"\\1 " . strtolower("\\2")', $r);
+    return $uc_first ? ucfirst($r) : $r;
   }
 
   /*  */

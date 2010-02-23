@@ -6,13 +6,13 @@
  * @license <http://arc.semsol.org/license>
  * @homepage <http://arc.semsol.org/>
  * @package ARC2
- * @version 2010-01-15
+ * @version 2010-02-23
 */
 
 class ARC2 {
 
   function getVersion() {
-    return '2010-01-15';
+    return '2010-02-23';
   }
 
   /*  */
@@ -120,14 +120,17 @@ class ARC2 {
   /*  */
   
   function toUTF8($v) {
-    if (utf8_decode($v) == $v) return $v;
+    if (urlencode($v) === $v) return $v;
+    //if (utf8_decode($v) == $v) return $v;
 		$v = (strpos(utf8_decode(str_replace('?', '', $v)), '?') === false) ? utf8_decode($v) : $v;
     return preg_replace_callback('/([\x00-\xdf][\x80-\xbf]|[\xe0-\xef][\x80-\xbf]{2}|[\xf0-\xf7][\x80-\xbf]{3}|[\xf8-\xfb][\x80-\xbf]{4}|[\xfc-\xfd][\x80-\xbf]{5}|[^\x00-\x7f])/', array('ARC2', 'getUTF8Char'), $v);
   }
   
   function getUTF8Char($v) {
     $val = $v[1];
-    return (strlen(trim($val)) === 1) ? utf8_encode($val) : $val;
+    if (strlen(trim($val)) === 1) return utf8_encode($val);
+    if (preg_match('/^([\x00-\x7f])(.+)/', $val, $m)) return $m[1] . ARC2::toUTF8($m[2]);
+    return $val;
   }
 
   /*  */

@@ -1,11 +1,12 @@
 <?php
-/*
-homepage: http://arc.semsol.org/
-license:  http://arc.semsol.org/license
-
-class:    ARC2 RDF/JSON Serializer
-author:   Benjamin Nowack
-version:  2008-07-01 (Fix: Proper jsonEscape method, thx to Keith Alexander)
+/**
+ * ARC2 RDF/JSON Serializer
+ *
+ * @author Benjamin Nowack <bnowack@semsol.com>
+ * @license http://arc.semsol.org/license
+ * @homepage <http://arc.semsol.org/>
+ * @package ARC2
+ * @version 2010-02-23
 */
 
 ARC2::inc('RDFSerializer');
@@ -39,12 +40,12 @@ class ARC2_RDFJSONSerializer extends ARC2_RDFSerializer {
         return $this->getTerm($v['value'], $term);
       }
       if (preg_match('/^\_\:/', $v['value'])) {
-        return '{ "value" : "' . $v['value']. '", "type" : "bnode" }';
+        return '{ "value" : "' . $this->jsonEscape($v['value']) . '", "type" : "bnode" }';
       }
-      return '{ "value" : "' . $v['value']. '", "type" : "uri" }';
+      return '{ "value" : "' . $this->jsonEscape($v['value']) . '", "type" : "uri" }';
     }
     /* literal */
-    $r = '{ "value" : "' . $this->jsonEscape($v['value']). '", "type" : "literal"';
+    $r = '{ "value" : "' . $this->jsonEscape($v['value']) . '", "type" : "literal"';
     $suffix = isset($v['datatype']) ? ', "datatype" : "' . $v['datatype'] . '"' : '';
     $suffix = isset($v['lang']) ? ', "lang" : "' . $v['lang'] . '"' : $suffix;
     $r .= $suffix . ' }';

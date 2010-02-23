@@ -6,7 +6,7 @@
  * @license <http://arc.semsol.org/license>
  * @homepage <http://arc.semsol.org/>
  * @package ARC2
- * @version 2009-12-08
+ * @version 2010-01-30
 */
 
 ARC2::inc('Class');
@@ -133,7 +133,7 @@ class ARC2_Reader extends ARC2_Class {
       }
       /* add header */
       if ($auth) {
-        $this->setCustomHeaders('Authorization: ' . $auth);
+        $this->addCustomHeaders('Authorization: ' . $auth);
         break;
       }
     }
@@ -199,8 +199,9 @@ class ARC2_Reader extends ARC2_Class {
     else {
       $h_code = $http_mthd . ' ' . $this->v1('path', '/', $parts) . (($v = $this->v1('query', 0, $parts)) ? '?' . $v : '') . (($v = $this->v1('fragment', 0, $parts)) ? '#' . $v : '');
     }
+    $port_code = ($parts['port'] != 80) ? ':' . $parts['port'] : '';
     $h_code .= ' HTTP/1.0' . $nl.
-      'Host: ' . $parts['host'] . ':' . $parts['port'] . $nl .
+      'Host: ' . $parts['host'] . $port_code . $nl .
       (($v = $this->http_accept_header) ? $v . $nl : '') .
       (($v = $this->http_user_agent_header) && !preg_match('/User\-Agent\:/', $this->http_custom_headers) ? $v . $nl : '') .
       (($http_mthd == 'POST') ? 'Content-Length: ' . strlen($this->message_body) . $nl : '') .
@@ -223,7 +224,7 @@ class ARC2_Reader extends ARC2_Class {
           stream_context_set_option($context, 'ssl', $m[1], $v);
         }
       }
-      $s = stream_socket_client('ssl://' . $parts['host'] . ':' . $parts['port'], $errno, $errstr, $this->timeout, STREAM_CLIENT_CONNECT, $context);
+      $s = stream_socket_client('ssl://' . $parts['host'] . $port_code, $errno, $errstr, $this->timeout, STREAM_CLIENT_CONNECT, $context);
     }
     elseif ($parts['scheme'] == 'https') {
       $s = @fsockopen('ssl://' . $parts['host'], $parts['port'], $errno, $errstr, $this->timeout);
@@ -285,7 +286,7 @@ class ARC2_Reader extends ARC2_Class {
           $this->digest_auth = 1;
           return $this->getHTTPSocket($url);
         }
-        return $this->addError($error . ' "' . (!feof($s) ? trim(strip_tags(fread($s, 64))) . '..."' : ''));
+        return $this->addError($error . ' "' . (!feof($s) ? trim(strip_tags(fread($s, 128))) . '..."' : ''));
       }
       /* redirect */
       if ($this->v('redirect', 0, $h) && ($new_url = $this->v1('location', 0, $h))) {
