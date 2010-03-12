@@ -24,6 +24,7 @@ class ARC2_NTriplesSerializer extends ARC2_RDFSerializer {
   function __init() {
     parent::__init();
     $this->esc_chars = array();
+    $this->raw = 0;
   }
 
   /*  */
@@ -43,7 +44,7 @@ class ARC2_NTriplesSerializer extends ARC2_RDFSerializer {
     }
     /* literal */
     $quot = '"';
-    if (preg_match('/\"/', $v['value'])) {
+    if ($this->raw && preg_match('/\"/', $v['value'])) {
       $quot = "'";
       if (preg_match('/\'/', $v['value'])) {
         $quot = '"""';
@@ -55,7 +56,7 @@ class ARC2_NTriplesSerializer extends ARC2_RDFSerializer {
         }
       }
     }
-    if ((strlen($quot) == 1) && preg_match('/[\x0d\x0a]/', $v['value'])) {
+    if ($this->raw && (strlen($quot) == 1) && preg_match('/[\x0d\x0a]/', $v['value'])) {
       $quot = $quot . $quot . $quot;
     }
     $suffix = isset($v['lang']) && $v['lang'] ? '@' . $v['lang'] : '';

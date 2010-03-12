@@ -6,7 +6,7 @@
  * @license <http://arc.semsol.org/license>
  * @homepage <http://arc.semsol.org/>
  * @package ARC2
- * @version 2010-01-30
+ * @version 2010-03-04
 */
 
 ARC2::inc('Class');
@@ -185,11 +185,14 @@ class ARC2_Reader extends ARC2_Class {
     return array('type' => 'socket', 'socket' =>& $s, 'headers' => array(), 'pos' => 0, 'size' => filesize($parts['path']), 'buffer' => '');
   }
   
-  function getHTTPSocket($url, $redirs = 0) {
+  function getHTTPSocket($url, $redirs = 0, $prev_parts = '') {
     $parts = parse_url($url);
-    if (!isset($parts['scheme'])) {
-      return $this->addError('Socket error: No supported URI scheme detected.');
-    }
+    /* relative redirect */
+    if (!isset($parts['scheme']) && $prev_parts) $parts['scheme'] = $prev_parts['scheme'];
+    if (!isset($parts['host']) && $prev_parts) $parts['host'] = $prev_parts['host'];
+    /* no scheme */
+    if (!$this->v('scheme', '', $parts)) return $this->addError('Socket error: Missing URI scheme.');
+    /* port tweaks */
     $parts['port'] = ($parts['scheme'] == 'https') ? $this->v1('port', 443, $parts) : $this->v1('port', 80, $parts);
     $nl = "\r\n";
     $http_mthd = strtoupper($this->http_method);
@@ -296,7 +299,7 @@ class ARC2_Reader extends ARC2_Class {
         if ($redirs > $this->max_redirects) {
           return $this->addError('Max numbers of redirects exceeded.');
         }
-        return $this->getHTTPSocket($new_url, $redirs+1);
+        return $this->getHTTPSocket($new_url, $redirs+1, $parts);
       }
     }
     if ($this->timeout) {
