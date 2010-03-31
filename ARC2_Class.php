@@ -6,7 +6,7 @@
  * @license <http://arc.semsol.org/license>
  * @homepage <http://arc.semsol.org/>
  * @package ARC2
- * @version 2010-02-17
+ * @version 2010-03-16
 */
 
 class ARC2_Class {
@@ -179,7 +179,7 @@ class ARC2_Class {
         foreach ($os as $i => $o) {
           if (!is_array($o)) {
             $o_val = $this->expandPName($o);
-            $o_type = preg_match('/^[a-z]+\:[^\s]+$/si', $o_val) ? 'uri' : 'literal';
+            $o_type = preg_match('/^[a-z]+\:[^\s\<\>]+$/si', $o_val) ? 'uri' : 'literal';
             $o = array('value' => $o_val, 'type' => $o_type);
           }
           $os[$i] = $o;
