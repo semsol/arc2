@@ -6,7 +6,7 @@
  * @license <http://arc.semsol.org/license>
  * @homepage <http://arc.semsol.org/>
  * @package ARC2
- * @version 2010-02-17
+ * @version 2010-02-29
 */
 
 ARC2::inc('StoreQueryHandler');
@@ -67,7 +67,10 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler {
     $loader =& new $cls($this->a, $this);
     $loader->setReader($reader);
     /* lock */
-    if (!$this->store->getLock()) return $this->addError('Could not get lock in "runQuery"');
+    if (!$this->store->getLock()) {
+      $l_name = $this->a['db_name'] . '.' . $this->store->getTablePrefix() . '.write_lock';
+      return $this->addError('Could not get lock in "runQuery" (' . $l_name . ')');
+    }
     $this->has_lock = 1;
     /* logging */
     $this->t_count = 0;
