@@ -6,7 +6,7 @@
  * @license <http://arc.semsol.org/license>
  * @homepage <http://arc.semsol.org/>
  * @package ARC2
- * @version 2010-02-16
+ * @version 2010-03-16
 */
 
 ARC2::inc('RDFParser');
@@ -29,6 +29,7 @@ class ARC2_TurtleParser extends ARC2_RDFParser {
     $this->xsd = 'http://www.w3.org/2001/XMLSchema#';
     $this->nsp = array($this->xml => 'xml', $this->rdf => 'rdf', $this->xsd => 'xsd');
     $this->unparsed_code = '';
+    $this->max_parsing_loops = $this->v('turtle_max_parsing_loops', 500, $this->a);
   }
   
   /*  */
@@ -143,7 +144,7 @@ class ARC2_TurtleParser extends ARC2_RDFParser {
       } while ($proceed);
       $loops++;
       $buffer = $sub_v;
-      if ($loops > 100) {/* most probably a parser or code bug, might also be a huge object value, though */
+      if ($loops > $this->max_parsing_loops) {/* most probably a parser or code bug, might also be a huge object value, though */
         $this->addError('too many loops: ' . $loops . '. Could not parse "' . substr($buffer, 0, 200) . '..."');
         break;
       }
