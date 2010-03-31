@@ -6,7 +6,7 @@
  * @license <http://arc.semsol.org/license>
  * @homepage <http://arc.semsol.org/>
  * @package ARC2
- * @version 2010-03-04
+ * @version 2010-03-31
 */
 
 ARC2::inc('Class');
@@ -70,6 +70,11 @@ class ARC2_Reader extends ARC2_Class {
     $id = md5($path . ' ' . $data);
     if ($this->stream_id != $id) {
       $this->stream_id = $id;
+      /* data uri? */
+      if (!$data && preg_match('/^data\:([^\,]+)\,(.*)$/', $path, $m)) {
+        $path = '';
+        $data = preg_match('/base64/', $m[1]) ? base64_decode($m[2]) : rawurldecode($m[2]);
+      }
       $this->base = $this->calcBase($path);
       $this->uri = $this->calcURI($path, $this->base);
       $this->stream = ($data) ? $this->getDataStream($data) : $this->getSocketStream($this->base, $ping_only);
