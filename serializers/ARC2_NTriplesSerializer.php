@@ -1,12 +1,12 @@
 <?php
-/*
-homepage: http://arc.semsol.org/
-license:  http://arc.semsol.org/license
-
-class:    ARC2 N-Triples Serializer
-author:   Benjamin Nowack
-version:  2008-09-11 (Fix: improved literal/uri detection
-                      Addition: Support for "raw" (turtle-like) terms)
+/**
+ * ARC2 N-Triples Serializer
+ *
+ * @author Benjamin Nowack
+ * @license <http://arc.semsol.org/license>
+ * @homepage <http://arc.semsol.org/>
+ * @package ARC2
+ * @version 2010-03-29
 */
 
 ARC2::inc('RDFSerializer');
@@ -34,7 +34,7 @@ class ARC2_NTriplesSerializer extends ARC2_RDFSerializer {
       if (preg_match('/^\_\:/', $v)) {
         return $v;
       }
-      if (preg_match('/^[a-z0-9]+\:[^\s]*$/is', $v)) {
+      if (preg_match('/^[a-z0-9]+\:[^\s\"]*$/is', $v)) {
         return '<' . $this->escape($v) . '>';
       }
       return $this->getTerm(array('type' => 'literal', 'value' => $v));
