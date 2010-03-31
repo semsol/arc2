@@ -6,13 +6,13 @@
  * @license <http://arc.semsol.org/license>
  * @homepage <http://arc.semsol.org/>
  * @package ARC2
- * @version 2010-03-12
+ * @version 2010-03-31
 */
 
 class ARC2 {
 
   function getVersion() {
-    return '2010-03-12';
+    return '2010-03-31';
   }
 
   /*  */
@@ -42,8 +42,7 @@ class ARC2 {
     );
     foreach ($dirs as $k => $dir) {
       if (preg_match('/' . $k . '/i', $f)) {
-        $r .= $dir . '/';
-        return $r;
+        return $r . $dir . '/';
       }
     }
     return $r;
