@@ -6,7 +6,7 @@
  * @license http://arc.semsol.org/license
  * @homepage <http://arc.semsol.org/>
  * @package ARC2
- * @version 2009-11-25
+ * @version 2010-04-20
 */
 
 ARC2::inc('Class');
@@ -425,6 +425,16 @@ class ARC2_Store extends ARC2_Class {
     $sql = "SELECT id FROM " . $this->getTablePrefix() . $tbl . " WHERE val = BINARY '" . mysql_real_escape_string($val, $con) . "' LIMIT 1";
     if (($rs = mysql_query($sql, $con)) && mysql_num_rows($rs) && ($row = mysql_fetch_array($rs))) {
       return $row['id'];
+    }
+    return 0;
+  }
+
+  function getIDValue($id, $term = '') {
+    $tbl = preg_match('/^(s|o)$/', $term) ? $term . '2val' : 'id2val';
+    $con = $this->getDBCon();
+    $sql = "SELECT val FROM " . $this->getTablePrefix() . $tbl . " WHERE id = " . mysql_real_escape_string($id, $con) . " LIMIT 1";
+    if (($rs = mysql_query($sql, $con)) && mysql_num_rows($rs) && ($row = mysql_fetch_array($rs))) {
+      return $row['val'];
     }
     return 0;
   }
