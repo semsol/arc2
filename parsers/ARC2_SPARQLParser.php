@@ -1,11 +1,12 @@
 <?php
-/*
-homepage: http://arc.semsol.org/
-license:  http://arc.semsol.org/license
-
-class:    ARC2 SPARQL Parser
-author:   Benjamin Nowack
-version:  2009-10-05
+/**
+ * ARC2 SPARQL Parser
+ *
+ * @author Benjamin Nowack
+ * @license <http://arc.semsol.org/license>
+ * @homepage <http://arc.semsol.org/>
+ * @package ARC2
+ * @version 2010-04-11
 */
 
 ARC2::inc('TurtleParser');
