@@ -6,7 +6,7 @@
  * @license http://arc.semsol.org/license
  * @homepage <http://arc.semsol.org/>
  * @package ARC2
- * @version 2010-02-23
+ * @version 2010-04-11
 */
 
 ARC2::inc('StoreQueryHandler');
@@ -176,7 +176,7 @@ class ARC2_StoreDeleteQueryHandler extends ARC2_StoreQueryHandler {
       mysql_query($sql, $con);
     }
     /* check for unconnected graph refs */
-    if ((rand(1, 100) == 1)) {
+    if ((rand(1, 10) == 1)) {
       $sql = '
         SELECT G.g FROM '. $tbl_prefix . 'g2t G LEFT JOIN '. $tbl_prefix . 'triple T ON ( T.t = G.t )
         WHERE T.t IS NULL LIMIT 1
