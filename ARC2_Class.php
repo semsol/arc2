@@ -6,7 +6,7 @@
  * @license <http://arc.semsol.org/license>
  * @homepage <http://arc.semsol.org/>
  * @package ARC2
- * @version 2010-03-16
+ * @version 2010-04-23
 */
 
 class ARC2_Class {
@@ -71,13 +71,25 @@ class ARC2_Class {
     while (preg_match('/^(.*)[^a-z0-9](.*)$/si', $r, $m)) {
       $r = $m[1] . ucfirst($m[2]);
     }
-    return $lc_first && !preg_match('/[A-Z]/', $r[1]) ? strtolower($r[0]) . substr($r, 1) : $r;
+    return $r && $lc_first && !preg_match('/[A-Z]/', $r[1]) ? strtolower($r[0]) . substr($r, 1) : $r;
   }
 
   function deCamelCase($v, $uc_first = 0) {
     $r = str_replace('_', ' ', $v);
-    $r = preg_replace('/([a-z])([A-Z])/e', '"\\1 " . strtolower("\\2")', $r);
+    $r = preg_replace('/([a-z0-9])([A-Z])/e', '"\\1 " . strtolower("\\2")', $r);
     return $uc_first ? ucfirst($r) : $r;
+  }
+
+  function extractTermLabel($uri, $loops = 0) {
+    list($ns, $r) = $this->splitURI($uri);
+    $r = $this->deCamelCase($this->camelCase($r, 1));
+    if (($loops < 1) && preg_match('/^(self|it|this|me)$/i', $r)) {
+      return $this->extractTermLabel(preg_replace('/\#.+$/', '', $uri), $loops + 1);
+    }
+    if ($uri && !$r && ($loops < 2)) {
+      return $this->extractTermLabel(preg_replace('/[\#\/]$/', '', $uri), $loops + 1);
+    }
+    return $r;
   }
 
   /*  */
@@ -121,7 +133,7 @@ class ARC2_Class {
 
   function getPName($v, $connector = ':') {
     /* is already a pname */
-    if ($ns = $this->getPNameNamespace($v)) {
+    if ($ns = $this->getPNameNamespace($v, $connector)) {
       if (!in_array($ns, $this->used_ns)) $this->used_ns[] = $ns;
       return $v;
     }
@@ -141,8 +153,14 @@ class ARC2_Class {
     return $v;
   }
 
-  function getPNameNamespace($v) {
-    if (!preg_match('/^([a-z0-9\_\-]+)\:([a-z0-9\_\-\.\%]*)$/i', $v, $m)) return 0;
+  function getPNameNamespace($v, $connector = ':') {
+    $re = '/^([a-z0-9\_\-]+)\:([a-z0-9\_\-\.\%]+)$/i';
+    if ($connector != ':') {
+      $connectors = array('\:', '\-', '\_', '\.');
+      $chars = join('', array_diff($connectors, array($connector)));
+      $re = '/^([a-z0-9' . $chars . ']+)\\' . $connector . '([a-z0-9\_\-\.\%]+)$/i';
+    }
+    if (!preg_match($re, $v, $m)) return 0;
     if (!isset($this->ns[$m[1]])) return 0;
     return $this->ns[$m[1]];
   }
@@ -158,9 +176,11 @@ class ARC2_Class {
   }
 
   function expandPName($v, $connector = ':') {
-    $re = '/^([a-z0-9\_\-]+)\:([a-z0-9\_\-]+)$/i';
-    if ($connector == '-') {
-      $re = '/^([a-z0-9\_]+)\-([a-z0-9\_\-]+)$/i';
+    $re = '/^([a-z0-9\_\-]+)\:([a-z0-9\_\-\.\%]+)$/i';
+    if ($connector != ':') {
+      $connectors = array('\:', '\-', '\_', '\.');
+      $chars = join('', array_diff($connectors, array($connector)));
+      $re = '/^([a-z0-9' . $chars . ']+)\\' . $connector . '([a-z0-9\_\-\.\%]+)$/i';
     }
     if (preg_match($re, $v, $m) && isset($this->ns[$m[1]])) {
       return $this->ns[$m[1]] . $m[2];
@@ -355,9 +375,9 @@ class ARC2_Class {
   }
 
   function toHTML($v, $ns = '') {
-    ARC2::inc('POSHRDFSerializer');
+    ARC2::inc('MicroRDFSerializer');
     if (!$ns) $ns = isset($this->a['ns']) ? $this->a['ns'] : array();
-    $ser = new ARC2_POSHRDFSerializer(array_merge($this->a, array('ns' => $ns)), $this);
+    $ser = new ARC2_MicroRDFSerializer(array_merge($this->a, array('ns' => $ns)), $this);
     return (isset($v[0]) && isset($v[0]['s'])) ? $ser->getSerializedTriples($v) : $ser->getSerializedIndex($v);
   }
 
@@ -413,5 +433,17 @@ class ARC2_Class {
     return addslashes($str); // @@todo extend
   }
   
+  /* Microdata methods */
+
+  function getMicrodataAttrs($id, $type = '') {
+    $type = $type ? $this->expandPName($type) : $this->expandPName('owl:Thing');
+    return 'itemscope="" itemtype="' . htmlspecialchars($type) . '" itemid="' . htmlspecialchars($id) . '"';
+  }
+
+  function mdAttrs($id, $type = '') {
+    return $this->getMicrodataAttrs($id, $type);
+  }
+
   /*  */
+
 }
