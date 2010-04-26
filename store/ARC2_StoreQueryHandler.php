@@ -24,6 +24,7 @@ class ARC2_StoreQueryHandler extends ARC2_Class {
     parent::__init();
     $this->xsd = 'http://www.w3.org/2001/XMLSchema#';
     $this->allow_extension_functions = $this->v('store_allow_extension_functions', 1, $this->a);    
+    $this->keep_time_limit = $this->v('keep_time_limit', 0, $this->a);
     $this->handler_type = '';
   }
 

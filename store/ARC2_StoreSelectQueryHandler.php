@@ -153,7 +153,8 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler {
         $alias = $m[2];
         if ($alias == '_pos_') continue;
         $r .= $r ? ',' : '';
-        $r .= "\n `" . $alias . "` mediumint UNSIGNED";
+        //$r .= "\n `" . $alias . "` mediumint UNSIGNED";
+        $r .= "\n `" . $alias . "` int UNSIGNED";
         $added[$alias] = 1;
       }
     }
@@ -1071,7 +1072,7 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler {
         //return $r;
       }
       else {
-        return 'FALSE';
+        return 'FALSE' . $r . $sub_r;
       }
     }
     /* some really ugly tweaks */
@@ -1134,9 +1135,11 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler {
         /* might be an alias */
         $r = 1;
         foreach ($this->infos['query']['result_vars'] as $r_var) {
-          //if ($r_var['alias'] == $var) $r = 'alias';
+          if ($r_var['alias'] == $var) {
+            $r = 'alias';
+            break;
+          }
           //if ($r_var['alias'] == $var) $r = 0;
-          break;
         }
         /* filter */
         //if (in_array('filter', $types)) $r = 0;

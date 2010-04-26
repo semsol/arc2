@@ -6,7 +6,7 @@
  * @license <http://arc.semsol.org/license>
  * @homepage <http://arc.semsol.org/>
  * @package ARC2
- * @version 2010-02-29
+ * @version 2010-04-11
 */
 
 ARC2::inc('StoreQueryHandler');
@@ -25,7 +25,6 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler {
     parent::__init();
     $this->store =& $this->caller;
     $this->write_buffer_size = $this->v('store_write_buffer', 2500, $this->a);
-    $this->keep_time_limit = $this->v('keep_time_limit', 0, $this->a);
     $this->split_threshold = $this->v('store_split_threshold', 0, $this->a);
     $this->has_pcre_unicode = @preg_match('/\pL/u', 'test');
     $this->strip_mb_comp_str = $this->v('store_strip_mb_comp_str', 0, $this->a);
