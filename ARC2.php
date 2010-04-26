@@ -427,8 +427,12 @@ class ARC2 {
     return ARC2::getSer('RDFJSON', $a);
   }
 
-  function getPOSHRDFSerializer($a = '') {
+  function getPOSHRDFSerializer($a = '') {/* deprecated */
     return ARC2::getSer('POSHRDF', $a);
+  }
+
+  function getMicroRDFSerializer($a = '') {
+    return ARC2::getSer('MicroRDF', $a);
   }
 
   function getRSS10Serializer($a = '') {
