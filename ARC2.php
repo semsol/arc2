@@ -6,13 +6,13 @@
  * @license <http://arc.semsol.org/license>
  * @homepage <http://arc.semsol.org/>
  * @package ARC2
- * @version 2010-03-31
+ * @version 2010-04-11
 */
 
 class ARC2 {
 
   function getVersion() {
-    return '2010-03-31';
+    return '2010-04-11';
   }
 
   /*  */
@@ -393,12 +393,12 @@ class ARC2 {
     return ARC2::getComponent('Store', $a, $caller);
   }
 
-  function getStoreEndpoint($a = '') {
-    return ARC2::getComponent('StoreEndpoint', $a);
+  function getStoreEndpoint($a = '', $caller = '') {
+    return ARC2::getComponent('StoreEndpoint', $a, $caller);
   }
 
-  function getRemoteStore($a = '') {
-    return ARC2::getComponent('RemoteStore', $a);
+  function getRemoteStore($a = '', $caller = '') {
+    return ARC2::getComponent('RemoteStore', $a, $caller);
   }
 
   function getMemStore($a = '') {
