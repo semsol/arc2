@@ -6,7 +6,7 @@
  * @license   http://arc.semsol.org/license
  * @homepage  <http://arc.semsol.org/>
  * @package   ARC2
- * @version   2010-02-12
+ * @version   2010-04-21
  *
 */
 
@@ -153,7 +153,6 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler {
         $alias = $m[2];
         if ($alias == '_pos_') continue;
         $r .= $r ? ',' : '';
-        //$r .= "\n `" . $alias . "` mediumint UNSIGNED";
         $r .= "\n `" . $alias . "` int UNSIGNED";
         $added[$alias] = 1;
       }
@@ -1072,7 +1071,7 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler {
         //return $r;
       }
       else {
-        return 'FALSE' . $r . $sub_r;
+        return 'FALSE';
       }
     }
     /* some really ugly tweaks */
