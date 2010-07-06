@@ -6,7 +6,7 @@
  * @license <http://arc.semsol.org/license>
  * @homepage <http://arc.semsol.org/>
  * @package ARC2
- * @version 2010-04-23
+ * @version 2010-06-25
 */
 
 class ARC2_Class {
@@ -66,12 +66,19 @@ class ARC2_Class {
 
   /*  */
 
-  function camelCase($v, $lc_first = 0) {
+  function camelCase($v, $lc_first = 0, $keep_boundaries = 0) {
     $r = ucfirst($v);
     while (preg_match('/^(.*)[^a-z0-9](.*)$/si', $r, $m)) {
+      /* don't fuse 2 upper-case chars */
+      if ($keep_boundaries && $m[1]) {
+        $boundary = substr($m[1], -1);
+        if (strtoupper($boundary) == $boundary) $m[1] .= 'CAMELCASEBOUNDARY';
+      }
       $r = $m[1] . ucfirst($m[2]);
     }
-    return $r && $lc_first && !preg_match('/[A-Z]/', $r[1]) ? strtolower($r[0]) . substr($r, 1) : $r;
+    $r = str_replace('CAMELCASEBOUNDARY', '_', $r);
+    if ((strlen($r) > 1) && $lc_first && !preg_match('/[A-Z]/', $r[1])) $r = strtolower($r[0]) . substr($r, 1);
+    return $r;
   }
 
   function deCamelCase($v, $uc_first = 0) {
@@ -82,7 +89,7 @@ class ARC2_Class {
 
   function extractTermLabel($uri, $loops = 0) {
     list($ns, $r) = $this->splitURI($uri);
-    $r = $this->deCamelCase($this->camelCase($r, 1));
+    $r = $this->deCamelCase($this->camelCase($r, 1, 1));
     if (($loops < 1) && preg_match('/^(self|it|this|me)$/i', $r)) {
       return $this->extractTermLabel(preg_replace('/\#.+$/', '', $uri), $loops + 1);
     }
@@ -178,9 +185,9 @@ class ARC2_Class {
   function expandPName($v, $connector = ':') {
     $re = '/^([a-z0-9\_\-]+)\:([a-z0-9\_\-\.\%]+)$/i';
     if ($connector != ':') {
-      $connectors = array('\:', '\-', '\_', '\.');
-      $chars = join('', array_diff($connectors, array($connector)));
-      $re = '/^([a-z0-9' . $chars . ']+)\\' . $connector . '([a-z0-9\_\-\.\%]+)$/i';
+      $connectors = array(':', '-', '_', '.');
+      $chars = '\\' . join('\\', array_diff($connectors, array($connector)));
+      $re = '/^([a-z0-9' . $chars . ']+)\\' . $connector . '([a-z0-9\_\-\.\%]+)$/Ui';
     }
     if (preg_match($re, $v, $m) && isset($this->ns[$m[1]])) {
       return $this->ns[$m[1]] . $m[2];
@@ -374,10 +381,12 @@ class ARC2_Class {
     return $ser->getSerializedArray($v);
   }
 
-  function toHTML($v, $ns = '') {
+  function toHTML($v, $ns = '', $label_store = '') {
     ARC2::inc('MicroRDFSerializer');
     if (!$ns) $ns = isset($this->a['ns']) ? $this->a['ns'] : array();
-    $ser = new ARC2_MicroRDFSerializer(array_merge($this->a, array('ns' => $ns)), $this);
+    $conf = array_merge($this->a, array('ns' => $ns));
+    if ($label_store) $conf['label_store'] = $label_store;
+    $ser = new ARC2_MicroRDFSerializer($conf, $this);
     return (isset($v[0]) && isset($v[0]['s'])) ? $ser->getSerializedTriples($v) : $ser->getSerializedIndex($v);
   }
 
@@ -442,6 +451,19 @@ class ARC2_Class {
 
   function mdAttrs($id, $type = '') {
     return $this->getMicrodataAttrs($id, $type);
+  }
+
+  /* central DB query hook */
+
+  function queryDB($sql, $con, $log_errors = 0) {
+    $t1 = ARC2::mtime();
+    $r = mysql_query($sql, $con);
+    $t2 = ARC2::mtime() - $t1;
+    if ($t2 > 1) {
+      //echo "\n needed " . $t2 . ' secs for ' . $sql;
+    }
+    if ($log_errors && ($er = mysql_error($con))) $this->addError($er);
+    return $r;
   }
 
   /*  */
