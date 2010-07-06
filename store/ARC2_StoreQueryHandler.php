@@ -34,6 +34,14 @@ class ARC2_StoreQueryHandler extends ARC2_Class {
   function getTermID($val, $term = '') {
     return $this->store->getTermID($val, $term);
   }
+
+  function hasHashColumn($tbl) {
+    return $this->store->hasHashColumn($tbl);
+  }
+
+  function getValueHash($val) {
+    return $this->store->getValueHash($val);
+  }
   
   /*  */
 
@@ -41,7 +49,7 @@ class ARC2_StoreQueryHandler extends ARC2_Class {
     $r = $this->store->getTablePrefix() . 'triple';
     return $r;
   }
-  
+
   /*  */
 
   function createMergeTable() {
@@ -49,7 +57,7 @@ class ARC2_StoreQueryHandler extends ARC2_Class {
     if (!$split_ps) return 1;
     $this->mrg_table_id = 'MRG_' . $this->store->getTablePrefix() . crc32(uniqid(rand()));
     $con = $this->store->getDBCon();
-    mysql_query("FLUSH TABLES", $con);
+    $this->queryDB("FLUSH TABLES", $con);
     $indexes = $this->v('store_indexes', array('sp (s,p)', 'os (o,s)', 'po (p,o)'), $this->a);
     $index_code = $indexes ? 'KEY ' . join(', KEY ',  $indexes) . ', ' : '';
     $prefix = $this->store->getTablePrefix();
@@ -77,13 +85,14 @@ class ARC2_StoreQueryHandler extends ARC2_Class {
     //$sql .= ($v >= '04-00-00') ? " CHARACTER SET utf8" : "";
     //$sql .= ($v >= '04-01-00') ? " COLLATE utf8_unicode_ci" : "";
     //echo $sql;
-    return mysql_query($sql, $con);
+    return $this->queryDB($sql, $con);
   }
 
   function dropMergeTable() {
+    return 1;
     $sql = "DROP TABLE IF EXISTS " . $this->store->getTablePrefix() . "triple_all";
     //echo $sql;
-    return mysql_query($sql, $this->store->getDBCon());
+    return $this->queryDB($sql, $this->store->getDBCon());
   }
   
 }
