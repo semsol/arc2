@@ -640,4 +640,6 @@ class ARC2_RDFXMLParser extends ARC2_RDFParser {
     }
   }
   
+  /*  */
+  
 }
