@@ -6,7 +6,7 @@
  * @license <http://arc.semsol.org/license>
  * @homepage <http://arc.semsol.org/>
  * @package ARC2
- * @version 2010-04-11
+ * @version 2010-06-24
 */
 
 ARC2::inc('StoreQueryHandler');
