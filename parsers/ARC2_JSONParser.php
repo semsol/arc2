@@ -7,7 +7,7 @@
  * @license http://arc.semsol.org/license
  * @homepage <http://arc.semsol.org/>
  * @package ARC2
- * @version 2010-03-24
+ * @version 2010-06-07
 */
 
 ARC2::inc('RDFParser');
@@ -147,6 +147,7 @@ class ARC2_JSONParser extends ARC2_RDFParser {
   }
 
   function addT($s = '', $p = '', $o = '', $s_type = '', $o_type = '', $o_dt = '', $o_lang = '') {
+    $o = $this->toUTF8($o);
     //echo str_replace($this->base, '', "-----\n adding $s / $p / $o\n-----\n");
     $t = array('s' => $s, 'p' => $p, 'o' => $o, 's_type' => $s_type, 'o_type' => $o_type, 'o_datatype' => $o_dt, 'o_lang' => $o_lang);
     if ($this->skip_dupes) {
