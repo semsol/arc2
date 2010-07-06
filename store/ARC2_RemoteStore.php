@@ -5,7 +5,7 @@
  * @author Benjamin Nowack <bnowack@semsol.com>
  * @license http://arc.semsol.org/license
  * @package ARC2
- * @version 2010-02-23
+ * @version 2010-05-07
 */
 
 ARC2::inc('Class');
@@ -123,14 +123,14 @@ class ARC2_RemoteStore extends ARC2_Class {
     $format = $reader->getFormat();
     $resp = '';
     while ($d = $reader->readStream()) {
-      $resp .= $d;
+      $resp .= $this->toUTF8($d);
     }
     $reader->closeStream();
     $ers = $reader->getErrors();
     $this->a['reader_auth_infos'] = $reader->getAuthInfos();
     unset($this->reader);
     if ($ers) return array('errors' => $ers);
-		$mappings = array('rdfxml' => 'RDFXML', 'sparqlxml' => 'SPARQLXMLResult', 'turtle' => 'Turtle');
+    $mappings = array('rdfxml' => 'RDFXML', 'sparqlxml' => 'SPARQLXMLResult', 'turtle' => 'Turtle');
     if (!$format || !isset($mappings[$format])) {
       return $resp;
       //return $this->addError('No parser available for "' . $format . '" SPARQL result');
