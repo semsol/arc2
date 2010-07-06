@@ -6,13 +6,13 @@
  * @license <http://arc.semsol.org/license>
  * @homepage <http://arc.semsol.org/>
  * @package ARC2
- * @version 2010-04-26
+ * @version 2010-07-06
 */
 
 class ARC2 {
 
   function getVersion() {
-    return '2010-04-26';
+    return '2010-07-06';
   }
 
   /*  */
@@ -50,10 +50,22 @@ class ARC2 {
   
   function getScriptURI() {
     if (isset($_SERVER) && isset($_SERVER['SERVER_NAME'])) {
+      $proto = preg_replace('/^([a-z]+)\/.*$/', '\\1', strtolower($_SERVER['SERVER_PROTOCOL']));
+      $port = $_SERVER['SERVER_PORT'];
+      $server = $_SERVER['SERVER_NAME'];
+      $script = $_SERVER['SCRIPT_NAME'];
+      /* https */
+      if (($proto == 'http') && $port == 443) {
+        $proto = 'https';
+        $port = 80;
+      }
+      return $proto . '://' . $server . ($port != 80 ? ':' . $port : '') . $script;
+      /*
       return preg_replace('/^([a-z]+)\/.*$/', '\\1', strtolower($_SERVER['SERVER_PROTOCOL'])) . 
         '://' . $_SERVER['SERVER_NAME'] .
         ($_SERVER['SERVER_PORT'] != 80 ? ':' . $_SERVER['SERVER_PORT'] : '') .
         $_SERVER['SCRIPT_NAME'];
+      */
     }
     elseif (isset($_SERVER['SCRIPT_FILENAME'])) {
       return 'file://' . realpath($_SERVER['SCRIPT_FILENAME']);
@@ -79,16 +91,15 @@ class ARC2 {
     }
     $inc_path = $path ? $path : ARC2::getIncPath($f);
     $path = $inc_path . $prefix . '_' . urlencode($f) . '.php';
-    if (file_exists($path)) {
-      include_once($path);
-      return 1;
-    }
+    if (file_exists($path)) return include_once($path);
+    /* safe-mode hack */
+    if (@include_once($path)) return 1;
+    /* try other path */
     if ($prefix != 'ARC2') {
       $path = $inc_path . strtolower($prefix) . '/' . $prefix . '_' . urlencode($f) . '.php';
-      if (file_exists($path)) {
-        include_once($path);
-        return 1;
-      }
+      if (file_exists($path)) return include_once($path);
+      /* safe-mode hack */
+      if (@include_once($path)) return 1;
     }
     return 0;
   }
@@ -121,7 +132,25 @@ class ARC2 {
   function toUTF8($v) {
     if (urlencode($v) === $v) return $v;
     //if (utf8_decode($v) == $v) return $v;
-		$v = (strpos(utf8_decode(str_replace('?', '', $v)), '?') === false) ? utf8_decode($v) : $v;
+    $v = (strpos(utf8_decode(str_replace('?', '', $v)), '?') === false) ? utf8_decode($v) : $v;
+    /* custom hacks, mainly caused by bugs in PHP's json_decode */
+    $mappings = array(
+      '%18' => '‘',
+      '%19' => '’',
+      '%1C' => '“',
+      '%1D' => '”',
+      '%1E' => '„',
+      '%10' => '‐',
+      '%12' => '−',
+      '%13' => '–',
+      '%14' => '—',
+      '%26' => '&',
+    );
+    $froms = array_keys($mappings);
+    $tos = array_values($mappings);
+    foreach ($froms as $i => $from) $froms[$i] = urldecode($from);
+    $v = str_replace($froms, $tos, $v);
+    /* utf8 tweaks */
     return preg_replace_callback('/([\x00-\xdf][\x80-\xbf]|[\xe0-\xef][\x80-\xbf]{2}|[\xf0-\xf7][\x80-\xbf]{3}|[\xf8-\xfb][\x80-\xbf]{4}|[\xfc-\xfd][\x80-\xbf]{5}|[^\x00-\x7f])/', array('ARC2', 'getUTF8Char'), $v);
   }
   
@@ -299,13 +328,22 @@ class ARC2 {
   function getStructType($v) {
     /* string */
     if (is_string($v)) return 'string';
-    /* triples */
-    if (isset($v[0]) && isset($v[0]['s']) && isset($v[0]['p'])) return 'triples';
-    /* index */
-    foreach ($v as $s => $ps) {
-      if (is_array($ps)) {
+    /* flat array, numeric keys */
+    if (in_array(0, array_keys($v))) {/* numeric keys */
+      /* simple array */
+      if (!is_array($v[0])) return 'array';
+      /* triples */
+      //if (isset($v[0]) && isset($v[0]['s']) && isset($v[0]['p'])) return 'triples';
+      if (in_array('p', array_keys($v[0]))) return 'triples';
+    }
+    /* associative array */
+    else {
+      /* index */
+      foreach ($v as $s => $ps) {
+        if (!is_array($ps)) break;
         foreach ($ps as $p => $os) {
-          if (is_array($os) && isset($os[0]) && isset($os[0]['value'])) return 'index';
+          if (!is_array($os) || !is_array($os[0])) break;
+          if (in_array('value', array_keys($os[0]))) return 'index';
         }
       }
     }
@@ -331,6 +369,12 @@ class ARC2 {
 
   function getResource($a = '') {
     return ARC2::getComponent('Resource', $a);
+  }
+
+  /* reader */
+
+  function getReader($a = '') {
+    return ARC2::getComponent('Reader', $a);
   }
 
   /* parsers */
