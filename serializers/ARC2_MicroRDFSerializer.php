@@ -6,7 +6,7 @@
  * @license <http://arc.semsol.org/license>
  * @homepage <http://arc.semsol.org/>
  * @package ARC2
- * @version 2010-04-23
+ * @version 2010-06-24
 */
 
 ARC2::inc('RDFSerializer');
@@ -24,6 +24,7 @@ class ARC2_MicroRDFSerializer extends ARC2_RDFSerializer {
   function __init() {
     parent::__init();
     $this->content_header = 'text/html';
+    $this->label_store = $this->v('label_store', '', $this->a);
   }
 
   /*  */
@@ -51,18 +52,24 @@ class ARC2_MicroRDFSerializer extends ARC2_RDFSerializer {
       /* node */
       $r .= '
         <div class="rdf-item" ' . $this->mdAttrs($s, $main_type) . '>
-          <h3><a href="' . $s . '">' . ucfirst($this->getLabel($s, $ps))  . '</a></h3>
+          <h3 class="rdf-itemlabel"><a href="' . $s . '">' . ucfirst($this->getLabel($s, $ps))  . '</a></h3>
       ';
       /* arcs */
       foreach ($ps as $p => $os) {
+        $p_cls = strtolower($this->getPName($p));
+        $p_cls = str_replace(':', '-', $p_cls);
         $r .= '
-          <div class="rdf-prop">
+          <div class="rdf-prop ' . $p_cls . '">
             <a class="rdf-proplabel" href="' . $p . '">' . ucfirst($this->getLabel($p)) . ':</a>
             <ul class="rdf-values">
         ';
-        foreach ($os as $o) {
+        $oc = count($os);
+        foreach ($os as $i => $o) {
           $val = $this->getObjectValue($o, $p);
-          $r .= $n . '<li>' . $val . '</li>';
+          $cls = '';
+          if ($i == 0) $cls .= ($cls ? ' ' : '') . 'first';
+          if ($i == $oc - 1) $cls .= ($cls ? ' ' : '') . 'last';
+          $r .= $n . '<li' . ($cls ? ' class="' . $cls . '"' : '') . '>' . $val . '</li>';
         }
         $r .= '
             </ul>
@@ -97,14 +104,20 @@ class ARC2_MicroRDFSerializer extends ARC2_RDFSerializer {
   }
   
   function getURIObjectValue($o, $p) {
-    $href = htmlspecialchars($o['value']);
-    $label = $o['value'];
+    $id = htmlspecialchars($o['value']);
+    $label = $this->getObjectLabel($o['value']);
+    /* differing href */
+    $href = htmlspecialchars($this->v('href', $o['value'], $o));
+    if ($id != $href) {
+      return '<a class="rdf-value" itemprop="' . $p. '" href="' . $id . '" onclick="location.href=\'' . $href . '\';return false">' . $label . '</a>';
+    }
+    return '<a class="rdf-value" itemprop="' . $p. '" href="' . $id . '">' . $label . '</a>';
+    //$label = $o['value'];
     //$label = preg_replace('/^https?\:\/\/(www\.)?/', '', $label);
-    $label = $this->extractTermLabel($label);
-    return '<a class="rdf-value" itemprop="' . $p. '" href="' . $href . '">' . $label . '</a>';
   }
 
   function getBNodeObjectValue($o, $p) {
+    return '<div class="rdf-value" itemprop="' . $p. '" itemscope="">' . $o['value'] . '</div>';
     return '<div class="rdf-value" itemprop="' . $p. '" itemscope="">An unnamed resource</div>';
   }
 
@@ -114,5 +127,20 @@ class ARC2_MicroRDFSerializer extends ARC2_RDFSerializer {
 
   /*  */
 
+  function getObjectLabel($id) {
+    $r = $this->extractTermLabel($id);
+    if (!$this->label_store) return $r;
+    $q = '
+      SELECT ?val WHERE {
+        <' . $id . '> ?p ?val .
+        FILTER(REGEX(str(?p), "(label|title|name|summary)$"))
+      } LIMIT 1
+    ';
+    $row = $this->label_store->query($q, 'row');
+    return $row ? $row['val'] : $r;
+  }
+
+  /*  */
+  
 }
 
