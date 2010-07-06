@@ -6,7 +6,7 @@
  * @license <http://arc.semsol.org/license>
  * @homepage <http://arc.semsol.org/>
  * @package ARC2
- * @version 2010-03-31
+ * @version 2010-07-06
 */
 
 ARC2::inc('Class');
@@ -84,64 +84,87 @@ class ARC2_Reader extends ARC2_Class {
     }
   }
 
+  /*
+   * HTTP Basic/Digest + Proxy authorization can be defined in the
+   * arc_reader_credentials config setting:
+
+        'arc_reader_credentials' => array(
+          'http://basic.example.com/' => 'user:pass', // shortcut for type=basic
+          'http://digest.example.com/' => 'user::pass', // shortcut for type=digest
+          'http://proxy.example.com/' => array('type' => 'basic', 'proxy', 'user' => 'user', 'pass' => 'pass'),
+        ),
+
+   */
+
   function setCredentials($url) {
     if (!$creds = $this->v('arc_reader_credentials', array(), $this->a))  return 0;
-    foreach ($creds as $pattern => $cred) {
+    foreach ($creds as $pattern => $creds) {
+      /* digest shortcut (user::pass) */
+      if (!is_array($creds) && preg_match('/^(.+)\:\:(.+)$/', $creds, $m)) {
+        $creds = array('type' => 'digest', 'user' => $m[1], 'pass' => $m[2]);
+      }
+      /* basic shortcut (user:pass) */
+      if (!is_array($creds) && preg_match('/^(.+)\:(.+)$/', $creds, $m)) {
+        $creds = array('type' => 'basic', 'user' => $m[1], 'pass' => $m[2]);
+      }
+      if (!is_array($creds)) return 0;
       $regex = '/' . preg_replace('/([\:\/\.\?])/', '\\\\\1', $pattern) . '/';
       if (!preg_match($regex, $url)) continue;
-      $parts = parse_url($url);
-      $path = $this->v1('path', '/', $parts);
-      /* Basic auth */
-      $auth = 'Basic ' . base64_encode($cred);
-      /* Digest auth */
-      if (preg_match('/(.*)\:\:(.*)/', $cred, $m)) {
-        $username = $m[1];
-        $pwd = $m[2];
-        $auth = '';
-        $hs = $this->getResponseHeaders();
-        /* 401 received */
-        $h = $this->v('www-authenticate', '', $hs);
-        if ($h && preg_match('/Digest/i', $h)) {
-          $auth = 'Digest ';
-          /* Digest realm="$realm", nonce="$nonce", qop="auth", opaque="$opaque" */
-          $ks = array('realm', 'nonce', 'opaque');/* skipping qop, assuming "auth" */
-          foreach ($ks as $i => $k) {
-            $$k = preg_match('/' . $k . '=\"?([^\"]+)\"?/i', $h, $m) ? $m[1] : '';
-            $auth .= ($i ? ', ' : '') . $k . '="' . $$k . '"';
-            $this->auth_infos[$k] = $$k;
-          }
-          $this->auth_infos['auth'] = $auth;
-          $this->auth_infos['request_count'] = 1;
-        }
-        /* 401 or repeated request */
-        if ($this->v('auth', 0, $this->auth_infos)) {
-          $qop = 'auth';
-          $auth = $this->auth_infos['auth'];
-          $rc = $this->auth_infos['request_count'];
-          $realm = $this->auth_infos['realm'];
-          $nonce = $this->auth_infos['nonce'];
-          $ha1 = md5($username . ':' . $realm . ':' . $pwd);
-          $ha2 = md5($this->http_method . ':' . $path);
-          $nc = dechex($rc);
-          $cnonce = dechex($rc * 2);
-          $resp = md5($ha1 . ':' . $nonce . ':' . $nc . ':' . $cnonce . ':' . $qop . ':' . $ha2);
-          $auth .= ', username="' . $username . '"' .
-            ', uri="' . $path . '"' .
-            ', qop=' . $qop . '' .
-            ', nc=' . $nc .
-            ', cnonce="' . $cnonce . '"' .
-            ', uri="' . $path . '"' .
-            ', response="' . $resp . '"' .
-          '';
-          $this->auth_infos['request_count'] = $rc + 1;
-        }
-      }
-      /* add header */
-      if ($auth) {
-        $this->addCustomHeaders('Authorization: ' . $auth);
-        break;
-      }
+      $mthd = 'set' . $this->camelCase($creds['type']) . 'AuthCredentials';
+      if (method_exists($this, $mthd)) $this->$mthd($creds, $url);
     }
+  }
+
+  function setBasicAuthCredentials($creds) {
+    $auth = 'Basic ' . base64_encode($creds['user'] . ':' . $creds['pass']);
+    $h = in_array('proxy', $creds) ? 'Proxy-Authorization' : 'Authorization';
+    $this->addCustomHeaders($h . ': ' . $auth);
+    //echo $h . ': ' . $auth . print_r($creds, 1);
+  }
+
+  function setDigestAuthCredentials($creds, $url) {
+    $path = $this->v1('path', '/', parse_url($url));
+    $auth = '';
+    $hs = $this->getResponseHeaders();
+    /* initial 401 */
+    $h = $this->v('www-authenticate', '', $hs);
+    if ($h && preg_match('/Digest/i', $h)) {
+      $auth = 'Digest ';
+      /* Digest realm="$realm", nonce="$nonce", qop="auth", opaque="$opaque" */
+      $ks = array('realm', 'nonce', 'opaque');/* skipping qop, assuming "auth" */
+      foreach ($ks as $i => $k) {
+        $$k = preg_match('/' . $k . '=\"?([^\"]+)\"?/i', $h, $m) ? $m[1] : '';
+        $auth .= ($i ? ', ' : '') . $k . '="' . $$k . '"';
+        $this->auth_infos[$k] = $$k;
+      }
+      $this->auth_infos['auth'] = $auth;
+      $this->auth_infos['request_count'] = 1;
+    }
+    /* initial 401 or repeated request */
+    if ($this->v('auth', 0, $this->auth_infos)) {
+      $qop = 'auth';
+      $auth = $this->auth_infos['auth'];
+      $rc = $this->auth_infos['request_count'];
+      $realm = $this->auth_infos['realm'];
+      $nonce = $this->auth_infos['nonce'];
+      $ha1 = md5($creds['user'] . ':' . $realm . ':' . $creds['pass']);
+      $ha2 = md5($this->http_method . ':' . $path);
+      $nc = dechex($rc);
+      $cnonce = dechex($rc * 2);
+      $resp = md5($ha1 . ':' . $nonce . ':' . $nc . ':' . $cnonce . ':' . $qop . ':' . $ha2);
+      $auth .= ', username="' . $creds['user'] . '"' .
+        ', uri="' . $path . '"' .
+        ', qop=' . $qop . '' .
+        ', nc=' . $nc .
+        ', cnonce="' . $cnonce . '"' .
+        ', uri="' . $path . '"' .
+        ', response="' . $resp . '"' .
+      '';
+      $this->auth_infos['request_count'] = $rc + 1;
+    }
+    if (!$auth) return 0;
+    $h = in_array('proxy', $creds) ? 'Proxy-Authorization' : 'Authorization';
+    $this->addCustomHeaders($h . ': ' . $auth);
   }
 
   /*  */
