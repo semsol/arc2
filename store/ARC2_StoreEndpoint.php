@@ -6,7 +6,7 @@
  * @license <http://arc.semsol.org/license>
  * @homepage <http://arc.semsol.org/>
  * @package ARC2
- * @version 2010-04-11
+ * @version 2010-06-04
 */
 
 ARC2::inc('Store');
@@ -96,10 +96,10 @@ class ARC2_StoreEndpoint extends ARC2_Store {
         $this->result = 'Missing configuration or the endpoint store was not set up yet.';
       }
     }
-    elseif ($img = $this->p('img')) {
+    elseif (($img = $this->p('img'))) {
       $this->handleImgRequest($img);
     }
-    elseif ($q = $this->p('query')) {
+    elseif (($q = $this->p('query'))) {
       $this->checkProcesses();
       $this->handleQueryRequest($q);
       if ($this->p('show_inline')) {
@@ -296,7 +296,8 @@ class ARC2_StoreEndpoint extends ARC2_Store {
       $prefs[] = $v;
     }
     /* accept header */
-    if ($vals = explode(',', $_SERVER['HTTP_ACCEPT'])) {
+    $vals = explode(',', $_SERVER['HTTP_ACCEPT']);
+    if ($vals) {
       $o_vals = array();
       foreach ($vals as $val) {
         if (preg_match('/(rdf\+n3|x\-turtle|rdf\+xml|sparql\-results\+xml|sparql\-results\+json|json)/', $val, $m)) {
