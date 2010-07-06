@@ -6,7 +6,7 @@
  * @license   http://arc.semsol.org/license
  * @homepage  <http://arc.semsol.org/>
  * @package   ARC2
- * @version   2010-04-21
+ * @version   2010-06-22
  *
 */
 
@@ -52,7 +52,7 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler {
     $r = $this->getFinalQueryResult($q_sql, $tmp_tbl);
     /* remove intermediate results */
     if (!$this->cache_results) {
-      mysql_query('DROP TABLE IF EXISTS ' . $tmp_tbl, $con);
+      $this->queryDB('DROP TABLE IF EXISTS ' . $tmp_tbl, $con);
     }
     return $r;
   }
@@ -117,7 +117,7 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler {
     $tmp_sql = 'CREATE TEMPORARY TABLE ' . $tbl . ' ( ' . $this->getTempTableDef($tbl, $q_sql) . ') ';
     $tmp_sql .= (($v < '04-01-00') && ($v >= '04-00-18')) ? 'ENGINE' : (($v >= '04-01-02') ? 'ENGINE' : 'TYPE');
     $tmp_sql .= '=' . $this->engine_type;/* HEAP doesn't support AUTO_INCREMENT, and MySQL breaks on MEMORY sometimes */
-    if (!mysql_query($tmp_sql, $con) && !mysql_query(str_replace('CREATE TEMPORARY', 'CREATE', $tmp_sql), $con)) {
+    if (!$this->queryDB($tmp_sql, $con) && !$this->queryDB(str_replace('CREATE TEMPORARY', 'CREATE', $tmp_sql), $con)) {
       return $this->addError(mysql_error($con));
     }
     mysql_unbuffered_query('INSERT INTO ' . $tbl . ' ' . "\n" . $q_sql, $con);
@@ -350,14 +350,15 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler {
   function getUnionIndexes($pre_index) {
     $r = array();
     $branches = array();
-    $min_length = 1000;
+    $min_depth = 1000;
+    /* only process branches with minimum depth */
     foreach ($pre_index['union_branches'] as $id) {
-      $branches[$id] = strlen($id);
-      $min_length = min($min_length, strlen($id));
+      $branches[$id] = count(preg_split('/\_/', $id));
+      $min_depth = min($min_depth, $branches[$id]);
     }
-    foreach ($branches as $branch_id => $length) {
-      if ($length == $min_length) {
-        $union_id = substr($branch_id, 0, -2);
+    foreach ($branches as $branch_id => $depth) {
+      if ($depth == $min_depth) {
+        $union_id = preg_replace('/\_[0-9]+$/', '', $branch_id);
         $index = array('keeping' => $branch_id, 'union_branches' => array(), 'patterns' => $pre_index['patterns']);
         $old_branches = $index['patterns'][$union_id]['patterns'];
         $skip_id = ($old_branches[0] == $branch_id) ? $old_branches[1] : $old_branches[0];
@@ -1594,17 +1595,22 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler {
       $sub_r_3 = (isset($sub_r_3) && preg_match('/[\"\'](.+)[\"\']/', $sub_r_3, $m)) ? strtolower($m[1]) : '';
       $op = ($this->v('operator', '', $pattern) == '!') ? ' NOT' : '';
       if (!$sub_r_1 || !$sub_r_2) return '';
-      $opt = ($sub_r_3 == 'i') ? '' : 'BINARY ';
-      /* use like for simple patterns */
-      if (!$opt && preg_match('/^\"(\^)?([a-z0-9\_\-\s]+)(\$)?\"$/is', $sub_r_2, $m)) {
+      $is_simple_search = preg_match('/^[\(\"]+(\^)?([a-z0-9\_\-\s]+)(\$)?[\)\"]+$/is', $sub_r_2, $m);
+      $is_simple_search = preg_match('/^[\(\"]+(\^)?([^\\\*\[\]\}\{\(\)\"\'\?\+\.]+)(\$)?[\)\"]+$/is', $sub_r_2, $m);
+      $is_o_search = preg_match('/o\.val\)*$/', $sub_r_1);
+      /* fulltext search */
+      if ($is_simple_search && $is_o_search && !$op && (strlen($m[2]) > 4) && $this->store->hasFulltextIndex()) {
+        return 'MATCH(' . trim($sub_r_1, '()') . ') AGAINST("' . $m[2] . '")';
+      }
+      /* LIKE */
+      if ($is_simple_search && ($sub_r_3 == 'i')) {
         $sub_r_2 = $m[1] ? $m[2] : '%' . $m[2];
         $sub_r_2 .= isset($m[3]) && $m[3] ? '' : '%';
         return $sub_r_1 . $op . ' LIKE "' . $sub_r_2 . '"';
       }
-      /* use REGEXP */
-      else {
-        return $sub_r_1 . $op . ' REGEXP ' . $opt . $sub_r_2;
-      }
+      /* REGEXP */
+      $opt = ($sub_r_3 == 'i') ? '' : 'BINARY ';
+      return $sub_r_1 . $op . ' REGEXP ' . $opt . $sub_r_2;
     }
     return '';
   }
