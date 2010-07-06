@@ -6,7 +6,7 @@
  * @license http://arc.semsol.org/license
  * @homepage <http://arc.semsol.org/>
  * @package ARC2
- * @version 2010-04-11
+ * @version 2010-06-24
 */
 
 ARC2::inc('StoreQueryHandler');
@@ -50,7 +50,7 @@ class ARC2_StoreDeleteQueryHandler extends ARC2_StoreQueryHandler {
     $t2 = ARC2::mtime();
     /* clean up */
     if ($tc && ($this->refs_deleted || (rand(1, 100) == 1))) $this->cleanTableReferences();
-    if ($tc && (rand(1, 50) == 1)) $this->store->optimizeTables();
+    if ($tc && (rand(1, 100) == 1)) $this->store->optimizeTables();
     if ($tc && (rand(1, 500) == 1)) $this->cleanValueTables();
     $t3 = ARC2::mtime();
     $index_dur = round($t3 - $t2, 4);
