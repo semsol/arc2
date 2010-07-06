@@ -4,7 +4,7 @@
  *
  * @license   http://arc.semsol.org/license
  * @author    Benjamin Nowack
- * @version   2009-09-07 Tweak: store_engine_type is a config option
+ * @version   2010-06-21
  *
 */
 
@@ -146,13 +146,16 @@ class ARC2_StoreTableManager extends ARC2_Store {
   /*  */
   
   function createS2ValTable() {
+    //$indexes = 'UNIQUE KEY (id), KEY vh (val_hash), KEY v (val(64))';
+    $indexes = 'UNIQUE KEY (id), KEY vh (val_hash)';
     $sql = "
       CREATE TABLE IF NOT EXISTS " . $this->getTablePrefix() . "s2val (
         id mediumint UNSIGNED NOT NULL,
         misc tinyint(1) NOT NULL default 0,
+        val_hash char(32) NOT NULL,
         val text NOT NULL,
-        UNIQUE KEY (id), KEY v (val(64))
-      ) ". $this->getTableOptionsCode() . "
+        " . $indexes . "
+      ) " . $this->getTableOptionsCode() . "
     ";
     return mysql_query($sql, $this->getDBCon());
   }  
@@ -168,12 +171,16 @@ class ARC2_StoreTableManager extends ARC2_Store {
   /*  */
   
   function createO2ValTable() {
+    /* object value index, e.g. "KEY v (val(64))" and/or "FULLTEXT KEY vft (val)" */
+    $val_index = $this->v('store_object_index', 'KEY v (val(64))', $this->a);
+    if ($val_index) $val_index = ', ' . ltrim($val_index, ',');
     $sql = "
       CREATE TABLE IF NOT EXISTS " . $this->getTablePrefix() . "o2val (
         id mediumint UNSIGNED NOT NULL,
         misc tinyint(1) NOT NULL default 0,
+        val_hash char(32) NOT NULL,
         val text NOT NULL,
-        UNIQUE KEY (id), KEY v (val(64))
+        UNIQUE KEY (id), KEY vh (val_hash)" . $val_index . "
       ) ". $this->getTableOptionsCode() . "
     ";
     return mysql_query($sql, $this->getDBCon());
