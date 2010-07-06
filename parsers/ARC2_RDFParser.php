@@ -126,6 +126,18 @@ class ARC2_RDFParser extends ARC2_Class {
     }
   }
 
+  /**
+   * returns the array of namespace prefixes encountered during parsing
+   * @return array (keys = namespace URI / values = prefix used)
+  */
+
+  function getParsedNamespacePrefixes() {
+    if (isset($this->parser)) {
+      return $this->v('nsp', array(), $this->parser);
+    }
+    return $this->v('nsp', array());
+  }
+
   /*  */
 
 }
