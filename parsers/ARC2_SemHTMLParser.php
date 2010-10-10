@@ -16,10 +16,6 @@ class ARC2_SemHTMLParser extends ARC2_LegacyXMLParser {
     parent::__construct($a, $caller);
   }
   
-  function ARC2_SemHTMLParser($a = '', &$caller) {
-    $this->__construct($a, $caller);
-  }
-
   function __init() {/* reader */
     parent::__init();
     $this->default_sem_html_formats = 'dc openid erdf rdfa posh-rdf microformats';
@@ -48,18 +44,10 @@ class ARC2_SemHTMLParser extends ARC2_LegacyXMLParser {
     return false;
   }
 
-  function camelCase($v) {
-    $r = ucfirst($v);
-    while (preg_match('/^(.*)[\-\_ ](.*)$/', $r, $m)) {
-      $r = $m[1] . ucfirst($m[2]);
-    }
-    return $r;
-  }
-  
   /*  */
 
   function setReader(&$reader) {
-    $this->reader =& $reader;
+    $this->reader = $reader;
   }
   
   function createBnodeID(){
@@ -99,14 +87,14 @@ class ARC2_SemHTMLParser extends ARC2_LegacyXMLParser {
 
   /*  */
 
-  function parse($path, $data = '') {
+  function parse($path, $data = '', $iso_fallback = 'ignore') {
     $this->nodes = array();
     $this->node_count = 0;
     $this->level = 0;
     /* reader */
     if (!$this->v('reader')) {
       ARC2::inc('Reader');
-      $this->reader = & new ARC2_Reader($this->a, $this);
+      $this->reader = new ARC2_Reader($this->a, $this);
     }
     $this->reader->setAcceptHeader('Accept: text/html, application/xhtml, */*; q=0.9');
     $this->reader->activate($path, $data);
@@ -127,7 +115,7 @@ class ARC2_SemHTMLParser extends ARC2_LegacyXMLParser {
   
   /*  */
 
-  function getEncoding() {
+  function getEncoding($src = 'ignore') {
     return $this->target_encoding;
   }
 
@@ -282,7 +270,7 @@ class ARC2_SemHTMLParser extends ARC2_LegacyXMLParser {
         $sub_v = substr($sub_v, 1);
       }
       $sub_v = $sub_v ? $sub_r[2] : $sub_v;
-      $vals = split(' ', $val);
+      $vals = preg_split('/ /', $val);
       return array(array('k' => $r[1], 'value' => $val, 'values' => $vals), $sub_v);
     }
     return array(0, $v);
@@ -327,8 +315,8 @@ class ARC2_SemHTMLParser extends ARC2_LegacyXMLParser {
 
   function extractRDF($formats = '') {
     $this->node_index = $this->getNodeIndex();
-    $formats = !$formats ? $this->v1('sem_html_formats', $this->default_sem_html_formats, $this->a) : $formats;
-    $formats = split(' ', $formats);
+    $formats = !$formats ? $this->v('sem_html_formats', $this->default_sem_html_formats, $this->a) : $formats;
+    $formats = preg_split('/ /', $formats);
     foreach ($formats as $format) {
       if (!in_array($format, $this->extracted_formats)) {
         $comp = $this->camelCase($format) . 'Extractor';

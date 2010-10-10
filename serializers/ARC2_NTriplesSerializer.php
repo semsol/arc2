@@ -17,10 +17,6 @@ class ARC2_NTriplesSerializer extends ARC2_RDFSerializer {
     parent::__construct($a, $caller);
   }
   
-  function ARC2_NTriplesSerializer($a = '', &$caller) {
-    $this->__construct($a, $caller);
-  }
-
   function __init() {
     parent::__init();
     $this->esc_chars = array();

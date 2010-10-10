@@ -17,10 +17,6 @@ class ARC2_RDFParser extends ARC2_Class {
     parent::__construct($a, $caller);
   }
   
-  function ARC2_RDFParser($a = '', &$caller) {
-    $this->__construct($a, $caller);
-  }
-
   function __init() {/* proxy_host, proxy_port, proxy_skip, http_accept_header, http_user_agent_header, max_redirects, reader, skip_dupes */
     parent::__init();
     $this->a['format'] = $this->v('format', false, $this->a);
@@ -37,14 +33,14 @@ class ARC2_RDFParser extends ARC2_Class {
   /*  */
   
   function setReader(&$reader) {
-    $this->reader =& $reader;
+    $this->reader = $reader;
   }
   
   function parse($path, $data = '') {
     /* reader */
     if (!isset($this->reader)) {
       ARC2::inc('Reader');
-      $this->reader = & new ARC2_Reader($this->a, $this);
+      $this->reader = new ARC2_Reader($this->a, $this);
     }
     $this->reader->activate($path, $data) ;
     /* format detection */
@@ -68,7 +64,7 @@ class ARC2_RDFParser extends ARC2_Class {
     $suffix = $mappings[$format] . 'Parser';
     ARC2::inc($suffix);
     $cls = 'ARC2_' . $suffix;
-    $this->parser =& new $cls($this->a, $this);
+    $this->parser = new $cls($this->a, $this);
     $this->parser->setReader($this->reader);
     return $this->parser->parse($path, $data);
   }

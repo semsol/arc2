@@ -18,13 +18,9 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler {
     parent::__construct($a, $caller);
   }
   
-  function ARC2_StoreSelectQueryHandler($a = '', &$caller) {
-    $this->__construct($a, $caller);
-  }
-
   function __init() {/* db_con */
     parent::__init();
-    $this->store =& $this->caller;
+    $this->store = $this->caller;
     $con = $this->store->getDBCon();
     $this->handler_type = 'select';
     $this->engine_type = $this->v('store_engine_type', 'MyISAM', $this->a);
@@ -1060,7 +1056,8 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler {
       return '';
     }
     /* unconnected vars in FILTERs eval to false */
-    if ($sub_r = $this->hasUnconnectedFilterVars($id)) {
+    $sub_r = $this->hasUnconnectedFilterVars($id);
+    if ($sub_r) {
       if ($sub_r == 'alias') {
         if (!in_array($r, $this->index['havings'])) $this->index['havings'][] = $r;
         return '';
@@ -1081,75 +1078,96 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler {
     return $r;
   }
   
-  /*  */
+  /**
+   * Checks if vars in the given (filter) pattern are used within the filter's scope.
+   */
   
-  function hasUnconnectedFilterVars($filter_id) {
-    $pattern = $this->getInitialPattern($filter_id);
-    $gp = $this->getInitialPattern($pattern['parent_id']);
-    $vars = array();
-    foreach ($this->initial_index['patterns'] as $id => $p) {
-      /* vars in given filter */
-      if (preg_match('/^' .$filter_id. '.+/', $id)) {
-        if ($p['type'] == 'var') {
-          $vars[$p['value']][] = 'filter';
-        }
-        if (($p['type'] == 'built_in_call') && ($p['call'] == 'bound')) {
-          $vars[$p['args'][0]['value']][] = 'filter';
-        }
+  function hasUnconnectedFilterVars($filter_pattern_id) {
+    $scope_id = $this->getFilterScope($filter_pattern_id);
+    $vars = $this->getFilterVars($filter_pattern_id);
+    $r = 0;
+    foreach ($vars as $var_name) {
+      if ($this->isUsedTripleVar($var_name, $scope_id)) continue;
+      if ($this->isAliasVar($var_name)) {
+        $r = 'alias';
+        break;
       }
-      /* triple patterns if their scope is in the parent path of the filter */
-      if ($p['type'] == 'triple') {
-        $tp = $p;
-        do {
-          $proceed = 1;
-          $tp = $this->getInitialPattern($tp['parent_id']);
-          if ($tp['type'] == 'group') {
-            $proceed = 0;
-            if (isset($tp['parent_id']) && ($p_tp = $this->getInitialPattern($tp['parent_id'])) && ($p_tp['type'] == 'union')) {
-              $proceed = 1;
-            }
-          }
-        } while ($proceed);
-        $tp_id = $tp['id'];
-        $fp_id = $filter_id;
-        $ok = 0;
-        do {
-          $fp = $this->getInitialPattern($fp_id);
-          $fp_id = $fp['parent_id'];
-          if (($fp['type'] != 'group') && ($fp_id === $tp_id)) {
-            $ok = 1;
-            break;
-          }
-        } while (($fp['parent_id'] != $fp['id']) && ($fp['type'] != 'group'));
-        if ($ok) {
-          foreach (array('s', 'p', 'o') as $term) {
-            if ($p[$term . '_type'] == 'var') {
-              $vars[$p[$term]][] = 'triple';
-            }
-          }
-        }
+      $r = 1;
+      break;
+    }
+    return $r;
+  }
+  
+  /**
+   * Returns the given filter pattern's scope (the id of the parent group pattern).
+   */
+
+  function getFilterScope($filter_pattern_id) {
+    $patterns = $this->initial_index['patterns'];
+    $r = '';
+    foreach ($patterns as $id => $p) {
+      /* the id has to be sub-part of the given filter id */
+      if (!preg_match('/^' . $id . '.+/', $filter_pattern_id)) continue;
+      /* we are looking for a group or union */
+      if (!preg_match('/^(group|union)$/', $p['type'])) continue;
+      /* we are looking for the longest/deepest match */
+      if (strlen($id) > strlen($r)) $r = $id;
+    }
+    return $r;
+  }
+
+  /**
+   * Builds a list of vars used in the given (filter) pattern.
+   */
+
+  function getFilterVars($filter_pattern_id) {
+    $r = array();
+    $patterns = $this->initial_index['patterns'];
+    /* find vars in the given filter (i.e. the given id is part of their pattern id) */
+    foreach ($patterns as $id => $p) {
+      if (!preg_match('/^' . $filter_pattern_id . '.+/', $id)) continue;
+      $var_name = '';
+      if ($p['type'] == 'var') {
+        $var_name = $p['value'];
+      }
+      elseif (($p['type'] == 'built_in_call') && ($p['call'] == 'bound')) {
+        $var_name = $p['args'][0]['value'];
+      }
+      if ($var_name && !in_array($var_name, $r)) {
+        $r[] = $var_name;
       }
     }
-    foreach ($vars as $var => $types) {
-      if (!in_array('triple', $types)) {
-        /* might be an alias */
-        $r = 1;
-        foreach ($this->infos['query']['result_vars'] as $r_var) {
-          if ($r_var['alias'] == $var) {
-            $r = 'alias';
-            break;
-          }
-          //if ($r_var['alias'] == $var) $r = 0;
-        }
-        /* filter */
-        //if (in_array('filter', $types)) $r = 0;
-        if ($r) return $r;
-      }
+    return $r;
+  }
+
+  /**
+   * Checks if $var_name appears as result projection alias.
+   */
+
+  function isAliasVar($var_name) {
+    foreach ($this->infos['query']['result_vars'] as $r_var) {
+      if ($r_var['alias'] == $var_name) return 1;
     }
     return 0;
   }
 
-   /*  */
+  /**
+   * Checks if $var_name is used in a triple pattern in the given scope
+   */
+
+  function isUsedTripleVar($var_name, $scope_id = '0') {
+    $patterns = $this->initial_index['patterns'];
+    foreach ($patterns as $id => $p) {
+      if ($p['type'] != 'triple') continue;
+      if (!preg_match('/^' . $scope_id . '.+/', $id)) continue;
+      foreach (array('s', 'p', 'o') as $term) {
+        if ($p[$term . '_type'] != 'var') continue;
+        if ($p[$term] == $var_name) return 1;
+      }
+    }
+  }
+
+  /*  */
 
   function getExpressionSQL($pattern, $context, $val_type = '', $parent_type = '') {
     $r = '';
@@ -1598,10 +1616,17 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler {
       $is_simple_search = preg_match('/^[\(\"]+(\^)?([a-z0-9\_\-\s]+)(\$)?[\)\"]+$/is', $sub_r_2, $m);
       $is_simple_search = preg_match('/^[\(\"]+(\^)?([^\\\*\[\]\}\{\(\)\"\'\?\+\.]+)(\$)?[\)\"]+$/is', $sub_r_2, $m);
       $is_o_search = preg_match('/o\.val\)*$/', $sub_r_1);
-      /* fulltext search */
-      if ($is_simple_search && $is_o_search && !$op && (strlen($m[2]) > 4) && $this->store->hasFulltextIndex()) {
-        return 'MATCH(' . trim($sub_r_1, '()') . ') AGAINST("' . $m[2] . '")';
+      /* fulltext search (may have "|") */
+      if ($is_simple_search && $is_o_search && !$op && (strlen($m[2]) > 8) && $this->store->hasFulltextIndex()) {
+        /* MATCH variations */
+        if (($val_parts = preg_split('/\|/', $m[2]))) {
+          return 'MATCH(' . trim($sub_r_1, '()') . ') AGAINST("' . join(' ', $val_parts) . '")';
+        }
+        else {
+          return 'MATCH(' . trim($sub_r_1, '()') . ') AGAINST("' . $m[2] . '")';
+        }
       }
+      if (preg_match('/\|/', $sub_r_2)) $is_simple_search = 0;
       /* LIKE */
       if ($is_simple_search && ($sub_r_3 == 'i')) {
         $sub_r_2 = $m[1] ? $m[2] : '%' . $m[2];

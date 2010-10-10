@@ -17,10 +17,6 @@ class ARC2_Reader extends ARC2_Class {
     parent::__construct($a, $caller);
   }
   
-  function ARC2_Reader($a = '', &$caller) {
-    $this->__construct($a, $caller);
-  }
-
   function __init() {/* inc_path, proxy_host, proxy_port, proxy_skip, http_accept_header, http_user_agent_header, max_redirects */
     parent::__init();
     $this->http_method = $this->v('http_method', 'GET', $this->a);

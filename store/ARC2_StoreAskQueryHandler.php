@@ -17,13 +17,9 @@ class ARC2_StoreAskQueryHandler extends ARC2_StoreSelectQueryHandler {
     parent::__construct($a, $caller);
   }
   
-  function ARC2_StoreAskQueryHandler($a = '', &$caller) {
-    $this->__construct($a, $caller);
-  }
-
   function __init() {/* db_con */
     parent::__init();
-    $this->store =& $this->caller;
+    $this->store = $this->caller;
   }
 
   /*  */

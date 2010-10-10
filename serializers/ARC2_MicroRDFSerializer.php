@@ -17,10 +17,6 @@ class ARC2_MicroRDFSerializer extends ARC2_RDFSerializer {
     parent::__construct($a, $caller);
   }
   
-  function ARC2_MicroRDFSerializer($a = '', &$caller) {/* ns */
-    $this->__construct($a, $caller);
-  }
-
   function __init() {
     parent::__init();
     $this->content_header = 'text/html';

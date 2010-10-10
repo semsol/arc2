@@ -17,10 +17,6 @@ class ARC2_Resource extends ARC2_Class {
     parent::__construct($a, $caller);
   }
   
-  function ARC2_Resource($a = '', &$caller) {
-    $this->__construct($a, $caller);
-  }
-
   function __init() {
     parent::__init();
     $this->uri = '';

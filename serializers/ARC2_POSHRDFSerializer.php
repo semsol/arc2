@@ -16,10 +16,6 @@ class ARC2_POSHRDFSerializer extends ARC2_RDFSerializer {
     parent::__construct($a, $caller);
   }
   
-  function ARC2_POSHRDFSerializer($a = '', &$caller) {/* ns */
-    $this->__construct($a, $caller);
-  }
-
   function __init() {
     parent::__init();
     $this->content_header = 'text/html';

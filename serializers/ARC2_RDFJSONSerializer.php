@@ -17,10 +17,6 @@ class ARC2_RDFJSONSerializer extends ARC2_RDFSerializer {
     parent::__construct($a, $caller);
   }
   
-  function ARC2_RDFJSONSerializer($a = '', &$caller) {
-    $this->__construct($a, $caller);
-  }
-
   function __init() {
     parent::__init();
     $this->content_header = 'application/json';
@@ -59,7 +55,7 @@ class ARC2_RDFJSONSerializer extends ARC2_RDFSerializer {
     return str_replace($from, $to, $v);
   }
     
-  function getSerializedIndex($index) {
+  function getSerializedIndex($index, $raw = 0) {
     $r = '';
     $nl = "\n";
     foreach ($index as $s => $ps) {

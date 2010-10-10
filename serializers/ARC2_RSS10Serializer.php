@@ -18,10 +18,6 @@ class ARC2_RSS10Serializer extends ARC2_RDFXMLSerializer {
     parent::__construct($a, $caller);
   }
   
-  function ARC2_RSS10Serializer($a = '', &$caller) {
-    $this->__construct($a, $caller);
-  }
-
   function __init() {
     parent::__init();
     $this->content_header = 'application/rss+xml';

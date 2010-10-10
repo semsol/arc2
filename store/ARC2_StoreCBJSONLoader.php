@@ -17,10 +17,6 @@ class ARC2_StoreCBJSONLoader extends ARC2_CBJSONParser {
     parent::__construct($a, $caller);
   }
   
-  function ARC2_StoreCBJSONLoader($a = '', &$caller) {
-    $this->__construct($a, $caller);
-  }
-
   function __init() {
     parent::__init();
   }

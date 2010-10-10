@@ -16,10 +16,6 @@ class ARC2_StoreTableManager extends ARC2_Store {
     parent::__construct($a, $caller);
   }
   
-  function ARC2_StoreTableManager($a = '', &$caller) {
-    $this->__construct($a, $caller);
-  }
-
   function __init() {/* db_con */
     parent::__init();
     $this->engine_type = $this->v('store_engine_type', 'MyISAM', $this->a);

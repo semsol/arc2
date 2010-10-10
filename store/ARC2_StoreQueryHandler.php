@@ -17,10 +17,6 @@ class ARC2_StoreQueryHandler extends ARC2_Class {
     parent::__construct($a, $caller);
   }
   
-  function ARC2_StoreQueryHandler($a = '', &$caller) {
-    $this->__construct($a, $caller);
-  }
-
   function __init() {/* db_con */
     parent::__init();
     $this->xsd = 'http://www.w3.org/2001/XMLSchema#';

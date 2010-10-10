@@ -16,10 +16,6 @@ class ARC2_SGAJSONParser extends ARC2_JSONParser {
     parent::__construct($a, $caller);
   }
   
-  function ARC2_SGAJSONParser($a = '', &$caller) {
-    $this->__construct($a, $caller);
-  }
-
   function __init() {/* reader */
     parent::__init();
     $this->rdf = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#';

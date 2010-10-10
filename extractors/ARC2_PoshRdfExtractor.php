@@ -16,10 +16,6 @@ class ARC2_PoshRdfExtractor extends ARC2_RDFExtractor {
     parent::__construct($a, $caller);
   }
   
-  function ARC2_PoshRdfExtractor($a = '', &$caller) {
-    $this->__construct($a, $caller);
-  }
-
   function __init() {
     parent::__init();
     $this->terms = $this->v('posh_terms', array(), $this->a);

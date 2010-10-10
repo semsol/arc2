@@ -16,17 +16,13 @@ class ARC2_SPARQLScriptParser extends ARC2_SPARQLPlusParser {
     parent::__construct($a, $caller);
   }
   
-  function ARC2_SPARQLScriptParser($a = '', &$caller) {
-    $this->__construct($a, $caller);
-  }
-
   function __init() {
     parent::__init();
   }
 
   /*  */
 
-  function parse($v, $src = '') {
+  function parse($v, $src = '', $iso_fallback = 'ignore') {
     $this->setDefaultPrefixes();
     $this->base = $src ? $this->calcBase($src) : ARC2::getScriptURI();
     $this->blocks = array();

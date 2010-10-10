@@ -16,10 +16,6 @@ class ARC2_OpenidExtractor extends ARC2_RDFExtractor {
     parent::__construct($a, $caller);
   }
   
-  function ARC2_OpenidExtractor($a = '', &$caller) {
-    $this->__construct($a, $caller);
-  }
-
   function __init() {
     parent::__init();
     $this->a['ns']['foaf'] = 'http://xmlns.com/foaf/0.1/';

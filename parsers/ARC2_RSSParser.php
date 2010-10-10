@@ -16,10 +16,6 @@ class ARC2_RSSParser extends ARC2_LegacyXMLParser {
     parent::__construct($a, $caller);
   }
   
-  function ARC2_RSSParser($a = '', &$caller) {
-    $this->__construct($a, $caller);
-  }
-
   function __init() {/* reader */
     parent::__init();
     $this->triples = array();
@@ -42,7 +38,7 @@ class ARC2_RSSParser extends ARC2_LegacyXMLParser {
   /*  */
   
   function setReader(&$reader) {
-    $this->reader =& $reader;
+    $this->reader = $reader;
   }
   
   function createBnodeID(){

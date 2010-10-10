@@ -17,13 +17,9 @@ class ARC2_StoreDeleteQueryHandler extends ARC2_StoreQueryHandler {
     parent::__construct($a, $caller);
   }
   
-  function ARC2_StoreDeleteQueryHandler($a = '', &$caller) {
-    $this->__construct($a, $caller);
-  }
-
   function __init() {/* db_con */
     parent::__init();
-    $this->store =& $this->caller;
+    $this->store = $this->caller;
     $this->handler_type = 'delete';
   }
 
@@ -144,7 +140,7 @@ class ARC2_StoreDeleteQueryHandler extends ARC2_StoreQueryHandler {
   
   function deleteConstructedGraph() {
     ARC2::inc('StoreConstructQueryHandler');
-    $h =& new ARC2_StoreConstructQueryHandler($this->a, $this->store);
+    $h = new ARC2_StoreConstructQueryHandler($this->a, $this->store);
     $sub_r = $h->runQuery($this->infos);
     $triples = ARC2::getTriplesFromIndex($sub_r);
     $tgs = $this->infos['query']['target_graphs'];

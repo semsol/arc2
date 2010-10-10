@@ -17,10 +17,6 @@ class ARC2_TurtleParser extends ARC2_RDFParser {
     parent::__construct($a, $caller);
   }
   
-  function ARC2_TurtleParser($a = '', &$caller) {
-    $this->__construct($a, $caller);
-  }
-
   function __init() {/* reader */
     parent::__init();
     $this->state = 0;
@@ -101,7 +97,7 @@ class ARC2_TurtleParser extends ARC2_RDFParser {
     /* reader */
     if (!$this->v('reader')) {
       ARC2::inc('Reader');
-      $this->reader = & new ARC2_Reader($this->a, $this);
+      $this->reader = new ARC2_Reader($this->a, $this);
     }
     $this->reader->setAcceptHeader('Accept: application/x-turtle; q=0.9, */*; q=0.1');
     $this->reader->activate($path, $data);

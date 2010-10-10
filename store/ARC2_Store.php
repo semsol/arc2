@@ -17,10 +17,6 @@ class ARC2_Store extends ARC2_Class {
     parent::__construct($a, $caller);
   }
   
-  function ARC2_Store($a = '', &$caller) {
-    $this->__construct($a, $caller);
-  }
-
   function __init() {/* db_con */
     parent::__init();
     $this->table_lock = 0;
@@ -56,7 +52,7 @@ class ARC2_Store extends ARC2_Class {
     if (!$db_con = mysql_connect($this->a['db_host'], $this->a['db_user'], $this->a['db_pwd'])) {
       return $this->addError(mysql_error());
     }
-    $this->a['db_con'] =& $db_con;
+    $this->a['db_con'] = $db_con;
     if (!mysql_select_db($this->a['db_name'], $db_con)) {
       return $this->addError(mysql_error($db_con));
     }
@@ -152,6 +148,26 @@ class ARC2_Store extends ARC2_Class {
 
   function countDBProcesses() {
     return ($rs = $this->queryDB('SHOW PROCESSLIST', $this->getDBCon())) ? mysql_num_rows($rs) : 0;
+  }
+  
+  function killDBProcesses($needle = '', $runtime = 30) {
+    $dbcon = $this->getDBCon();
+    /* make sure needle is sql */
+    if (preg_match('/\?.+ WHERE/i', $needle, $m)) {
+      $needle = $this->query($needle, 'sql');
+    }
+    $rs = $this->queryDB('SHOW FULL PROCESSLIST', $dbcon);
+    $ref_tbl = $this->getTablePrefix() . 'triple';
+    while ($row = mysql_fetch_array($rs)) {
+      if ($row['Time'] < $runtime) continue;
+      if (!preg_match('/^\s*(INSERT|SELECT) /s', $row['Info'])) continue; /* only basic queries */
+      if (!strpos($row['Info'], $ref_tbl . ' ')) continue; /* only from this store */
+      $kill = 0;
+      if ($needle && (strpos($row['Info'], $needle) !== false)) $kill = 1;
+      if (!$needle) $kill = 1;
+      if (!$kill) continue;
+      $this->queryDB('KILL ' . $row['Id'], $dbcon);
+    }
   }
   
   /*  */
@@ -306,7 +322,7 @@ class ARC2_Store extends ARC2_Class {
     $doc = is_array($doc) ? $this->toTurtle($doc) : $doc;
     $infos = array('query' => array('url' => $g, 'target_graph' => $g));
     ARC2::inc('StoreLoadQueryHandler');
-    $h =& new ARC2_StoreLoadQueryHandler($this->a, $this);
+    $h = new ARC2_StoreLoadQueryHandler($this->a, $this);
     $r = $h->runQuery($infos, $doc, $keep_bnode_ids);
     $this->processTriggers('insert', $infos);
     return $r;
@@ -316,7 +332,7 @@ class ARC2_Store extends ARC2_Class {
     if (!$doc) {
       $infos = array('query' => array('target_graphs' => array($g)));
       ARC2::inc('StoreDeleteQueryHandler');
-      $h =& new ARC2_StoreDeleteQueryHandler($this->a, $this);
+      $h = new ARC2_StoreDeleteQueryHandler($this->a, $this);
       $r = $h->runQuery($infos);
       $this->processTriggers('delete', $infos);
       return $r;
@@ -329,13 +345,13 @@ class ARC2_Store extends ARC2_Class {
   
   function dump() {
     ARC2::inc('StoreDumper');
-    $d =& new ARC2_StoreDumper($this->a, $this);
+    $d = new ARC2_StoreDumper($this->a, $this);
     $d->dumpSPOG();
   }
   
   function createBackup($path, $q = '') {
     ARC2::inc('StoreDumper');
-    $d =& new ARC2_StoreDumper($this->a, $this);
+    $d = new ARC2_StoreDumper($this->a, $this);
     $d->saveSPOG($path, $q);
   }
   
@@ -384,7 +400,7 @@ class ARC2_Store extends ARC2_Class {
     }
     else {
       ARC2::inc('SPARQLPlusParser');
-      $p = & new ARC2_SPARQLPlusParser($this->a, $this);
+      $p = new ARC2_SPARQLPlusParser($this->a, $this);
       $p->parse($q, $src);
       $infos = $p->getQueryInfos();
     }
@@ -417,7 +433,7 @@ class ARC2_Store extends ARC2_Class {
   function runQuery($infos, $type, $keep_bnode_ids = 0, $q = '') {
     ARC2::inc('Store' . ucfirst($type) . 'QueryHandler');
     $cls = 'ARC2_Store' . ucfirst($type) . 'QueryHandler';
-    $h =& new $cls($this->a, $this);
+    $h = new $cls($this->a, $this);
     $ticket = 1;
     $r = array();
     if ($q && ($type == 'select')) $ticket = $this->getQueueTicket($q);
@@ -543,6 +559,7 @@ class ARC2_Store extends ARC2_Class {
   }
 
   function optimizeTables($level = 2) {
+    if ($this->v('ignore_optimization')) return 1;
     return $this->processTables($level, 'optimize');
   }
 

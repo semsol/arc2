@@ -17,13 +17,9 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler {
     parent::__construct($a, $caller);
   }
   
-  function ARC2_StoreLoadQueryHandler($a = '', &$caller) {
-    $this->__construct($a, $caller);
-  }
-
   function __init() {/* db_con, store_log_inserts */
     parent::__init();
-    $this->store =& $this->caller;
+    $this->store = $this->caller;
     $this->write_buffer_size = $this->v('store_write_buffer', 2500, $this->a);
     $this->split_threshold = $this->v('store_split_threshold', 0, $this->a);
     $this->has_pcre_unicode = @preg_match('/\pL/u', 'test');
@@ -40,7 +36,7 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler {
     $this->keep_bnode_ids = $keep_bnode_ids;
     /* reader */
     ARC2::inc('Reader');
-    $reader =& new ARC2_Reader($this->a, $this);
+    $reader = new ARC2_Reader($this->a, $this);
     $reader->activate($url, $data);
     /* format detection */
     $mappings = array(
@@ -63,7 +59,7 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler {
     $suffix = 'Store' . $mappings[$format] . 'Loader';
     ARC2::inc($suffix);
     $cls = 'ARC2_' . $suffix;
-    $loader =& new $cls($this->a, $this);
+    $loader = new $cls($this->a, $this);
     $loader->setReader($reader);
     /* lock */
     if (!$this->store->getLock()) {
@@ -117,15 +113,15 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler {
   function addT($s, $p, $o, $s_type, $o_type, $o_dt = '', $o_lang = '') {
     if (!$this->has_lock) return 0;
     $type_ids = array ('uri' => '0', 'bnode' => '1' , 'literal' => '2');
-    $g = $this->getTermID($this->target_graph, '0', 'id');
+    $g = $this->getStoredTermID($this->target_graph, '0', 'id');
     $s = (($s_type == 'bnode') && !$this->keep_bnode_ids) ? '_:b' . abs(crc32($g . $s)) . '_' . (strlen($s) > 12 ? substr(substr($s, 2) , -10) : substr($s, 2)) : $s;
     $o = (($o_type == 'bnode') && !$this->keep_bnode_ids) ? '_:b' . abs(crc32($g . $o)) . '_' . (strlen($o) > 12 ? substr(substr($o, 2), -10) : substr($o, 2)) : $o;
     /* triple */
     $t = array(
-      's' => $this->getTermID($s, $type_ids[$s_type], 's'),
-      'p' => $this->getTermID($p, '0', 'id'),
-      'o' => $this->getTermID($o, $type_ids[$o_type], 'o'),
-      'o_lang_dt' => $this->getTermID($o_dt . $o_lang, $o_dt ? '0' : '2', 'id'),
+      's' => $this->getStoredTermID($s, $type_ids[$s_type], 's'),
+      'p' => $this->getStoredTermID($p, '0', 'id'),
+      'o' => $this->getStoredTermID($o, $type_ids[$o_type], 'o'),
+      'o_lang_dt' => $this->getStoredTermID($o_dt . $o_lang, $o_dt ? '0' : '2', 'id'),
       'o_comp' => $this->getOComp($o),
       's_type' => $type_ids[$s_type], 
       'o_type' => $type_ids[$o_type],
@@ -179,7 +175,7 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler {
     return 1;
   }
 
-  function getTermID($val, $type_id, $tbl) {
+  function getStoredTermID($val, $type_id, $tbl) {
     $con = $this->store->getDBCon();
     /* buffered */
     if (isset($this->term_ids[$val])) {

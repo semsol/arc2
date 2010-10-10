@@ -5,8 +5,8 @@
  * @author    Benjamin Nowack
  * @license   http://arc.semsol.org/license
  * @homepage <http://arc.semsol.org/>
- * @package ARC2
- * @version   2009-11-23
+ * @package   ARC2
+ * @version   2010-08-11
  *
 */
 
@@ -18,10 +18,6 @@ class ARC2_TurtleSerializer extends ARC2_RDFSerializer {
     parent::__construct($a, $caller);
   }
   
-  function ARC2_TurtleSerializer($a = '', &$caller) {
-    $this->__construct($a, $caller);
-  }
-
   function __init() {
     parent::__init();
     $this->content_header = 'application/x-turtle';
@@ -56,7 +52,7 @@ class ARC2_TurtleSerializer extends ARC2_RDFSerializer {
     $quot = '"';
     if (preg_match('/\"/', $v['value'])) {
       $quot = "'";
-      if (preg_match('/\'/', $v['value'])) {
+      if (preg_match('/\'/', $v['value']) || preg_match('/[\x0d\x0a]/', $v['value'])) {
         $quot = '"""';
         if (preg_match('/\"\"\"/', $v['value']) || preg_match('/\"$/', $v['value']) || preg_match('/^\"/', $v['value'])) {
           $quot = "'''";
@@ -79,7 +75,11 @@ class ARC2_TurtleSerializer extends ARC2_RDFSerializer {
     $nl = "\n";
     foreach ($this->used_ns as $v) {
       $r .= $r ? $nl : '';
-      $r .= '@prefix ' . $this->nsp[$v] . ': <' .$v. '> .';
+      foreach ($this->ns as $prefix => $ns) {
+        if ($ns != $v) continue;
+        $r .= '@prefix ' . $prefix . ': <' .$v. '> .';
+        break;
+      }
     }
     return $r;
   }

@@ -16,10 +16,6 @@ class ARC2_StoreSGAJSONLoader extends ARC2_SGAJSONParser {
     parent::__construct($a, $caller);
   }
   
-  function ARC2_StoreSGAJSONLoader($a = '', &$caller) {
-    $this->__construct($a, $caller);
-  }
-
   function __init() {
     parent::__init();
   }

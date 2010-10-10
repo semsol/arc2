@@ -17,10 +17,6 @@ class ARC2_RDFXMLParser extends ARC2_RDFParser {
     parent::__construct($a, $caller);
   }
   
-  function ARC2_RDFXMLParser($a = '', &$caller) {
-    $this->__construct($a, $caller);
-  }
-
   function __init() {/* reader */
     parent::__init();
     $this->encoding = $this->v('encoding', false, $this->a);
@@ -41,7 +37,7 @@ class ARC2_RDFXMLParser extends ARC2_RDFParser {
     /* reader */
     if (!$this->v('reader')) {
       ARC2::inc('Reader');
-      $this->reader = & new ARC2_Reader($this->a, $this);
+      $this->reader = new ARC2_Reader($this->a, $this);
     }
     $this->reader->setAcceptHeader('Accept: application/rdf+xml; q=0.9, */*; q=0.1');
     $this->reader->activate($path, $data);
@@ -94,7 +90,7 @@ class ARC2_RDFXMLParser extends ARC2_RDFParser {
       xml_set_character_data_handler($parser, 'cdata');
       xml_set_start_namespace_decl_handler($parser, 'nsDecl');
       xml_set_object($parser, $this);
-      $this->xml_parser =& $parser;
+      $this->xml_parser = $parser;
     }
   }
 
@@ -483,7 +479,7 @@ class ARC2_RDFXMLParser extends ARC2_RDFParser {
       else {
         $ns_uri = $parts[0];
         $name = $parts[1];
-        $nsp = $this->nsp[$ns_uri];
+        $nsp = $this->v($ns_uri, '', $this->nsp);
         $data .= $nsp ? ' '.$nsp.':'.$name.'="'.$v.'"' : ' '.$name.'="'.$v.'"' ;
       }
     }

@@ -16,10 +16,6 @@ class ARC2_RDFExtractor extends ARC2_Class {
     parent::__construct($a, $caller);
   }
   
-  function ARC2_RDFExtractor($a = '', &$caller) {
-    $this->__construct($a, $caller);
-  }
-
   function __init() {
     parent::__init();
     $this->nodes = $this->caller->getNodes();
@@ -34,14 +30,6 @@ class ARC2_RDFExtractor extends ARC2_Class {
   
   function x($re, $v, $options = 'si') {
     return ARC2::x($re, $v, $options);
-  }
-
-  function camelCase($v) {
-    $r = ucfirst($v);
-    while (preg_match('/^(.*)[\-\_ ](.*)$/', $r, $m)) {
-      $r = $m[1] . ucfirst($m[2]);
-    }
-    return $r;
   }
 
   function createBnodeID(){

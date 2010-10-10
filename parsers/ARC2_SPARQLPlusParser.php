@@ -16,10 +16,6 @@ class ARC2_SPARQLPlusParser extends ARC2_SPARQLParser {
     parent::__construct($a, $caller);
   }
   
-  function ARC2_SPARQLPlusParser($a = '', &$caller) {
-    $this->__construct($a, $caller);
-  }
-
   function __init() {
     parent::__init();
   }

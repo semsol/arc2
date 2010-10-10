@@ -17,10 +17,6 @@ class ARC2_SPARQLParser extends ARC2_TurtleParser {
     parent::__construct($a, $caller);
   }
   
-  function ARC2_SPARQLParser($a = '', &$caller) {
-    $this->__construct($a, $caller);
-  }
-
   function __init() {
     parent::__init();
     $this->bnode_prefix = $this->v('bnode_prefix', 'arc'.substr(md5(uniqid(rand())), 0, 4).'b', $this->a);
@@ -30,7 +26,7 @@ class ARC2_SPARQLParser extends ARC2_TurtleParser {
 
   /*  */
 
-  function parse($q, $src = '') {
+  function parse($q, $src = '', $iso_fallback = 'ignore') {
     $this->setDefaultPrefixes();
     $this->base = $src ? $this->calcBase($src) : ARC2::getRequestURI();
     $this->r = array(

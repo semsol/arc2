@@ -16,10 +16,6 @@ class ARC2_StoreAtomLoader extends ARC2_AtomParser {
     parent::__construct($a, $caller);
   }
   
-  function ARC2_StoreAtomLoader($a = '', &$caller) {
-    $this->__construct($a, $caller);
-  }
-
   function __init() {
     parent::__init();
   }

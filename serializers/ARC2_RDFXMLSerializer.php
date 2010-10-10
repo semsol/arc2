@@ -2,11 +2,11 @@
 /**
  * ARC2 RDF/XML Serializer
  *
- * @author Benjamin Nowack
- * @license <http://arc.semsol.org/license>
- * @homepage <http://arc.semsol.org/>
- * @package ARC2
- * @version 2010-01-30
+ * @author    Benjamin Nowack
+ * @license   <http://arc.semsol.org/license>
+ * @homepage  <http://arc.semsol.org/>
+ * @package   ARC2
+ * @version   2010-08-11
  * 
 */
 
@@ -18,10 +18,6 @@ class ARC2_RDFXMLSerializer extends ARC2_RDFSerializer {
     parent::__construct($a, $caller);
   }
   
-  function ARC2_RDFXMLSerializer($a = '', &$caller) {
-    $this->__construct($a, $caller);
-  }
-
   function __init() {
     parent::__init();
     $this->content_header = 'application/rdf+xml';
@@ -93,7 +89,11 @@ class ARC2_RDFXMLSerializer extends ARC2_RDFSerializer {
     $first_ns = 1;
     foreach ($this->used_ns as $v) {
       $r .= $first_ns ? ' ' : $nl . '  ';
-      $r .= 'xmlns:' . $this->nsp[$v] . '="' .$v. '"';
+      foreach ($this->ns as $prefix => $ns) {
+        if ($ns != $v) continue;
+        $r .= 'xmlns:' . $prefix . '="' .$v. '"';
+        break;
+      }
       $first_ns = 0;
     }
     if ($this->default_ns) {

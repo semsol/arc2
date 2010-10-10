@@ -16,10 +16,6 @@ class ARC2_DcExtractor extends ARC2_RDFExtractor {
     parent::__construct($a, $caller);
   }
   
-  function ARC2_DcExtractor($a = '', &$caller) {
-    $this->__construct($a, $caller);
-  }
-
   function __init() {
     parent::__init();
     $this->a['ns']['dc'] = 'http://purl.org/dc/elements/1.1/';

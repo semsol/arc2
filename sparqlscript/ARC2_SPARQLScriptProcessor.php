@@ -16,10 +16,6 @@ class ARC2_SPARQLScriptProcessor extends ARC2_Class {
     parent::__construct($a, $caller);
   }
   
-  function ARC2_SPARQLScriptProcessor ($a = '', &$caller) {
-    $this->__construct($a, $caller);
-  }
-
   function __init() {
     parent::__init();
     $this->max_operations = $this->v('sparqlscript_max_operations', 0, $this->a);
@@ -531,7 +527,7 @@ class ARC2_SPARQLScriptProcessor extends ARC2_Class {
   
   function processHTTPCall($block, $mthd = 'GET') {
     ARC2::inc('Reader');
-    $reader =& new ARC2_Reader($this->a, $this);
+    $reader = new ARC2_Reader($this->a, $this);
     $url = $this->replacePlaceholders($block['args'][0]['value'], 'function_call');
     if ($mthd != 'GET') {
       $reader->setHTTPMethod($mthd);

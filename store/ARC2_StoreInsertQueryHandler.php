@@ -17,13 +17,9 @@ class ARC2_StoreInsertQueryHandler extends ARC2_StoreQueryHandler {
     parent::__construct($a, $caller);
   }
   
-  function ARC2_StoreInsertQueryHandler($a = '', &$caller) {
-    $this->__construct($a, $caller);
-  }
-
   function __init() {/* db_con */
     parent::__init();
-    $this->store =& $this->caller;
+    $this->store = $this->caller;
   }
 
   /*  */
@@ -38,7 +34,7 @@ class ARC2_StoreInsertQueryHandler extends ARC2_StoreQueryHandler {
     else {
       $keep_bnode_ids = 1;
       ARC2::inc('StoreConstructQueryHandler');
-      $h =& new ARC2_StoreConstructQueryHandler($this->a, $this->store);
+      $h = new ARC2_StoreConstructQueryHandler($this->a, $this->store);
       if ($sub_r = $h->runQuery($this->infos)) {
         return $this->store->insert($sub_r, $this->infos['query']['target_graph'], $keep_bnode_ids);
       }

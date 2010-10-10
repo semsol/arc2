@@ -16,10 +16,6 @@ class ARC2_SPARQLXMLResultParser extends ARC2_LegacyXMLParser {
     parent::__construct($a, $caller);
   }
   
-  function ARC2_SPARQLXMLResultParser($a = '', &$caller) {
-    $this->__construct($a, $caller);
-  }
-
   function __init() {/* reader */
     parent::__init();
     $this->srx = 'http://www.w3.org/2005/sparql-results#';

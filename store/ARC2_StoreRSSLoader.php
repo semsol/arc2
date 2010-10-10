@@ -16,10 +16,6 @@ class ARC2_StoreRSSLoader extends ARC2_RSSParser {
     parent::__construct($a, $caller);
   }
   
-  function ARC2_StoreRSSLoader($a = '', &$caller) {
-    $this->__construct($a, $caller);
-  }
-
   function __init() {
     parent::__init();
   }

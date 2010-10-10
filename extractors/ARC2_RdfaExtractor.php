@@ -16,10 +16,6 @@ class ARC2_RdfaExtractor extends ARC2_RDFExtractor {
     parent::__construct($a, $caller);
   }
   
-  function ARC2_RdfaExtractor($a = '', &$caller) {
-    $this->__construct($a, $caller);
-  }
-
   function __init() {
     parent::__init();
   }

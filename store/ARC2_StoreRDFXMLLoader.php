@@ -16,10 +16,6 @@ class ARC2_StoreRDFXMLLoader extends ARC2_RDFXMLParser {
     parent::__construct($a, $caller);
   }
   
-  function ARC2_StoreRDFXMLLoader($a = '', &$caller) {
-    $this->__construct($a, $caller);
-  }
-
   function __init() {
     parent::__init();
   }

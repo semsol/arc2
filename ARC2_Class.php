@@ -11,21 +11,12 @@
 
 class ARC2_Class {
   
-  function __construct($a = '', &$caller) {
-    $a = is_array($a) ? $a : array();
-    $this->a = $a;
-    $this->caller = &$caller;
+  function __construct($a, &$caller) {
+    $this->a = is_array($a) ? $a : array();
+    $this->caller = $caller;
     $this->__init();
   }
   
-  function ARC2_Class($a = '', &$caller) {
-    $this->__construct($a, $caller);
-  }
-
-  function __destruct() {
-    //echo "\ndestructing " . get_class($this);
-  }
-
   function __init() {/* base, time_limit */
     if (!$_POST && isset($GLOBALS['HTTP_RAW_POST_DATA'])) parse_str($GLOBALS['HTTP_RAW_POST_DATA'], $_POST); /* php5 bug */
     $this->inc_path = ARC2::getIncPath();
@@ -44,7 +35,7 @@ class ARC2_Class {
   /*  */
   
   function v($name, $default = false, $o = false) {/* value if set */
-    if ($o === false) $o =& $this;
+    if ($o === false) $o = $this;
     if (is_array($o)) {
       return isset($o[$name]) ? $o[$name] : $default;
     }
@@ -52,7 +43,7 @@ class ARC2_Class {
   }
   
   function v1($name, $default = false, $o = false) {/* value if 1 (= not empty) */
-    if ($o === false) $o =& $this;
+    if ($o === false) $o = $this;
     if (is_array($o)) {
       return (isset($o[$name]) && $o[$name]) ? $o[$name] : $default;
     }
@@ -60,7 +51,7 @@ class ARC2_Class {
   }
   
   function m($name, $a = false, $default = false, $o = false) {/* call method */
-    if ($o === false) $o =& $this;
+    if ($o === false) $o = $this;
     return method_exists($o, $name) ? $o->$name($a) : $default;
   }
 

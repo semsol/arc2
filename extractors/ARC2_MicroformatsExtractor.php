@@ -16,10 +16,6 @@ class ARC2_MicroformatsExtractor extends ARC2_PoshRdfExtractor {
     parent::__construct($a, $caller);
   }
   
-  function ARC2_MicroformatsExtractor($a = '', &$caller) {
-    $this->__construct($a, $caller);
-  }
-
   function __init() {
     parent::__init();
     $this->terms = $this->getTerms();
@@ -49,8 +45,8 @@ class ARC2_MicroformatsExtractor extends ARC2_PoshRdfExtractor {
         }
       }
     }
-    $n['a']['class m'] = split(' ', $n['a']['class']);
-    $n['a']['rel m'] = split(' ', $n['a']['rel']);
+    $n['a']['class m'] = preg_split('/ /', $n['a']['class']);
+    $n['a']['rel m'] = preg_split('/ /', $n['a']['rel']);
     return $n;
   }
   
