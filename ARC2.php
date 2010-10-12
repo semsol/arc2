@@ -7,7 +7,7 @@
  * @homepage <http://arc.semsol.org/>
  * @package ARC2
  * @version 2010-10-12
-*/
+ */
 
 /* E_STRICT hack */
 if (function_exists('date_default_timezone_get')) {
