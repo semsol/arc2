@@ -7,7 +7,7 @@
  * @homepage <http://arc.semsol.org/>
  * @package ARC2
  * @version 2010-10-12
-*/
+ */
 
 class ARC2_Class {
   
