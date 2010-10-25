@@ -6,15 +6,14 @@
  * @license   <http://arc.semsol.org/license>
  * @homepage  <http://arc.semsol.org/>
  * @package   ARC2
- * @version   2010-08-11
- * 
+ * @version   2010-10-25
 */
 
 ARC2::inc('RDFSerializer');
 
 class ARC2_RDFXMLSerializer extends ARC2_RDFSerializer {
 
-  function __construct($a = '', &$caller) {
+  function __construct($a, &$caller) {
     parent::__construct($a, $caller);
   }
   
@@ -37,10 +36,8 @@ class ARC2_RDFXMLSerializer extends ARC2_RDFSerializer {
         return ' rdf:about="' . htmlspecialchars($v) . '"';
       }
       if ($type == 'p') {
-        if ($pn = $this->getPName($v)) {
-          return $pn;
-        }
-        return 0;
+        $pn = $this->getPName($v);
+        return $pn ? $pn : 0;
       }
       if ($type == 'o') {
         $v = $this->expandPName($v);
@@ -55,7 +52,7 @@ class ARC2_RDFXMLSerializer extends ARC2_RDFSerializer {
         return ' xml:lang="' . htmlspecialchars($v) . '"';
       }
     }
-    if ($v['type'] != 'literal') {
+    if ($this->v('type', '', $v) != 'literal') {
       return $this->getTerm($v['value'], 'o');
     }
     /* literal */
@@ -70,7 +67,7 @@ class ARC2_RDFXMLSerializer extends ARC2_RDFSerializer {
     elseif ($lang) {
       return $this->getTerm($lang, 'lang') . '>' . htmlspecialchars($v['value']);
     }
-    return '>' . htmlspecialchars($v['value']);
+    return '>' . htmlspecialchars($this->v('value', '', $v));
   }
 
   function getPName($v, $connector = ':') {
@@ -129,7 +126,8 @@ class ARC2_RDFXMLSerializer extends ARC2_RDFSerializer {
       $first_p = 1;
       foreach ($ps as $p => $os) {
         if (!$os) continue;
-        if ($p = $this->getTerm($p, 'p')) {
+        $p = $this->getTerm($p, 'p');
+        if ($p) {
           $r .= $nl . str_pad('', 4);
           $first_o = 1;
           if (!is_array($os)) {/* single literal o */
