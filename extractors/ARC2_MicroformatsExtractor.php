@@ -5,14 +5,14 @@ license:  http://arc.semsol.org/license
 
 class:    ARC2 microformats Extractor
 author:   Benjamin Nowack
-version:  
+version:  2010-11-16
 */
 
 ARC2::inc('ARC2_PoshRdfExtractor');
 
 class ARC2_MicroformatsExtractor extends ARC2_PoshRdfExtractor {
 
-  function __construct($a = '', &$caller) {
+  function __construct($a, &$caller) {
     parent::__construct($a, $caller);
   }
   

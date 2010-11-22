@@ -5,14 +5,14 @@ license:  http://arc.semsol.org/license
 
 class:    ARC2 Store SG API JSON Loader
 author:   Benjamin Nowack
-version:  2008-07-15
+version:  2010-11-16
 */
 
 ARC2::inc('SGAJSONParser');
 
 class ARC2_StoreSGAJSONLoader extends ARC2_SGAJSONParser {
 
-  function __construct($a = '', &$caller) {
+  function __construct($a, &$caller) {
     parent::__construct($a, $caller);
   }
   

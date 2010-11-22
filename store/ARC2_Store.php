@@ -6,14 +6,14 @@
  * @license http://arc.semsol.org/license
  * @homepage <http://arc.semsol.org/>
  * @package ARC2
- * @version 2010-06-22
+ * @version 2010-11-16
 */
 
 ARC2::inc('Class');
 
 class ARC2_Store extends ARC2_Class {
 
-  function __construct($a = '', &$caller) {
+  function __construct($a, &$caller) {
     parent::__construct($a, $caller);
   }
   
@@ -149,7 +149,7 @@ class ARC2_Store extends ARC2_Class {
   function countDBProcesses() {
     return ($rs = $this->queryDB('SHOW PROCESSLIST', $this->getDBCon())) ? mysql_num_rows($rs) : 0;
   }
-  
+
   function killDBProcesses($needle = '', $runtime = 30) {
     $dbcon = $this->getDBCon();
     /* make sure needle is sql */

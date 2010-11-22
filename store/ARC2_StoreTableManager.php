@@ -4,7 +4,7 @@
  *
  * @license   http://arc.semsol.org/license
  * @author    Benjamin Nowack
- * @version   2010-06-21
+ * @version   2010-11-16
  *
 */
 
@@ -12,7 +12,7 @@ ARC2::inc('Store');
 
 class ARC2_StoreTableManager extends ARC2_Store {
 
-  function __construct($a = '', &$caller) {
+  function __construct($a, &$caller) {
     parent::__construct($a, $caller);
   }
   

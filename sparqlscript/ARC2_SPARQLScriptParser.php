@@ -5,14 +5,14 @@ license:  http://arc.semsol.org/license
 
 class:    ARC2 SPARQLScript Parser (SPARQL+ + functions)
 author:   Benjamin Nowack
-version:  2008-09-22 (Addition: support for FunctionCall) 
+version:  2010-11-16
 */
 
 ARC2::inc('ARC2_SPARQLPlusParser');
 
 class ARC2_SPARQLScriptParser extends ARC2_SPARQLPlusParser {
 
-  function __construct($a = '', &$caller) {
+  function __construct($a, &$caller) {
     parent::__construct($a, $caller);
   }
   

@@ -5,14 +5,14 @@ license:  http://arc.semsol.org/license
 
 class:    ARC2 SG API JSON Parser
 author:   Benjamin Nowack
-version:  2008-07-17 (Tweak: Moved re-usable code to new ARC2_JSONParser)
+version:  2010-11-16
 */
 
 ARC2::inc('JSONParser');
 
 class ARC2_SGAJSONParser extends ARC2_JSONParser {
 
-  function __construct($a = '', &$caller) {
+  function __construct($a, &$caller) {
     parent::__construct($a, $caller);
   }
   

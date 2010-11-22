@@ -5,14 +5,14 @@ license:  http://arc.semsol.org/license
 
 class:    ARC2 poshRDF Extractor
 author:   Benjamin Nowack
-version:  
+version:  2010-11-16
 */
 
 ARC2::inc('ARC2_RDFExtractor');
 
 class ARC2_PoshRdfExtractor extends ARC2_RDFExtractor {
 
-  function __construct($a = '', &$caller) {
+  function __construct($a, &$caller) {
     parent::__construct($a, $caller);
   }
   

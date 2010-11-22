@@ -6,14 +6,14 @@
  * @license <http://arc.semsol.org/license>
  * @homepage <http://arc.semsol.org/>
  * @package ARC2
- * @version 2010-06-08
+ * @version 2010-11-16
 */
 
 ARC2::inc('RDFParser');
 
 class ARC2_SPOGParser extends ARC2_RDFParser {
 
-  function __construct($a = '', &$caller) {
+  function __construct($a, &$caller) {
     parent::__construct($a, $caller);
   }
   

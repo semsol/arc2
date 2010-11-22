@@ -5,14 +5,14 @@ license:  http://arc.semsol.org/license
 
 class:    ARC2 Atom Parser
 author:   Benjamin Nowack
-version:  2009-04-21 (Addition: support for link types)
+version:  2010-11-16
 */
 
 ARC2::inc('LegacyXMLParser');
 
 class ARC2_AtomParser extends ARC2_LegacyXMLParser {
 
-  function __construct($a = '', &$caller) {
+  function __construct($a, &$caller) {
     parent::__construct($a, $caller);
   }
   

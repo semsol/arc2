@@ -5,14 +5,14 @@ license:  http://arc.semsol.org/license
 
 class:    ARC2 RDF Store DUMP Query Handler
 author:   Benjamin Nowack
-version:  2008-07-02
+version:  2010-11-16
 */
 
 ARC2::inc('StoreQueryHandler');
 
 class ARC2_StoreDumpQueryHandler extends ARC2_StoreQueryHandler {
 
-  function __construct($a = '', &$caller) {/* caller has to be a store */
+  function __construct($a, &$caller) {/* caller has to be a store */
     parent::__construct($a, $caller);
   }
   

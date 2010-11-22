@@ -5,14 +5,14 @@ license:  http://arc.semsol.org/license
 
 class:    ARC2 DC Extractor
 author:   Benjamin Nowack
-version:  2008-04-09 (Fix: base URL (not doc URL) was used for annotations)
+version:  2010-11-16
 */
 
 ARC2::inc('RDFExtractor');
 
 class ARC2_DcExtractor extends ARC2_RDFExtractor {
 
-  function __construct($a = '', &$caller) {
+  function __construct($a, &$caller) {
     parent::__construct($a, $caller);
   }
   

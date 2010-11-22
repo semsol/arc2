@@ -5,14 +5,14 @@ license:  http://arc.semsol.org/license
 
 class:    ARC2 Store SemHTML Loader
 author:   Benjamin Nowack
-version:  2008-06-28 (Tweak: adjusted to normalized "literal" type)
+version:  2010-11-16
 */
 
 ARC2::inc('SemHTMLParser');
 
 class ARC2_StoreSemHTMLLoader extends ARC2_SemHTMLParser {
 
-  function __construct($a = '', &$caller) {
+  function __construct($a, &$caller) {
     parent::__construct($a, $caller);
   }
   

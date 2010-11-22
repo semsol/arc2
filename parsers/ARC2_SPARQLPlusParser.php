@@ -5,14 +5,14 @@ license:  http://arc.semsol.org/license
 
 class:    ARC2 SPARQL+ Parser (SPARQL + Aggregates + LOAD + INSERT + DELETE)
 author:   Benjamin Nowack
-version:  2008-05-30 (Tweak: CONSTRUCT keyword is now optional)
+version:  2010-11-16
 */
 
 ARC2::inc('SPARQLParser');
 
 class ARC2_SPARQLPlusParser extends ARC2_SPARQLParser {
 
-  function __construct($a = '', &$caller) {
+  function __construct($a, &$caller) {
     parent::__construct($a, $caller);
   }
   

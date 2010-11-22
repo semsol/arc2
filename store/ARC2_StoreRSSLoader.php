@@ -5,14 +5,14 @@ license:  http://arc.semsol.org/license
 
 class:    ARC2 Store RSS(2) Loader
 author:   Benjamin Nowack
-version:  2008-06-28 (Tweak: adjusted to normalized "literal" type)
+version:  2010-11-16
 */
 
 ARC2::inc('RSSParser');
 
 class ARC2_StoreRSSLoader extends ARC2_RSSParser {
 
-  function __construct($a = '', &$caller) {
+  function __construct($a, &$caller) {
     parent::__construct($a, $caller);
   }
   

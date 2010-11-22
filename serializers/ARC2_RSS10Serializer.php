@@ -7,14 +7,14 @@
  * @license <http://arc.semsol.org/license>
  * @homepage <http://arc.semsol.org/>
  * @package ARC2
- * @version 2009-11-09
+ * @version 2010-11-16
 */
 
 ARC2::inc('RDFXMLSerializer');
 
 class ARC2_RSS10Serializer extends ARC2_RDFXMLSerializer {
 
-  function __construct($a = '', &$caller) {
+  function __construct($a, &$caller) {
     parent::__construct($a, $caller);
   }
   

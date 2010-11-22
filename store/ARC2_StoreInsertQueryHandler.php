@@ -5,15 +5,14 @@ license:  http://arc.semsol.org/license
 
 class:    ARC2 RDF Store INSERT Query Handler
 author:   Benjamin Nowack
-version:  2007-09-11 (Fix: empty CONSTRUCT results were not caught, which led to a GET in LOAD
-                      Tweak: INSERT CONSTRUCT will keep bnode ids unchanged)
+version:  2010-11-16
 */
 
 ARC2::inc('StoreQueryHandler');
 
 class ARC2_StoreInsertQueryHandler extends ARC2_StoreQueryHandler {
 
-  function __construct($a = '', &$caller) {/* caller has to be a store */
+  function __construct($a, &$caller) {/* caller has to be a store */
     parent::__construct($a, $caller);
   }
   

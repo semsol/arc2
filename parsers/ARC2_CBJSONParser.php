@@ -6,14 +6,14 @@
  * @license http://arc.semsol.org/license
  * @homepage <http://arc.semsol.org/>
  * @package ARC2
- * @version 2010-03-25
+ * @version 2010-11-16
 */
 
 ARC2::inc('JSONParser');
 
 class ARC2_CBJSONParser extends ARC2_JSONParser {
 
-  function __construct($a = '', &$caller) {
+  function __construct($a, &$caller) {
     parent::__construct($a, $caller);
   }
   

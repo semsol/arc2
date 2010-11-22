@@ -5,14 +5,14 @@ license:  http://arc.semsol.org/license
 
 class:    ARC2 RSS Parser
 author:   Benjamin Nowack
-version:  2008-02-10
+version:  2010-11-16
 */
 
 ARC2::inc('LegacyXMLParser');
 
 class ARC2_RSSParser extends ARC2_LegacyXMLParser {
 
-  function __construct($a = '', &$caller) {
+  function __construct($a, &$caller) {
     parent::__construct($a, $caller);
   }
   

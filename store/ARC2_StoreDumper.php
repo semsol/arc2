@@ -6,14 +6,14 @@
  * @license <http://arc.semsol.org/license>
  * @homepage <http://arc.semsol.org/>
  * @package ARC2
- * @version 2010-06-09
+ * @version 2010-11-16
 */
 
 ARC2::inc('Class');
 
 class ARC2_StoreDumper extends ARC2_Class {
 
-  function __construct($a = '', &$caller) {
+  function __construct($a, &$caller) {
     parent::__construct($a, $caller);
   }
   

@@ -5,14 +5,14 @@ license:  http://arc.semsol.org/license
 
 class:    ARC2 Legaxy XML Parser
 author:   Benjamin Nowack
-version:  2008-10-04 (Fix: nsDecl led to warnings when uri was an array.)
+version:  2010-11-16
 */
 
 ARC2::inc('Class');
 
 class ARC2_LegacyXMLParser extends ARC2_Class {
 
-  function __construct($a = '', &$caller) {
+  function __construct($a, &$caller) {
     parent::__construct($a, $caller);
   }
   

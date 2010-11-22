@@ -5,14 +5,14 @@ license:  http://arc.semsol.org/license
 
 class:    ARC2 RDFa Extractor
 author:   Benjamin Nowack
-version:  2009-05-29 (Fix: CURIEs support DOTs now)
+version:  2010-11-16
 */
 
 ARC2::inc('RDFExtractor');
 
 class ARC2_RdfaExtractor extends ARC2_RDFExtractor {
 
-  function __construct($a = '', &$caller) {
+  function __construct($a, &$caller) {
     parent::__construct($a, $caller);
   }
   

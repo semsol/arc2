@@ -6,7 +6,7 @@
  * @license   <http://arc.semsol.org/license>
  * @homepage  <http://arc.semsol.org/>
  * @package   ARC2
- * @version   2010-10-25
+ * @version   2010-11-16
 */
 
 ARC2::inc('RDFSerializer');

@@ -5,14 +5,14 @@ license:  http://arc.semsol.org/license
 
 class:    ARC2 Legacy XML Serializer
 author:   Benjamin Nowack
-version:  2008-08-04
+version:  2010-11-16
 */
 
 ARC2::inc('Class');
 
 class ARC2_LegacyHTMLSerializer extends ARC2_Class {
 
-  function __construct($a = '', &$caller) {
+  function __construct($a, &$caller) {
     parent::__construct($a, $caller);
   }
   

@@ -6,14 +6,14 @@
  * @license http://arc.semsol.org/license
  * @homepage <http://arc.semsol.org/>
  * @package ARC2
- * @version 2010-03-10
+ * @version 2010-11-16
 */
 
 ARC2::inc('RDFSerializer');
 
 class ARC2_RDFJSONSerializer extends ARC2_RDFSerializer {
 
-  function __construct($a = '', &$caller) {
+  function __construct($a, &$caller) {
     parent::__construct($a, $caller);
   }
   
