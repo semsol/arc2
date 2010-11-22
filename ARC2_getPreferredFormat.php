@@ -6,7 +6,7 @@
  * @license <http://arc.semsol.org/license>
  * @homepage <http://arc.semsol.org/>
  * @package ARC2
- * @version 2010-07-15
+ * @version 2010-11-16
 */
 
 function ARC2_getPreferredFormat($default = 'plain') {

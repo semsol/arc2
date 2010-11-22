@@ -5,7 +5,7 @@
  * @author Benjamin Nowack <bnowack@semsol.com>
  * @license http://arc.semsol.org/license
  * @package ARC2
- * @version 2010-01-18
+ * @version 2010-11-16
 */
 
 function ARC2_getFormat($v, $mtype = '', $ext = '') {

@@ -6,7 +6,7 @@
  * @license <http://arc.semsol.org/license>
  * @homepage <http://arc.semsol.org/>
  * @package ARC2
- * @version 2010-10-12
+ * @version 2010-11-16
  */
 
 class ARC2_Class {
@@ -85,7 +85,12 @@ class ARC2_Class {
 
   function extractTermLabel($uri, $loops = 0) {
     list($ns, $r) = $this->splitURI($uri);
+    /* encode apostrophe + s */
+    $r = str_replace('%27s', '_apostrophes_', $r);
+    /* normalize */
     $r = $this->deCamelCase($this->camelCase($r, 1, 1));
+    /* decode apostrophe + s */
+    $r = str_replace(' apostrophes ', "'s ", $r);
     /* typical RDF non-info URI */
     if (($loops < 1) && preg_match('/^(self|it|this|me)$/i', $r)) {
       return $this->extractTermLabel(preg_replace('/\#.+$/', '', $uri), $loops + 1);
