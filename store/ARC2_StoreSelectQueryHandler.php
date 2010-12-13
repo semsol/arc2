@@ -6,7 +6,7 @@
  * @license   http://arc.semsol.org/license
  * @homepage  <http://arc.semsol.org/>
  * @package   ARC2
- * @version   2010-11-16
+ * @version   2010-06-22
  *
 */
 
@@ -14,7 +14,7 @@ ARC2::inc('StoreQueryHandler');
 
 class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler {
 
-  function __construct($a, &$caller) {/* caller has to be a store */
+  function __construct($a = '', &$caller) {/* caller has to be a store */
     parent::__construct($a, $caller);
   }
   
@@ -1097,7 +1097,7 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler {
     }
     return $r;
   }
-
+  
   /**
    * Returns the given filter pattern's scope (the id of the parent group pattern).
    */

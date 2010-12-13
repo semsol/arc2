@@ -5,14 +5,14 @@ license:  http://arc.semsol.org/license
 
 class:    ARC2 RDF Store CONSTRUCT Query Handler
 author:   Benjamin Nowack
-version:  2010-11-16
+version:  2008-02-11 (Fix: auto-adding DISTINCT to avoid unnecessary duplicates)
 */
 
 ARC2::inc('StoreSelectQueryHandler');
 
 class ARC2_StoreConstructQueryHandler extends ARC2_StoreSelectQueryHandler {
 
-  function __construct($a, &$caller) {/* caller has to be a store */
+  function __construct($a = '', &$caller) {/* caller has to be a store */
     parent::__construct($a, $caller);
   }
   

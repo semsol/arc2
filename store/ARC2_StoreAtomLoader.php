@@ -5,14 +5,14 @@ license:  http://arc.semsol.org/license
 
 class:    ARC2 Store Atom(2) Loader
 author:   Benjamin Nowack
-version:  2010-11-16
+version:  2008-09-26
 */
 
 ARC2::inc('AtomParser');
 
 class ARC2_StoreAtomLoader extends ARC2_AtomParser {
 
-  function __construct($a, &$caller) {
+  function __construct($a = '', &$caller) {
     parent::__construct($a, $caller);
   }
   

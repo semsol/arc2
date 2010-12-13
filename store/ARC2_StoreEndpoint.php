@@ -6,14 +6,14 @@
  * @license <http://arc.semsol.org/license>
  * @homepage <http://arc.semsol.org/>
  * @package ARC2
- * @version 2010-11-16
+ * @version 2010-06-04
 */
 
 ARC2::inc('Store');
 
 class ARC2_StoreEndpoint extends ARC2_Store {
 
-  function __construct($a, &$caller) {
+  function __construct($a = '', &$caller) {
     parent::__construct($a, $caller);
   }
   

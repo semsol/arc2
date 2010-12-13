@@ -5,14 +5,14 @@ license:  http://arc.semsol.org/license
 
 class:    ARC2 Store RDF/XML Loader
 author:   Benjamin Nowack
-version:  2010-11-16
+version:  2007-08-21
 */
 
 ARC2::inc('RDFXMLParser');
 
 class ARC2_StoreRDFXMLLoader extends ARC2_RDFXMLParser {
 
-  function __construct($a, &$caller) {
+  function __construct($a = '', &$caller) {
     parent::__construct($a, $caller);
   }
   

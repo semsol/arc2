@@ -5,14 +5,14 @@ license:  http://arc.semsol.org/license
 
 class:    ARC2 Store SPOG Loader
 author:   Morten H�ybye Frederiksen / Benjamin Nowack
-version:  2010-11-16
+version:  2008-07-02
 */
 
 ARC2::inc('SPOGParser');
 
 class ARC2_StoreSPOGLoader extends ARC2_SPOGParser {
 
-  function __construct($a, &$caller) {
+  function __construct($a = '', &$caller) {
     parent::__construct($a, $caller);
   }
   

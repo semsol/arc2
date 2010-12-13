@@ -5,14 +5,14 @@ license:  http://arc.semsol.org/license
 
 class:    ARC2 RDF Store Helper
 author:   Benjamin Nowack
-version:  2010-11-16
+version:  2008-04-03 (Tweak: Changed locking approach from "LOCK TABLE" to "GET LOCK")
 */
 
 ARC2::inc('Class');
 
 class ARC2_StoreHelper extends ARC2_Class {
 
-  function __construct($a, &$caller) {
+  function __construct($a = '', &$caller) {
     parent::__construct($a, $caller);
   }
   
