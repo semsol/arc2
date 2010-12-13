@@ -114,18 +114,19 @@ class ARC2_StoreDeleteQueryHandler extends ARC2_StoreQueryHandler {
       if ($skip) {
         continue;
       }
+      $w = $q ? 'WHERE ' . $q : '';
       if ($gq) {
         $sql = ($dbv < '04-01') ? 'DELETE ' . $tbl_prefix . 'g2t' : 'DELETE G';
         $sql .= '
           FROM ' . $tbl_prefix . 'g2t G 
           JOIN ' . $this->getTripleTable() . ' T ON (T.t = G.t' . $gq . ')
-          WHERE ' . $q . '
+          ' . $w . '
         ';
         $this->refs_deleted = 1;
       }
       else {/* triples only */
         $sql = ($dbv < '04-01') ? 'DELETE ' . $this->getTripleTable() : 'DELETE T';
-        $sql .= ' FROM ' . $this->getTripleTable() . ' T WHERE ' . $q;
+        $sql .= ' FROM ' . $this->getTripleTable() . ' T ' . $w;
       }
       $rs = mysql_query($sql, $con);
       if ($er = mysql_error($con)) {
