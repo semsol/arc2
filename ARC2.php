@@ -6,7 +6,7 @@
  * @license <http://arc.semsol.org/license>
  * @homepage <http://arc.semsol.org/>
  * @package ARC2
- * @version 2010-11-22
+ * @version 2011-01-07
  */
 
 /* E_STRICT hack */
@@ -17,7 +17,7 @@ if (function_exists('date_default_timezone_get')) {
 class ARC2 {
 
   static function getVersion() {
-    return '2010-11-22';
+    return '2011-01-07';
   }
 
   /*  */
