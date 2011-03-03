@@ -300,8 +300,14 @@ class ARC2_RemoteStoreEndpoint extends ARC2_RemoteStore {
       $prefs[] = $v;
     }
     /* accept header */
-    $vals = explode(',', $_SERVER['HTTP_ACCEPT']);
-    if ($vals) {
+    if (isset($_SERVER['HTTP_ACCEPT'])) {
+      $vals = explode(',', $_SERVER['HTTP_ACCEPT']);
+    }
+    else {
+      $vals = array();
+    }
+
+    if (count($vals) > 0) {
       $o_vals = array();
       foreach ($vals as $val) {
         if (preg_match('/(rdf\+n3|x\-turtle|rdf\+xml|sparql\-results\+xml|sparql\-results\+json|json)/', $val, $m)) {
