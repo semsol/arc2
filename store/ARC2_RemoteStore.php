@@ -133,6 +133,13 @@ class ARC2_RemoteStore extends ARC2_Class {
       return $resp;
       //return $this->addError('No parser available for "' . $format . '" SPARQL result');
     }
+
+    // Return raw data from endpoint if passthrough_FORMAT specified
+    $passthrough = $this->v('passthrough_sparqlxml', false, $this->a);
+    if ($passthrough && $this->p('output') == 'xml') {
+      return $resp;
+    }
+
     /* format parser */
     $suffix = $mappings[$format] . 'Parser';
     ARC2::inc($suffix);

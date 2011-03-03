@@ -352,6 +352,12 @@ class ARC2_RemoteStoreEndpoint extends ARC2_RemoteStore {
   
   function getSPARQLXMLSelectResultDoc($r) {
     $this->setHeader('content-type', 'Content-Type: application/sparql-results+xml');
+
+    $passthrough = $this->v('passthrough_sparqlxml', false, $this->a);
+    if ($passthrough && $this->p('output') == 'xml') {
+      return $r['result'];
+    }
+
     $vars = $r['result']['variables'];
     $rows = $r['result']['rows'];
     $dur = $r['query_time'];
