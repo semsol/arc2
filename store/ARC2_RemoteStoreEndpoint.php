@@ -288,6 +288,10 @@ class ARC2_RemoteStoreEndpoint extends ARC2_RemoteStore {
     if (($this->p('format') == 'sql') || ($this->p('output') == 'sql')) {
       $infos['result_format'] = 'sql';
     }
+
+    if ($this->p('output')) {
+      $infos['output'] = $this->p('output');
+    }
     return $infos;
   }
   
