@@ -434,6 +434,10 @@ class ARC2 {
     return ARC2::getComponent('StoreEndpoint', $a, $caller);
   }
 
+  static function getRemoteStoreEndpoint($a = '', $caller = '') {
+    return ARC2::getComponent('RemoteStoreEndpoint', $a, $caller);
+  }
+
   static function getRemoteStore($a = '', $caller = '') {
     return ARC2::getComponent('RemoteStore', $a, $caller);
   }
