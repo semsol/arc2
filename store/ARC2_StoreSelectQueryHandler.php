@@ -616,8 +616,8 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler {
     foreach ($id2code as $id => $code) {
       $deps[$id]['rank'] = 0;
       foreach ($id2code as $other_id => $other_code) {
-        $deps[$id]['rank'] += ($id != $other_id) && preg_match('/' . $other_id . '/', $code) ? 1 : 0;
-        $deps[$id][$other_id] = ($id != $other_id) && preg_match('/' . $other_id . '/', $code) ? 1 : 0;
+        $deps[$id]['rank'] += ($id != $other_id) && preg_match('/' . $other_id . '\\D/', $code) ? 1 : 0;
+        $deps[$id][$other_id] = ($id != $other_id) && preg_match('/' . $other_id . '\\D/', $code) ? 1 : 0;
       }
     }
     $r = '';
