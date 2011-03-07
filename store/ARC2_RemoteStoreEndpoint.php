@@ -289,9 +289,17 @@ class ARC2_RemoteStoreEndpoint extends ARC2_RemoteStore {
       $infos['result_format'] = 'sql';
     }
 
-    if ($this->p('output')) {
-      $infos['output'] = $this->p('output');
-    }
+    $formats = array(
+      'rdfxml' => 'RDFXML', 'rdf+xml' => 'RDFXML', 
+      'xml' => 'SPARQLXML', 'sparql-results+xml' => 'SPARQLXML', 
+      'json' => 'SPARQLJSON', 'sparql-results+json' => 'SPARQLJSON',
+      'php_ser' => 'PHPSER', 'plain' => 'Plain', 
+      'sql' => ($this->allow_sql ? 'Plain' : 'xSQL'),
+      'infos' => 'Plain',
+      'htmltab' => 'HTMLTable',
+      'tsv' => 'TSV',
+    );
+    $infos['output'] = $this->getResultFormat($formats, 'xml');
     return $infos;
   }
   
@@ -357,13 +365,30 @@ class ARC2_RemoteStoreEndpoint extends ARC2_RemoteStore {
   function getSPARQLXMLSelectResultDoc($r) {
     $this->setHeader('content-type', 'Content-Type: application/sparql-results+xml');
 
+    $formats = array(
+      'rdfxml' => 'RDFXML', 'rdf+xml' => 'RDFXML', 
+      'xml' => 'SPARQLXML', 'sparql-results+xml' => 'SPARQLXML', 
+      'json' => 'SPARQLJSON', 'sparql-results+json' => 'SPARQLJSON',
+      'php_ser' => 'PHPSER', 'plain' => 'Plain', 
+      'sql' => ($this->allow_sql ? 'Plain' : 'xSQL'),
+      'infos' => 'Plain',
+      'htmltab' => 'HTMLTable',
+      'tsv' => 'TSV',
+    );
     $passthrough = $this->v('passthrough_sparqlxml', false, $this->a);
-    if ($passthrough && $this->p('output') == 'xml') {
+    if ($passthrough && $this->getResultFormat($formats, 'xml') == 'SPARQLXML') {
       return $r['result'];
     }
 
-    $vars = $r['result']['variables'];
-    $rows = $r['result']['rows'];
+    $vars = null;
+    if (isset($r['result']['variables'])) {
+      $vars = $r['result']['variables'];
+    }
+
+    $rows = null;
+    if (isset($r['result']['rows'])) {
+      $rows = $r['result']['rows'];
+    }
     $dur = $r['query_time'];
     $nl = "\n";
     /* doc */

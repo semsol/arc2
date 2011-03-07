@@ -136,7 +136,7 @@ class ARC2_RemoteStore extends ARC2_Class {
 
     // Return raw data from endpoint if passthrough_FORMAT specified
     $passthrough = $this->v('passthrough_sparqlxml', false, $this->a);
-    if ($passthrough && isset($infos['output']) && $infos['output'] == 'xml') {
+    if ($passthrough && isset($infos['output']) && $infos['output'] == 'SPARQLXML') {
       return $resp;
     }
 
