@@ -289,9 +289,18 @@ class ARC2_RemoteStoreEndpoint extends ARC2_RemoteStore {
       $infos['result_format'] = 'sql';
     }
 
-    if ($this->p('output')) {
-      $infos['output'] = $this->p('output');
-    }
+    $formats = array(
+      'rdfxml' => 'RDFXML', 'rdf+xml' => 'RDFXML', 
+      'xml' => 'SPARQLXML', 'sparql-results+xml' => 'SPARQLXML', 
+      'json' => 'SPARQLJSON', 'sparql-results+json' => 'SPARQLJSON',
+      'php_ser' => 'PHPSER', 'plain' => 'Plain', 
+      'sql' => ($this->allow_sql ? 'Plain' : 'xSQL'),
+      'infos' => 'Plain',
+      'htmltab' => 'HTMLTable',
+      'tsv' => 'TSV',
+      'csv' => 'CSV',
+    );
+    $infos['output'] = $this->getResultFormat($formats, 'xml');
     return $infos;
   }
   
@@ -346,6 +355,7 @@ class ARC2_RemoteStoreEndpoint extends ARC2_RemoteStore {
       'infos' => 'Plain',
       'htmltab' => 'HTMLTable',
       'tsv' => 'TSV',
+      'csv' => 'CSV',
     );
     if ($f = $this->getResultFormat($formats, 'xml')) {
       $m = 'get' . $f . 'SelectResultDoc';
@@ -357,13 +367,31 @@ class ARC2_RemoteStoreEndpoint extends ARC2_RemoteStore {
   function getSPARQLXMLSelectResultDoc($r) {
     $this->setHeader('content-type', 'Content-Type: application/sparql-results+xml');
 
+    $formats = array(
+      'rdfxml' => 'RDFXML', 'rdf+xml' => 'RDFXML', 
+      'xml' => 'SPARQLXML', 'sparql-results+xml' => 'SPARQLXML', 
+      'json' => 'SPARQLJSON', 'sparql-results+json' => 'SPARQLJSON',
+      'php_ser' => 'PHPSER', 'plain' => 'Plain', 
+      'sql' => ($this->allow_sql ? 'Plain' : 'xSQL'),
+      'infos' => 'Plain',
+      'htmltab' => 'HTMLTable',
+      'tsv' => 'TSV',
+      'csv' => 'CSV',
+    );
     $passthrough = $this->v('passthrough_sparqlxml', false, $this->a);
-    if ($passthrough && $this->p('output') == 'xml') {
+    if ($passthrough && $this->getResultFormat($formats, 'xml') == 'SPARQLXML') {
       return $r['result'];
     }
 
-    $vars = $r['result']['variables'];
-    $rows = $r['result']['rows'];
+    $vars = null;
+    if (isset($r['result']['variables'])) {
+      $vars = $r['result']['variables'];
+    }
+
+    $rows = null;
+    if (isset($r['result']['rows'])) {
+      $rows = $r['result']['rows'];
+    }
     $dur = $r['query_time'];
     $nl = "\n";
     /* doc */
@@ -517,6 +545,49 @@ class ARC2_RemoteStoreEndpoint extends ARC2_RemoteStore {
     }
     return $r ? $r : '<em>No results found</em>';
   }
+
+  function getCSVSelectResultDoc($r) {
+    // Output will always have header set
+    $this->setHeader('content-type', 'Content-Type: text/csv; charset=utf-8; header=present');
+
+    // Give this a sensible filename if being downloaded(i.e. not a .php file)
+    if (!$this->p('show_inline')) {
+      $this->setHeader('content-disposition', 'Content-Disposition: attachment; filename=results.csv');
+    }
+
+    $vars = $r['result']['variables'];
+    $rows = $r['result']['rows'];
+    return $this->getCSVRows($rows, $vars);
+  }
+
+  function getCSVRows($rows, $vars) {
+    $csv = '';
+    $crlf = "\r\n";
+    
+    $header = implode(',', $vars) . $crlf;
+
+    foreach ($rows as $row) {
+      $escaped_vars = array();
+      foreach ($vars as $var) {
+        if (isset($row[$var])) {
+          $item = $row[$var];
+          // Escape with double quotes if it contains quotes/commas/linebreaks
+          if (preg_match("/,|\r|\n|\"/", $item)) {
+            $item = preg_replace('/"/', '""', $item);
+            $item = '"' . $item . '"';
+          }
+          $escaped_vars[] = $item;
+        }
+        else {
+          $escaped_vars[] = '';
+        }
+      }
+      $csv .= implode(',', $escaped_vars) . $crlf;
+    }
+
+    return $header . $csv;
+  }
+
 
   function getTSVSelectResultDoc($r) {
     $this->setHeader('content-type', 'Content-Type: text/plain; charset=utf-8');
@@ -1138,6 +1209,7 @@ DEFAULT_END;
               ' . ($this->allow_sql ? '<option value="sql" ' . ($sel == 'sql' ? $sel_code : '') . '>SQL</option>' : '') . '
               <option value="htmltab" ' . ($sel == 'htmltab' ? $sel_code : '') . '>HTML Table</option>
               <option value="tsv" ' . ($sel == 'tsv' ? $sel_code : '') . '>TSV</option>
+              <option value="csv" ' . ($sel == 'csv' ? $sel_code : '') . '>CSV</option>
             </select>
           </dd>
           
