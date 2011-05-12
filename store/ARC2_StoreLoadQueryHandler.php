@@ -21,6 +21,9 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler {
     parent::__init();
     $this->store = $this->caller;
     $this->write_buffer_size = $this->v('store_write_buffer', 2500, $this->a);
+    /* Beware! Splitting is not fully supported yet. You won't be able to 
+       to query your data if you split tables. Better don't touch this, 
+       unless you know what you are doing! */
     $this->split_threshold = $this->v('store_split_threshold', 0, $this->a);
     $this->has_pcre_unicode = @preg_match('/\pL/u', 'test');
     $this->strip_mb_comp_str = $this->v('store_strip_mb_comp_str', 0, $this->a);
@@ -257,11 +260,19 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler {
     else {
       $this->triple_ids[$val] = $this->max_triple_id;
       $this->max_triple_id++;
+      
       /* split tables ? */
       if ($this->split_threshold && !($this->max_triple_id % $this->split_threshold)) {
         $this->store->splitTables();
         $this->dropMergeTable();
         $this->createMergeTable();
+      }
+      
+      /* tables must also be upgraded if the number of triples exceeds.
+         The triple id can't be stored otherwise. So upgrade! */
+      if (($this->column_type == 'mediumint') && ($this->max_triple_id >= 16750000)) {
+        $this->store->extendColumns();
+        $this->column_type = 'int';
       }
       return $this->triple_ids[$val];
     }
