@@ -1,0 +1,84 @@
+/* screen.css */
+* {
+    margin: 0;
+    padding: 0;
+}
+body {
+    font-family: sans-serif;
+    font-size: 0.8em;
+}   
+#wrapper {
+    width: 1020px;
+    margin: auto;
+    padding-top: 20px;
+}
+#header {
+    border-bottom: 1px solid rgb(192,192,192);
+    height: 43px;
+}
+#logo {
+    float: left;
+    margin-right: 30px;
+}
+#col-left {
+    width: 350px;
+    float: left;
+}
+#col-right {
+    width: 150px;
+    float: right;
+}
+#col-center {
+    width: 500px;
+    margin-left: 360px;
+}
+#infovis  {
+    background-color:#1a1a1a;
+    color:#ccc;
+    width: 500px;
+    height: 500px;
+    overflow: hidden;
+}
+#log {
+    clear: both;
+    margin-left: 360px;
+}
+h1 {
+    display: block;
+    font-size: 1.6em;
+    font-weight: normal;
+    padding-top: 11px;
+}
+h2, h3 {
+    font-size: 1em;
+    font-weight: bold;
+    margin: 20px 0 5px 0;
+}
+ul {
+    margin-left: 15px;
+}
+p, li {
+    text-align: justify;
+}
+li {
+    font-size: 0.8em;
+}
+textarea {
+    width: 350px;
+    height: 100px;
+}
+fieldset {
+    text-align: right;
+    border: 0;
+}
+#footer {
+    border-top: 1px solid rgb(192,192,192);
+    margin-top: 30px;
+    text-align: right;
+    font-size: 1em;
+    padding-bottom: 100px;
+}
+#footer a {
+    text-decoration: none;
+    color: rgb(192,192,192);
+}
