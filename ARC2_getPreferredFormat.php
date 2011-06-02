@@ -11,7 +11,7 @@
 
 function ARC2_getPreferredFormat($default = 'plain') {
   $formats = array(
-    'html' => 'HTML', 'text/html' => 'HTML', 'xhtml+xml' => 'HTML', 
+    'html' => 'HTML', 'text/html' => 'HTML', 'xhtml+xml' => 'HTML', '*/*' => 'HTML', 
     'rdfxml' => 'RDFXML', 'rdf+xml' => 'RDFXML',
     'ntriples' => 'NTriples', 
     'rdf+n3' => 'Turtle', 'x-turtle' => 'Turtle', 'turtle' => 'Turtle', 'text/turtle' => 'Turtle',
@@ -25,7 +25,7 @@ function ARC2_getPreferredFormat($default = 'plain') {
   $vals = explode(',', $_SERVER['HTTP_ACCEPT']);
   if ($vals) {
     foreach ($vals as $val) {
-      if (preg_match('/(rdf\+n3|(x\-|text\/)turtle|rdf\+xml|text\/html|xhtml\+xml|xml|json)/', $val, $m)) {
+      if (preg_match('/(rdf\+n3|(x\-|text\/)turtle|rdf\+xml|text\/html|xhtml\+xml|xml|json|\*\/\*)/', $val, $m)) {
         $o_vals[$m[1]] = 1;
         if (preg_match('/\;q\=([0-9\.]+)/', $val, $sub_m)) {
           $o_vals[$m[1]] = 1 * $sub_m[1];
