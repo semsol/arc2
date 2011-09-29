@@ -567,10 +567,10 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler {
   function getFROMSQL() {
     $r = '';
     foreach ($this->index['from'] as $id) {
-      $r .= $r ? ', ' : 'FROM (';
+      $r .= $r ? ', ' : 'FROM ';
       $r .= $this->getTripleTable($id) . ' T_' . $id;
     }
-    return $r ? $r . ')' : '';
+    return $r ? $r . '' : '';
   }
 
   /*  */
