@@ -109,7 +109,8 @@ class ARC2_RemoteStore extends ARC2_Class {
       $url .= 'query=' . urlencode($q);
       if ($k = $this->v('store_read_key', '', $this->a)) $url .= '&key=' . urlencode($k);
     }
-    else {
+    if ($mthd != 'GET' || strlen($url) > 255) {
+      $mthd = 'POST';
       $url = $ep;
       $reader->setHTTPMethod($mthd);
       $reader->setCustomHeaders("Content-Type: application/x-www-form-urlencoded");
