@@ -980,7 +980,12 @@ class ARC2_RemoteStoreEndpoint extends ARC2_RemoteStore {
   /*  */  
   
   function jsonEscape($v) {
-    if (function_exists('json_encode')) return trim(json_encode($v), '"');
+    if (function_exists('json_encode')) {
+      $v = json_encode($v);
+      $v = preg_replace('/^"/', '', $v);
+      $v = preg_replace('/"$/', '', $v);
+      return $v;
+    }
     $from = array("\\", "\r", "\t", "\n", '"', "\b", "\f", "/");
     $to = array('\\\\', '\r', '\t', '\n', '\"', '\b', '\f', '\/');
     return str_replace($from, $to, $v);
