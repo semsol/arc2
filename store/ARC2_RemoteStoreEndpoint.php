@@ -550,6 +550,9 @@ class ARC2_RemoteStoreEndpoint extends ARC2_RemoteStore {
   }
 
   function getSQLiteSelectResultDoc($r) {
+    if ($this->p('show_inline')) {
+      return "This format cannot be displayed inline.";
+    }
     $tmpdir = sys_get_temp_dir();
     $tmpname = tempnam($tmpdir, 'arc2_sqlite_results');
 
