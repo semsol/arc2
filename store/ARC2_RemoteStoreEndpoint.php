@@ -599,8 +599,19 @@ class ARC2_RemoteStoreEndpoint extends ARC2_RemoteStore {
     foreach ($rows as $row) {
       $params = array();
       foreach ($vars as $var) {
-        $params[":$var"] = $row[$var];
-        $params[":{$var}_type"] = $row["$var type"];
+        if (isset($row[$var])) {
+          $params[":$var"] = $row[$var];
+        }
+        else {
+          $params[":$var"] = null;
+        }
+
+        if (isset($row["$var type"])) {
+          $params[":{$var}_type"] = $row["$var type"];
+        }
+        else {
+          $params[":{$var}_type"] = null;
+        }
       }
       $sth->execute($params);
     }
