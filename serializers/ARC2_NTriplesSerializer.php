@@ -6,7 +6,6 @@
  * @license <http://arc.semsol.org/license>
  * @homepage <http://arc.semsol.org/>
  * @package ARC2
- * @version 2010-11-16
 */
 
 ARC2::inc('RDFSerializer');
@@ -26,16 +25,24 @@ class ARC2_NTriplesSerializer extends ARC2_RDFSerializer {
   /*  */
   
   function getTerm($v) {
-    if (!is_array($v)) {
+    // type detection
+    if (!is_array($v) || empty($v['type'])) {
       if (preg_match('/^\_\:/', $v)) {
-        return $v;
+        return $this->getTerm(array('value' => $v, 'type' => 'bnode'));
       }
-      if (preg_match('/^[a-z0-9]+\:[^\s\"]*$/is', $v)) {
-        return '<' . $this->escape($v) . '>';
+      if (preg_match('/^[a-z0-9]+\:[^\s\"]*$/is' . ($this->has_pcre_unicode ? 'u' : ''), $v)) {
+        return $this->getTerm(array('value' => $v, 'type' => 'uri'));
       }
       return $this->getTerm(array('type' => 'literal', 'value' => $v));
     }
-    if ($v['type'] != 'literal') {
+    if ($v['type'] == 'bnode') {
+      return $v['value'];
+    }
+    elseif ($v['type'] == 'uri') {
+      return '<' . $this->escape($v['value']) . '>';
+    }
+    // something went wrong
+    elseif ($v['type'] != 'literal') {
       return $this->getTerm($v['value']);
     }
     /* literal */

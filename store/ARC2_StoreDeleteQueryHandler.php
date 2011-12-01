@@ -6,7 +6,6 @@
  * @license http://arc.semsol.org/license
  * @homepage <http://arc.semsol.org/>
  * @package ARC2
- * @version 2010-11-16
 */
 
 ARC2::inc('StoreQueryHandler');
@@ -127,7 +126,8 @@ class ARC2_StoreDeleteQueryHandler extends ARC2_StoreQueryHandler {
         $sql = ($dbv < '04-01') ? 'DELETE ' . $this->getTripleTable() : 'DELETE T';
         $sql .= ' FROM ' . $this->getTripleTable() . ' T WHERE ' . $q;
       }
-      $rs = mysql_query($sql, $con);
+      //$rs = mysql_query($sql, $con);
+      $rs = $this->queryDB($sql, $con);
       if ($er = mysql_error($con)) {
         $this->addError($er .' in ' . $sql);
       }
