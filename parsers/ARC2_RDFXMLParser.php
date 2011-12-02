@@ -6,7 +6,6 @@
  * @license http://arc.semsol.org/license
  * @homepage <http://arc.semsol.org/>
  * @package ARC2
- * @version 2010-11-16
 */
 
 ARC2::inc('RDFParser');
@@ -447,7 +446,7 @@ class ARC2_RDFXMLParser extends ARC2_RDFParser {
     $data = isset($s['o_xml_data']) ? $s['o_xml_data'] : '';
     $ns = isset($s['ns']) ? $s['ns'] : array();
     $parts = $this->splitURI($t);
-    if (count($parts) === 1) {
+    if ((count($parts) === 1) || empty($parts[1])) {
       $data .= '<'.$t;
     }
     else {
@@ -587,7 +586,7 @@ class ARC2_RDFXMLParser extends ARC2_RDFParser {
       }
       else {
         $parts = $this->splitURI($t);
-        if (count($parts) == 1) {
+        if ((count($parts) === 1) || empty($parts[1])) {
           $data .= '</'.$t.'>';
         }
         else {

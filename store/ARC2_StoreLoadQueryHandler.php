@@ -6,7 +6,6 @@
  * @license <http://arc.semsol.org/license>
  * @homepage <http://arc.semsol.org/>
  * @package ARC2
- * @version 2010-11-16
 */
 
 ARC2::inc('StoreQueryHandler');
@@ -25,7 +24,6 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler {
        to query your data if you split tables. Better don't touch this, 
        unless you know what you are doing! */
     $this->split_threshold = $this->v('store_split_threshold', 0, $this->a);
-    $this->has_pcre_unicode = @preg_match('/\pL/u', 'test');
     $this->strip_mb_comp_str = $this->v('store_strip_mb_comp_str', 0, $this->a);
   }
 
@@ -262,14 +260,12 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler {
       $this->max_triple_id++;
       
       /* split tables ? */
-      if ($this->split_threshold && !($this->max_triple_id % $this->split_threshold)) {
+      if (0 && $this->split_threshold && !($this->max_triple_id % $this->split_threshold)) {
         $this->store->splitTables();
         $this->dropMergeTable();
         $this->createMergeTable();
       }
-      
-      /* tables must also be upgraded if the number of triples exceeds.
-         The triple id can't be stored otherwise. So upgrade! */
+      /* upgrade tables ? // Thanks to patch by Mark Fichtner (https://github.com/Knurg) */
       if (($this->column_type == 'mediumint') && ($this->max_triple_id >= 16750000)) {
         $this->store->extendColumns();
         $this->column_type = 'int';
@@ -321,7 +317,9 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler {
     }
     /* any other string: remove tags, linebreaks etc., but keep MB-chars  */
     //$val = substr(trim(preg_replace('/[\W\s]+/is', '-', strip_tags($val))), 0, 35);
+    // [\PL\s]+ ( = non-Letters) kills digits
     $re = $this->has_pcre_unicode ? '/[\PL\s]+/isu' : '/[\s\'\"\´\`]+/is';
+    $re = '/[\s\'\"\´\`]+/is';
     $val = trim(preg_replace($re, '-', strip_tags($val)));
     if (strlen($val) > 35) {
       $fnc = function_exists("mb_substr") ? 'mb_substr' : 'substr';

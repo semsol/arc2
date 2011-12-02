@@ -6,7 +6,6 @@
  * @license http://arc.semsol.org/license
  * @homepage <http://arc.semsol.org/>
  * @package ARC2
- * @version 2010-11-16
 */
 
 ARC2::inc('RDFSerializer');
@@ -50,10 +49,7 @@ class ARC2_RDFJSONSerializer extends ARC2_RDFSerializer {
 
   function jsonEscape($v) {
     if (function_exists('json_encode')) {
-      $v = json_encode($v);
-      if(preg_match('/^"(.*)"$/', $v, $matches))
-        $v = $matches[1];
-      return $v;
+        return preg_replace('/^"(.*)"$/', '\\1', json_encode($v));
     }
     $from = array("\\", "\r", "\t", "\n", '"', "\b", "\f", "/");
     $to = array('\\\\', '\r', '\t', '\n', '\"', '\b', '\f', '\/');

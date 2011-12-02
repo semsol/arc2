@@ -6,7 +6,6 @@
  * @license <http://arc.semsol.org/license>
  * @homepage <http://arc.semsol.org/>
  * @package ARC2
- * @version 2011-01-07
  */
 
 /* E_STRICT hack */
@@ -17,7 +16,7 @@ if (function_exists('date_default_timezone_get')) {
 class ARC2 {
 
   static function getVersion() {
-    return '2011-01-07';
+    return '2011-12-01';
   }
 
   /*  */
@@ -42,10 +41,10 @@ class ARC2 {
   }
   
   static function getScriptURI() {
-    if (isset($_SERVER) && isset($_SERVER['SERVER_NAME'])) {
+    if (isset($_SERVER) && (isset($_SERVER['SERVER_NAME']) || isset($_SERVER['HTTP_HOST']))) {
       $proto = preg_replace('/^([a-z]+)\/.*$/', '\\1', strtolower($_SERVER['SERVER_PROTOCOL']));
       $port = $_SERVER['SERVER_PORT'];
-      $server = $_SERVER['SERVER_NAME'];
+      $server = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME'];
       $script = $_SERVER['SCRIPT_NAME'];
       /* https */
       if (($proto == 'http') && $port == 443) {
@@ -69,7 +68,7 @@ class ARC2 {
   static function getRequestURI() {
     if (isset($_SERVER) && isset($_SERVER['REQUEST_URI'])) {
       return preg_replace('/^([a-z]+)\/.*$/', '\\1', strtolower($_SERVER['SERVER_PROTOCOL'])) . 
-        '://' . $_SERVER['SERVER_NAME'] .
+        '://' . (isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME']) .
         ($_SERVER['SERVER_PORT'] != 80 ? ':' . $_SERVER['SERVER_PORT'] : '') .
         $_SERVER['REQUEST_URI'];
     }

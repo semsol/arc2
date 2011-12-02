@@ -5,7 +5,7 @@ license:  http://arc.web-semantics.org/license
 
 class:    ARC2 DAWG Test Handler
 author:   Benjamin Nowack
-version:  2010-11-16
+version:  2011-12-01
 */
 
 ARC2::inc('Class');
@@ -50,6 +50,9 @@ class ARC2_TestHandler extends ARC2_Class {
     $fname = 'f' . crc32($url) . '.txt';
     if (!file_exists('tmp/' . $fname)) {
       $r = '';
+      if (!isset($this->reader)) {
+        $this->reader = new ARC2_Reader($this->a, $this);
+      }
       $this->reader->activate($url);
       while ($d = $this->reader->readStream()) {
         $r .= $d;

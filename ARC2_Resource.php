@@ -6,7 +6,7 @@
  * @license http://arc.semsol.org/license
  * @homepage <http://arc.semsol.org/>
  * @package ARC2
- * @version 2010-11-16
+ * @version 2011-01-19
 */
 
 ARC2::inc('Class');
@@ -33,6 +33,10 @@ class ARC2_Resource extends ARC2_Class {
 
   function setIndex($index) {
     $this->index = $index;
+  }
+
+  function getIndex($index) {
+    return $this->index;
   }
 
   function setProps($props, $s = '') {
