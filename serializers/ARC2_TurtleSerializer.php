@@ -39,7 +39,7 @@ class ARC2_TurtleSerializer extends ARC2_RDFSerializer {
       ) {
         return $pn;
       }
-      if (preg_match('/^[a-z0-9]+\:[^\s]*$/is', $v)) {
+      if (preg_match('/^[a-z0-9]+\:[^\s]*$/is' . ($this->has_pcre_unicode ? 'u' : ''), $v)) {
         return '<' .$v. '>';
       }
       return $this->getTerm(array('type' => 'literal', 'value' => $v), $term, $qualifier);
