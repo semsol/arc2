@@ -24,15 +24,22 @@ class ARC2_NTriplesSerializer extends ARC2_RDFSerializer {
 
   /*  */
   
-  function getTerm($v) {
+  function getTerm($v, $term = '') {
     // type detection
     if (!is_array($v) || empty($v['type'])) {
+      // bnode
       if (preg_match('/^\_\:/', $v)) {
         return $this->getTerm(array('value' => $v, 'type' => 'bnode'));
       }
+      // uri
       if (preg_match('/^[a-z0-9]+\:[^\s\"]*$/is' . ($this->has_pcre_unicode ? 'u' : ''), $v)) {
         return $this->getTerm(array('value' => $v, 'type' => 'uri'));
       }
+      // fallback for non-unicode environments: subjects and predicates can't be literals.
+      if (in_array($term, array('s', 'p'))) {
+        return $this->getTerm(array('value' => $v, 'type' => 'uri'));
+      }
+      // assume literal
       return $this->getTerm(array('type' => 'literal', 'value' => $v));
     }
     if ($v['type'] == 'bnode') {
@@ -73,14 +80,14 @@ class ARC2_NTriplesSerializer extends ARC2_RDFSerializer {
     $r = '';
     $nl = "\n";
     foreach ($index as $s => $ps) {
-      $s = $this->getTerm($s);
+      $s = $this->getTerm($s, 's');
       foreach ($ps as $p => $os) {
-        $p = $this->getTerm($p);
+        $p = $this->getTerm($p, 'p');
         if (!is_array($os)) {/* single literal o */
           $os = array(array('value' => $os, 'type' => 'literal'));
         }
         foreach ($os as $o) {
-          $o = $this->getTerm($o);
+          $o = $this->getTerm($o, 'o‚');
           $r .= $r ? $nl : '';
           $r .= $s . ' ' . $p . ' ' . $o . ' .';
         }
