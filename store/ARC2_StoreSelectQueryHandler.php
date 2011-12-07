@@ -175,36 +175,45 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler {
     }
     /* result */
     $r = array('variables' => $vars);
-    $v_sql = $this->getValueSQL($tmp_tbl, $q_sql);
-    //echo "\n\n" . $v_sql;
-    $t1 = ARC2::mtime();
-    $con = $this->store->getDBCon();
-    $rs = mysql_unbuffered_query($v_sql, $con);
-    if ($er = mysql_error($con)) {
-      $this->addError($er);
-    }
-    $t2 = ARC2::mtime();
-    $rows = array();
     $types = array(0 => 'uri', 1 => 'bnode', 2 => 'literal');
-    if ($rs) {
-  		while ($pre_row = mysql_fetch_array($rs)) {
-        $row = array();
-        foreach ($vars as $var) {
-          if (isset($pre_row[$var])) {
-            $row[$var] = $pre_row[$var];
-            $row[$var . ' type'] = isset($pre_row[$var . ' type']) ? $types[$pre_row[$var . ' type']] : (in_array($var, $aggregate_vars) ? 'literal' : 'uri');
-            if (isset($pre_row[$var . ' lang_dt']) && ($lang_dt = $pre_row[$var . ' lang_dt'])) {
-              if (preg_match('/^([a-z]+(\-[a-z0-9]+)*)$/i', $lang_dt)) {
-                $row[$var . ' lang'] = $lang_dt;
-              }
-              else {
-                $row[$var . ' datatype'] = $lang_dt;
+    $rows = array();
+    /* iterate through all indexes to cover unions, subquerys etc. */
+    foreach($this->indexes as $key => $index) {
+      /* set the current index */
+      $this->index = $index;
+      $v_sql = $this->getValueSQL($tmp_tbl, $q_sql);
+      //echo "\n\n" . $v_sql;
+      $t1 = ARC2::mtime();
+      $con = $this->store->getDBCon();
+      $rs = mysql_unbuffered_query($v_sql, $con);
+      if ($er = mysql_error($con)) {
+        $this->addError($er);
+      }
+      $t2 = ARC2::mtime();
+
+      if ($rs) {
+    		while ($pre_row = mysql_fetch_array($rs)) {
+          $row = array();
+          foreach ($vars as $var) {
+            if (isset($pre_row[$var])) {
+              $row[$var] = $pre_row[$var];
+              $row[$var . ' type'] = isset($pre_row[$var . ' type']) ? $types[$pre_row[$var . ' type']] : (in_array($var, $aggregate_vars) ? 'literal' : 'uri');
+              if (isset($pre_row[$var . ' lang_dt']) && ($lang_dt = $pre_row[$var . ' lang_dt'])) {
+                if (preg_match('/^([a-z]+(\-[a-z0-9]+)*)$/i', $lang_dt)) {
+                  $row[$var . ' lang'] = $lang_dt;
+                }
+                else {
+                  $row[$var . ' datatype'] = $lang_dt;
+                }
               }
             }
           }
-        }
-        if ($row || !$vars) {
-          $rows[] = $row;
+          if ($row || !$vars) {
+            /* only merge if the value was not in the result set already */
+            if(!in_array($row, $rows)) {
+              $rows[] = $row;
+            }
+          }
         }
       }
     }
