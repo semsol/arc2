@@ -62,11 +62,41 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler {
       $this->analyzeIndex($this->getPattern('0'));
       $sub_r = $this->getQuerySQL();
       $r .= $r ? $nl . 'UNION' . $this->getDistinctSQL() . $nl : '';
+      /* if this is a union-query and there is ORDER BY information handle it
+         in a correct way */
+      if ($this->v('order_infos', 0, $this->infos['query']) && $this->is_union_query) {
+        $infos = $this->v('order_infos', array(), $this->infos['query']);
+        /* every order-variable has to be selected to order by it later on */
+        foreach ($infos as $info) {
+          $type = $info['type'];
+          $ms = array('expression' => 'getExpressionSQL', 'built_in_call' => 'getBuiltInCallSQL', 'function_call' => 'getFunctionCallSQL');
+          $m = isset($ms[$type]) ? $ms[$type] : 'get' . ucfirst($type) . 'ExpressionSQL';
+          if (method_exists($this, $m)) {
+            /* put the value in it */
+            $sub_r = preg_replace('/SELECT(\s+DISTINCT)?\s*/', 'SELECT\\1 ' . $this->$m($info, 'order') . ' AS `_order_' . $info['value'] . '_`, ', $sub_r);
+          }
+        }
+      }
       $r .= $this->is_union_query ? '(' . $sub_r . ')' : $sub_r;
       $this->indexes[$i] = $this->index;
     }
+    
+    /* if there is order information and this is a union add the ORDER BY at the 
+       end */
+    $infos = $this->v('order_infos', array(), $this->infos['query']);
+    if ($infos && $this->is_union_query) {
+      $head = "";
+      $r .= " ORDER BY ";
+      foreach ($infos as $info) {
+        if(empty($head))
+          $head .= "`_order_" . $info['value'] . "_` ASC";
+        else
+          $head .= ", `_order_" . $info['value'] . "_` ASC";
+      }
+      $r .= $head;
+    }
     $r .= $this->is_union_query ? $this->getLIMITSQL() : '';
-    if ($this->v('order_infos', 0, $this->infos['query'])) {
+    if ($infos) {
       $r = preg_replace('/SELECT(\s+DISTINCT)?\s*/', 'SELECT\\1 NULL AS `_pos_`, ', $r);
     }
     $pd_count = $this->problematicDependencies();
