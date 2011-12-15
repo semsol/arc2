@@ -89,9 +89,9 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler {
       $r .= " ORDER BY ";
       foreach ($infos as $info) {
         if(empty($head))
-          $head .= "`_order_" . $info['value'] . "_` ASC";
+          $head .= "`_order_" . $info['value'] . "_` " . $info['direction'];
         else
-          $head .= ", `_order_" . $info['value'] . "_` ASC";
+          $head .= ", `_order_" . $info['value'] . "_` " . $info['direction'];
       }
       $r .= $head;
     }
