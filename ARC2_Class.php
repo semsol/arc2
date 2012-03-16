@@ -6,7 +6,6 @@
  * @license <http://arc.semsol.org/license>
  * @homepage <http://arc.semsol.org/>
  * @package ARC2
- * @version 2010-11-16
  */
 
 class ARC2_Class {
@@ -31,6 +30,7 @@ class ARC2_Class {
     $this->warnings = array();
     $this->adjust_utf8 = $this->v('adjust_utf8', 0, $this->a);
     $this->max_errors = $this->v('max_errors', 25, $this->a);
+    $this->has_pcre_unicode = @preg_match('/\pL/u', 'test');/* \pL = block/point which is a Letter */
   }
 
   /*  */
@@ -477,14 +477,51 @@ class ARC2_Class {
   function queryDB($sql, $con, $log_errors = 0) {
     $t1 = ARC2::mtime();
     $r = mysql_query($sql, $con);
-    $t2 = ARC2::mtime() - $t1;
-    if ($t2 > 1) {
-      //echo "\n needed " . $t2 . ' secs for ' . $sql;
+    if (0) {
+      $t2 = ARC2::mtime() - $t1;
+      $call_obj = $this;
+      $call_path = '';
+      while ($call_obj) {
+        $call_path = get_class($call_obj) . ' / ' . $call_path;
+        $call_obj = isset($call_obj->caller) ? $call_obj->caller : false;
+      }
+      echo "\n" . $call_path . " needed " . $t2 . ' secs for ' . str_replace("\n" , ' ', $sql);;
     }
     if ($log_errors && ($er = mysql_error($con))) $this->addError($er);
     return $r;
   }
 
-  /*  */
+  /**
+   * Shortcut method to create an RDF/XML backup dump from an RDF Store object.
+   */
+  function backupStoreData($store, $target_path, $offset = 0) {
+    $limit = 10;
+    $q = '
+      SELECT DISTINCT ?s WHERE {
+        ?s ?p ?o .
+      }
+      ORDER BY ?s
+      LIMIT ' . $limit . '
+      ' . ($offset ? 'OFFSET ' . $offset : '') . '
+    ';
+    $rows = $store->query($q, 'rows');
+    $tc = count($rows);
+    $full_tc = $tc + $offset;
+    $mode = $offset ? 'ab' : 'wb';
+    $fp = fopen($target_path, $mode);
+    foreach ($rows as $row) {
+      $index = $store->query('DESCRIBE <' . $row['s'] . '>', 'raw');
+      if ($index) {
+        $doc = $this->toRDFXML($index);
+        fwrite($fp, $doc . "\n\n");
+      }
+    }
+    fclose($fp);
+    if ($tc == 10) {
+      set_time_limit(300);
+      $this->backupStoreData($store, $target_path, $offset + $limit);
+    }
+    return $full_tc;
+  }
 
 }
