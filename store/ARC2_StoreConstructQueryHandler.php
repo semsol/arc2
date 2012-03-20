@@ -75,11 +75,11 @@ class ARC2_StoreConstructQueryHandler extends ARC2_StoreSelectQueryHandler {
           }
           $t[$term] = $val;
           $t[$term . '_type'] = $type;
-          if (isset($row[$term . ' lang'])) {
-            $t[$term . '_lang'] = $row[$term . ' lang'];
+          if (isset($row[$ct[$term] . ' lang'])) {
+            $t[$term . '_lang'] = $row[$ct[$term] . ' lang'];
           }
-          if (isset($row[$term . ' datatype'])) {
-            $t[$term . '_datatype'] = $row[$term . ' datatype'];
+          if (isset($row[$ct[$term] . ' datatype'])) {
+            $t[$term . '_datatype'] = $row[$ct[$term] . ' datatype'];
           }
         }
         if (!$skip_t) {
