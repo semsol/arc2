@@ -100,22 +100,57 @@ class ARC2_NTriplesSerializer extends ARC2_RDFSerializer {
 
   function escape($v) {
     $r = '';
+	// decode, if possible
     $v = (strpos(utf8_decode(str_replace('?', '', $v)), '?') === false) ? utf8_decode($v) : $v;
-    if ($this->raw) return $v;
-    for ($i = 0, $i_max = strlen($v); $i < $i_max; $i++) {
-      $c = $v[$i];
-      if (!isset($this->esc_chars[$c])) {
-        $this->esc_chars[$c] = $this->getEscapedChar($c, $this->getCharNo($c));
-      }
-      $r .= $this->esc_chars[$c];
-    }
-    return $r;
+	if ($this->raw) return $v;// no further escaping wanted
+	// escape tabs and linefeeds
+	$v = str_replace(array("\t", "\r", "\n"), array('\t', '\r', '\n'), $v);
+	// escape non-ascii-chars
+	$v = preg_replace_callback('/([^:ascii:]+)/', array($this, 'escapeChars'), $v);
+	return $v;
+  }
+  
+  function escapeChars($matches) {
+	$v = $matches[1];
+	$r = '';
+	// loop through mb chars
+	if (function_exists('mb_strlen')) {
+		for ($i = 0, $i_max = mb_strlen($v, 'UTF-8'); $i < $i_max; $i++) {
+		  $c = mb_substr($v, $i, 1, 'UTF-8');
+		  if (!isset($this->esc_chars[$c])) {
+			$this->esc_chars[$c] = $this->getEscapedChar($c, $this->getCharNo($c, 1));
+		  }
+		  $r .= $this->esc_chars[$c];
+		}
+	}
+	// fall back to built-in JSON functionality, if available
+	else if (function_exists('json_encode')) {
+		$r = json_encode($v);
+		if ($r == 'null') $r = json_encode (utf8_encode($v));
+		// remove boundary quotes
+		if (substr($r, 0, 1) == '"') $r = substr($r, 1);
+		if (substr($r, -1) == '"') $r = substr($r, 0, -1);
+		// uppercase hex chars
+		$r = preg_replace('/(\\\u)([0-9a-f]{4})/e', "'\\1' . strtoupper('\\2')", $r);
+		$r = preg_replace('/(\\\U)([0-9a-f]{8})/e', "'\\1' . strtoupper('\\2')", $r);
+	}
+	// escape byte-wise (may be wrong for mb chars and newer php versions)
+	else {
+		for ($i = 0, $i_max = strlen($v); $i < $i_max; $i++) {
+		  $c = $v[$i];
+		  if (!isset($this->esc_chars[$c])) {
+			$this->esc_chars[$c] = $this->getEscapedChar($c, $this->getCharNo($c));
+		  }
+		  $r .= $this->esc_chars[$c];
+		}
+	}
+	return $r;
   }
   
   /*  */
   
-  function getCharNo($c) {
-    $c_utf = utf8_encode($c);
+  function getCharNo($c, $is_encoded = false) {
+    $c_utf = $is_encoded ? $c : utf8_encode($c);
     $bl = strlen($c_utf);/* binary length */
     $r = 0;
     switch ($bl) {
