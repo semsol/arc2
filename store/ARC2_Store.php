@@ -63,6 +63,7 @@ class ARC2_Store extends ARC2_Class {
           ", $db_con, 1
         );
         if (mysql_select_db($this->a['db_name'], $db_con)) {
+          $this->queryDB("SET NAMES 'utf8'", $db_con);
           $fixed = 1;
         }
       }
