@@ -997,7 +997,7 @@ class ARC2_StoreEndpoint extends ARC2_Store {
           <p>
             <a href="?">This interface</a> implements 
             <a href="http://www.w3.org/TR/rdf-sparql-query/">SPARQL</a> and
-            <a href="http://arc.semsol.org/docs/v2/sparql+">SPARQL+</a> via <a href="http://www.w3.org/TR/rdf-sparql-protocol/#query-bindings-http">HTTP Bindings</a>. 
+            <a href="https://github.com/semsol/arc2/wiki/SPARQL%2B">SPARQL+</a> via <a href="http://www.w3.org/TR/rdf-sparql-protocol/#query-bindings-http">HTTP Bindings</a>. 
           </p>
           <p>
             Enabled operations: ' . join(', ', $this->getFeatures()) . '
