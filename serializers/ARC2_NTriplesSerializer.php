@@ -106,7 +106,7 @@ class ARC2_NTriplesSerializer extends ARC2_RDFSerializer {
 	// escape tabs and linefeeds
 	$v = str_replace(array("\t", "\r", "\n"), array('\t', '\r', '\n'), $v);
 	// escape non-ascii-chars
-	$v = preg_replace_callback('/([[:^ascii:]]+)/', array($this, 'escapeChars'), $v);
+	$v = preg_replace_callback('/([^a-zA-Z0-9 \!\#\$\%\&\(\)\*\+\,\-\.\/\:\;\=\?\@\^\_\{\|\}]+)/', array($this, 'escapeChars'), $v);
 	return $v;
   }
   
