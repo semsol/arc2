@@ -22,9 +22,10 @@ function ARC2_getFormat($v, $mtype = '', $ext = '') {
     /* starts with angle brackets */
     preg_match('/^\s*\<[^\s]/s', $v) &&
     /* has an xmlns:* declaration or a matching pair of tags */
-    (preg_match('/\sxmlns\:?/', $v) || preg_match('/\<([^\s]+).+\<\/\\1\>/s', $v)) &&
+    (preg_match('/\sxmlns\:?/', $v) || preg_match('/\<([^\s]+).+\<\/\\1\>/s', $v)) // &&
     /* not a typical ntriples/turtle/n3 file */
-    !preg_match('/[\>\"\']\s*\.\s*$/s', $v)
+    /* FIXME. With the buffered reader this regex matches if the 1024th cherecter is a '.' which is common in any serialisation! */
+    // !preg_match('/[\>\"\']\s*\.\s*$/s', $v)
   ) {
     while (preg_match('/^\s*\<\?xml[^\r\n]+\?\>\s*/s', $v)) {
       $v = preg_replace('/^\s*\<\?xml[^\r\n]+\?\>\s*/s', '', $v);
