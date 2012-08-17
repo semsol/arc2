@@ -59,12 +59,25 @@ class ARC2_Resource extends ARC2_Class {
 
   /* add a relation to a URI. Allows for instance $res->setRel('rdf:type', 'doap:Project') */
   function setRel($p, $r, $s = '') {
-    $uri = array (
-		  'type' => 'uri',
-		  'value' => $this->expandPName($r));
-    $this->setProp($p, $uri, $s);
+    if(!is_array($r)) {
+      $uri = array (
+		    'type' => 'uri',
+		    'value' => $this->expandPName($r));
+      $this->setProp($p, $uri, $s);
+    } else {
+      if (!$s) $s = $this->uri;
+      foreach($r as $i => $x) {
+	if(!is_array($x)) {
+	  $uri = array (
+			'type' => 'uri',
+			'value' => $this->expandPName($x));
+	  $r[$i] = $uri;
+	}
+      }
+      $this->index[$s][$this->expandPName($p)] = $r;
+    }
   }
-  
+
   function setStore($store) {
     $this->store = $store;
   }
