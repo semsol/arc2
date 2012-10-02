@@ -1,0 +1,13 @@
+{
+    "name": "kwijibo/arc2",
+    "description": "Semsol's ARC2 RDF library",
+    "authors": [
+        {
+            "name": "Benji Nowack",
+            "email": "mail@bnowack.de"
+        }
+    ],
+    "require": {
+
+    }
+}
