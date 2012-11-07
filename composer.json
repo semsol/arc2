@@ -9,5 +9,8 @@
     ],
     "require": {
 
+    },
+     "autoload": {
+        "classmap": ["./","parsers/","serializers/"]
     }
 }
