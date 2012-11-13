@@ -965,14 +965,14 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler {
       $type = $pattern[$term . '_type'];
       if ($type == 'uri') {
         $term_id = $this->getTermID($pattern[$term], $term);
-        $sub_r = '(T_' . $id . '.' . $term . ' = ' . $term_id . ') /* ' . str_replace('#' , '::', $pattern[$term]) . ' */';
+        $sub_r = '(T_' . $id . '.' . $term . ' = ' . $term_id . ') /* ' . preg_replace('/[\#\*\>]/' , '::', $pattern[$term]) . ' */';
       }
       elseif ($type == 'literal') {
         $term_id = $this->getTermID($pattern[$term], $term);
-        $sub_r = '(T_' . $id . '.' . $term . ' = ' . $term_id . ') /* ' . preg_replace('/[\#\n]/' , ' ', $pattern[$term]) . ' */';
+        $sub_r = '(T_' . $id . '.' . $term . ' = ' . $term_id . ') /* ' . preg_replace('/[\#\n\*\>]/' , ' ', $pattern[$term]) . ' */';
         if (($lang_dt = $this->v1($term . '_lang', '', $pattern)) || ($lang_dt = $this->v1($term . '_datatype', '', $pattern))) {
           $lang_dt_id = $this->getTermID($lang_dt);
-          $sub_r .= $nl . '  AND (T_' . $id . '.' .$term. '_lang_dt = ' . $lang_dt_id . ') /* ' . str_replace('#' , '::', $lang_dt) . ' */';
+          $sub_r .= $nl . '  AND (T_' . $id . '.' .$term. '_lang_dt = ' . $lang_dt_id . ') /* ' . preg_replace('/[\#\*\>]/' , '::', $lang_dt) . ' */';
         }
       }
       elseif ($type == 'var') {
@@ -1006,7 +1006,7 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler {
           if ($info['uri']) {
             $term_id = $this->getTermID($info['uri'], 'g');
             $sub_r['graph_uri'] .= $sub_r['graph_uri'] ? $nl . ' AND ' : '';
-            $sub_r['graph_uri'] .= '(' .$tbl_alias. ' = ' . $term_id . ') /* ' . str_replace('#' , '::', $info['uri']) . ' */';
+            $sub_r['graph_uri'] .= '(' .$tbl_alias. ' = ' . $term_id . ') /* ' . preg_replace('/[\#\*\>]/' , '::', $info['uri']) . ' */';
           }
         }
       }
@@ -1412,7 +1412,7 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler {
                 }
                 if ($tbl == $context_pattern_id) {/* @todo better dependency check */
                   if ($term_id || ($lang_dt != 'http://www.w3.org/2001/XMLSchema#integer')) {/* skip if simple int, but no id */
-                    $this->addConstraintSQLEntry($context_pattern_id, 'T_' . $tbl . '.o_lang_dt = ' . $term_id . ' /* ' . str_replace('#' , '::', $lang_dt) . ' */');
+                    $this->addConstraintSQLEntry($context_pattern_id, 'T_' . $tbl . '.o_lang_dt = ' . $term_id . ' /* ' . preg_replace('/[\#\*\>]/' , '::', $lang_dt) . ' */');
                   }
                 }
               }

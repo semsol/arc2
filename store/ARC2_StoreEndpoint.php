@@ -191,7 +191,7 @@ class ARC2_StoreEndpoint extends ARC2_Store {
     if ($errors = $this->getErrors()) {
       $this->setHeader('http', 'HTTP/1.1 400 Bad Request');
       $this->setHeader('content-type', 'Content-type: text/plain; charset=utf-8');
-      $this->result = join("\n", $errors);
+      $this->result = htmlspecialchars(join("\n", $errors));
       return true;
     }
     $qt = $infos['query']['type'];
