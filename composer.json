@@ -1,4 +1,5 @@
 {
+<<<<<<< HEAD
     "name": "kwijibo/arc2",
     "description": "Semsol's ARC2 RDF library",
     "authors": [
@@ -9,6 +10,23 @@
     ],
     "require": {
 
+=======
+    "name": "semsol/arc2",
+	"type": "library",
+    "description": "Semsol's ARC2 RDF library",
+	"keywords": ["rdf","sparql"],
+	"homepage": "https://github.com/semsol/arc2",
+    "license": "W3C",
+    "authors": [
+        {
+            "name": "Benji Nowack",
+            "email": "mail@bnowack.de",
+			"homepage": "http://bnowack.de/"
+        }
+    ],
+    "require": {
+		"php": ">=5.3.0"
+>>>>>>> 689951bb27fbd9adbd8ef261d8d99203f541509f
     },
      "autoload": {
         "classmap": ["./","parsers/","serializers/"]
