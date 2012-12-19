@@ -9,6 +9,12 @@
 
 ARC2::inc('Class');
 
+/**
+ * The purpose of this class is to connect some software running on arc2
+ * to a SPARQL1.1 endpoint. This is currently tested with Sesame, but seems
+ * to work fine up to now. Further work is needed - your support is welcome!
+ */
+
 class ARC2_RemoteSPARQLOneDotOneStore extends ARC2_Class {
 
   function __construct($a, &$caller) {
@@ -33,11 +39,11 @@ class ARC2_RemoteSPARQLOneDotOneStore extends ARC2_Class {
   /*  */
   
   function reset() {
-    return $this->query('CLEAR ALL');
+    return $this->runQuery('CLEAR ALL', 'clear');
   }
   
   function drop() {
-    return $this->query('DROP ALL');
+    return $this->runQuery('DROP ALL', 'drop');
   }
   
   function insert($doc, $g, $keep_bnode_ids = 0) {
@@ -96,7 +102,9 @@ class ARC2_RemoteSPARQLOneDotOneStore extends ARC2_Class {
    */
   
   function transformSPARQLToOneDotOne($q, $infos) {
-    if($infos['query']['type'] == "load")
+    if(empty($infos))
+      return $q;
+    else if($infos['query']['type'] == "load")
       $q = str_replace("INTO", "INTO GRAPH", $q);
     else if($infos['query']['type'] == "insert") {
       if(strpos("WHERE", $q) !== FALSE) 
@@ -131,7 +139,7 @@ class ARC2_RemoteSPARQLOneDotOneStore extends ARC2_Class {
       return $this->$mthd($q, $infos);
     }
     /* http verb */
-    $mthd = in_array($qt, array('load', 'insert', 'delete')) ? 'POST' : 'GET';
+    $mthd = in_array($qt, array('load', 'insert', 'delete', 'drop', 'clear')) ? 'POST' : 'GET';
     //$mthd = 'GET';
     
     $q = $this->transformSPARQLToOneDotOne($q, $infos);
@@ -152,7 +160,7 @@ class ARC2_RemoteSPARQLOneDotOneStore extends ARC2_Class {
       $reader->setHTTPMethod($mthd);
       $reader->setCustomHeaders("Content-Type: application/x-www-form-urlencoded");
       $suffix = ($k = $this->v('store_write_key', '', $this->a)) ? '&key=' . rawurlencode($k) : '';
-      if(in_array($qt, array('load', 'insert', 'delete')))
+      if(in_array($qt, array('load', 'insert', 'delete', 'drop', 'clear')))
         $reader->setMessageBody('update=' . rawurlencode($q) . $suffix);
       else
         $reader->setMessageBody('query=' . rawurlencode($q) . $suffix);
@@ -188,7 +196,7 @@ class ARC2_RemoteSPARQLOneDotOneStore extends ARC2_Class {
     $parser = new $cls($this->a, $this);
     $parser->parse($ep, $resp);
     /* ask|load|insert|delete */
-    if (in_array($qt, array('ask', 'load', 'insert', 'delete'))) {
+    if (in_array($qt, array('ask', 'load', 'insert', 'delete', 'drop', 'clear'))) {
       $bid = $parser->getBooleanInsertedDeleted();
       if ($qt == 'ask') {
         $r = $bid['boolean'];
