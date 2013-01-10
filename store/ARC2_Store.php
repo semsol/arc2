@@ -74,6 +74,8 @@ class ARC2_Store extends ARC2_Class {
     if (preg_match('/^utf8/', $this->getCollation())) {
       $this->queryDB("SET NAMES 'utf8'", $db_con);
     }
+	// This is RDF, we may need many JOINs...
+	$this->queryDB("SET SESSION SQL_BIG_SELECTS=1", $db_con);
     return true;
   }
   
