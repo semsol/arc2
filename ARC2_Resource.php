@@ -78,6 +78,14 @@ class ARC2_Resource extends ARC2_Class {
     }
   }
 
+  /* Specialize setProp to set an xsd:dateTime typed literal. Example : $res->setPropXSDdateTime('dcterms:created', date('c')) */
+  function setPropXSDdateTime($p, $dt, $s = '') {
+	$datecreated=array('value' => $dt,
+		'type' => 'literal',
+		'datatype' => 'http://www.w3.org/2001/XMLSchema#dateTime');
+	$this->setProp($p, $datecreated, $s);
+  }
+
   function setStore($store) {
     $this->store = $store;
   }
