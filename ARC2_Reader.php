@@ -24,7 +24,7 @@ class ARC2_Reader extends ARC2_Class {
     $this->http_accept_header = $this->v('http_accept_header', 'Accept: application/rdf+xml; q=0.9, */*; q=0.1', $this->a);
     $this->http_user_agent_header = $this->v('http_user_agent_header', 'User-Agent: ARC Reader (http://arc.semsol.org/)', $this->a);
     $this->http_custom_headers = $this->v('http_custom_headers', '', $this->a);
-    $this->max_redirects = $this->v('max_redirects', 3, $this->a);
+    $this->max_redirects = $this->v('max_redirects', 10, $this->a);
     $this->format = $this->v('format', false, $this->a);
     $this->redirects = array();
     $this->stream_id = '';

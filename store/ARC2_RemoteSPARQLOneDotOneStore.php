@@ -1,16 +1,21 @@
 <?php
 /**
- * ARC2 Remote RDF Store
+ * ARC2 Remote SPARQL1.1 Store
  *
- * @author Benjamin Nowack <bnowack@semsol.com>
- * @license http://arc.semsol.org/license
+ * @author Benjamin Nowack <bnowack@semsol.com>, Mark Fichtner <m.fichtner@wiss-ki.eu>
  * @package ARC2
- * @version 2010-11-16
+ * @version 2012-12-18
 */
 
 ARC2::inc('Class');
 
-class ARC2_RemoteStore extends ARC2_Class {
+/**
+ * The purpose of this class is to connect some software running on arc2
+ * to a SPARQL1.1 endpoint. This is currently tested with Sesame, but seems
+ * to work fine up to now. Further work is needed - your support is welcome!
+ */
+
+class ARC2_RemoteSPARQLOneDotOneStore extends ARC2_Class {
 
   function __construct($a, &$caller) {
     parent::__construct($a, $caller);
@@ -33,11 +38,16 @@ class ARC2_RemoteStore extends ARC2_Class {
   
   /*  */
   
-  function reset() {}
+  function reset() {
+    return $this->runQuery('CLEAR ALL', 'clear');
+  }
   
-  function drop() {}
+  function drop() {
+    return $this->runQuery('DROP ALL', 'drop');
+  }
   
   function insert($doc, $g, $keep_bnode_ids = 0) {
+
     return $this->query('INSERT INTO <' . $g . '> { ' . $this->toNTriples($doc, '', 1) . ' }');
   }
   
@@ -85,20 +95,60 @@ class ARC2_RemoteStore extends ARC2_Class {
     }
     return $r;
   }
+  
+  /* Transform a SPARQL 1.0 or SPARQL+/Update-Query to
+   * SPARQL 1.1
+   * @author Mark Fichtner
+   */
+  
+  function transformSPARQLToOneDotOne($q, $infos) {
+    if(empty($infos))
+      return $q;
+    else if($infos['query']['type'] == "load")
+      $q = str_replace("INTO", "INTO GRAPH", $q);
+    else if($infos['query']['type'] == "insert") {
+      if(strpos($q, "WHERE") !== FALSE) 
+        $q = str_replace("INTO", "{ GRAPH", $q) . "}";
+      else
+        $q = str_replace("INTO", "DATA { GRAPH", $q) . "}";
+    } else if($infos['query']['type'] == "delete") {
+      if(strpos($q, "FROM") !== FALSE)
+        $q = str_replace("FROM", "{ GRAPH", $q) . "}";
+      else {
+        if(strpos($q, "WHERE") === FALSE)
+//          $q = str_replace("DELETE ", "DELETE ", $q);
+//        else
+          $q = str_replace("DELETE ", "DELETE DATA ", $q);
+      }
+    }
+
+//    $q = preg_replace("/LIMIT \d+/", "", $q); 
+        
+    return $q;
+  
+  }
 
   function runQuery($q, $qt = '', $infos = '') {
+
     /* ep */
     $ep = $this->v('remote_store_endpoint', 0, $this->a);
     if (!$ep) return false;
     /* prefixes */
     $q = $this->completeQuery($q);
+
+
     /* custom handling */
     $mthd = 'run' . $this->camelCase($qt) . 'Query';
+    
     if (method_exists($this, $mthd)) {
       return $this->$mthd($q, $infos);
     }
     /* http verb */
-    $mthd = in_array($qt, array('load', 'insert', 'delete')) ? 'POST' : 'GET';
+    $mthd = in_array($qt, array('load', 'insert', 'delete', 'drop', 'clear')) ? 'POST' : 'GET';
+    //$mthd = 'GET';
+    
+    $q = $this->transformSPARQLToOneDotOne($q, $infos);
+    
     /* reader */
     ARC2::inc('Reader');
     $reader = new ARC2_Reader($this->a, $this);
@@ -113,9 +163,15 @@ class ARC2_RemoteStore extends ARC2_Class {
       $mthd = 'POST';
       $url = $ep;
       $reader->setHTTPMethod($mthd);
-      $reader->setCustomHeaders("Content-Type: application/x-www-form-urlencoded");
+      //$reader->setCustomHeaders("Content-Type: application/x-www-form-urlencoded");
+      $reader->setCustomHeaders("Content-Type: application/x-www-form-urlencoded; charset=utf-8");
       $suffix = ($k = $this->v('store_write_key', '', $this->a)) ? '&key=' . rawurlencode($k) : '';
-      $reader->setMessageBody('query=' . rawurlencode($q) . $suffix);
+      if(in_array($qt, array('load', 'insert', 'delete', 'drop', 'clear')))
+//        $reader->setMessageBody('update=' . rawurlencode($q) . $suffix);
+        $reader->setMessageBody('update=' .  rawurlencode(utf8_encode($q)) . $suffix);
+      else
+        $reader->setMessageBody('query=' . rawurlencode(utf8_encode($q)) . $suffix);
+//        $reader->setMessageBody('query=' . rawurlencode($q) . $suffix);
     }
     $to = $this->v('remote_store_timeout', 0, $this->a);
     $reader->activate($url, '', 0, $to);
@@ -124,6 +180,7 @@ class ARC2_RemoteStore extends ARC2_Class {
     while ($d = $reader->readStream()) {
       $resp .= $this->toUTF8($d);
     }
+
     $reader->closeStream();
     $ers = $reader->getErrors();
     $this->a['reader_auth_infos'] = $reader->getAuthInfos();
@@ -132,7 +189,6 @@ class ARC2_RemoteStore extends ARC2_Class {
     $mappings = array('rdfxml' => 'RDFXML', 'sparqlxml' => 'SPARQLXMLResult', 'turtle' => 'Turtle');
     if (!$format || !isset($mappings[$format])) {
       return $resp;
-      //return $this->addError('No parser available for "' . $format . '" SPARQL result');
     }
 
     // Return raw data from endpoint if passthrough_FORMAT specified
@@ -148,7 +204,7 @@ class ARC2_RemoteStore extends ARC2_Class {
     $parser = new $cls($this->a, $this);
     $parser->parse($ep, $resp);
     /* ask|load|insert|delete */
-    if (in_array($qt, array('ask', 'load', 'insert', 'delete'))) {
+    if (in_array($qt, array('ask', 'load', 'insert', 'delete', 'drop', 'clear'))) {
       $bid = $parser->getBooleanInsertedDeleted();
       if ($qt == 'ask') {
         $r = $bid['boolean'];

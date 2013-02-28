@@ -62,11 +62,41 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler {
       $this->analyzeIndex($this->getPattern('0'));
       $sub_r = $this->getQuerySQL();
       $r .= $r ? $nl . 'UNION' . $this->getDistinctSQL() . $nl : '';
+      /* if this is a union-query and there is ORDER BY information handle it
+         in a correct way */
+      if ($this->v('order_infos', 0, $this->infos['query']) && $this->is_union_query) {
+        $infos = $this->v('order_infos', array(), $this->infos['query']);
+        /* every order-variable has to be selected to order by it later on */
+        foreach ($infos as $info) {
+          $type = $info['type'];
+          $ms = array('expression' => 'getExpressionSQL', 'built_in_call' => 'getBuiltInCallSQL', 'function_call' => 'getFunctionCallSQL');
+          $m = isset($ms[$type]) ? $ms[$type] : 'get' . ucfirst($type) . 'ExpressionSQL';
+          if (method_exists($this, $m)) {
+            /* put the value in it */
+            $sub_r = preg_replace('/SELECT(\s+DISTINCT)?\s*/', 'SELECT\\1 ' . $this->$m($info, 'order') . ' AS `_order_' . $info['value'] . '_`, ', $sub_r);
+          }
+        }
+      }
       $r .= $this->is_union_query ? '(' . $sub_r . ')' : $sub_r;
       $this->indexes[$i] = $this->index;
     }
+    
+    /* if there is order information and this is a union add the ORDER BY at the 
+       end */
+    $infos = $this->v('order_infos', array(), $this->infos['query']);
+    if ($infos && $this->is_union_query) {
+      $head = "";
+      $r .= " ORDER BY ";
+      foreach ($infos as $info) {
+        if(empty($head))
+          $head .= "`_order_" . $info['value'] . "_` " . $info['direction'];
+        else
+          $head .= ", `_order_" . $info['value'] . "_` " . $info['direction'];
+      }
+      $r .= $head;
+    }
     $r .= $this->is_union_query ? $this->getLIMITSQL() : '';
-    if ($this->v('order_infos', 0, $this->infos['query'])) {
+    if ($infos) {
       $r = preg_replace('/SELECT(\s+DISTINCT)?\s*/', 'SELECT\\1 NULL AS `_pos_`, ', $r);
     }
     $pd_count = $this->problematicDependencies();
@@ -175,36 +205,45 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler {
     }
     /* result */
     $r = array('variables' => $vars);
-    $v_sql = $this->getValueSQL($tmp_tbl, $q_sql);
-    //echo "\n\n" . $v_sql;
-    $t1 = ARC2::mtime();
-    $con = $this->store->getDBCon();
-    $rs = mysql_unbuffered_query($v_sql, $con);
-    if ($er = mysql_error($con)) {
-      $this->addError($er);
-    }
-    $t2 = ARC2::mtime();
-    $rows = array();
     $types = array(0 => 'uri', 1 => 'bnode', 2 => 'literal');
-    if ($rs) {
-  		while ($pre_row = mysql_fetch_array($rs)) {
-        $row = array();
-        foreach ($vars as $var) {
-          if (isset($pre_row[$var])) {
-            $row[$var] = $pre_row[$var];
-            $row[$var . ' type'] = isset($pre_row[$var . ' type']) ? $types[$pre_row[$var . ' type']] : (in_array($var, $aggregate_vars) ? 'literal' : 'uri');
-            if (isset($pre_row[$var . ' lang_dt']) && ($lang_dt = $pre_row[$var . ' lang_dt'])) {
-              if (preg_match('/^([a-z]+(\-[a-z0-9]+)*)$/i', $lang_dt)) {
-                $row[$var . ' lang'] = $lang_dt;
-              }
-              else {
-                $row[$var . ' datatype'] = $lang_dt;
+    $rows = array();
+    /* iterate through all indexes to cover unions, subquerys etc. */
+    foreach($this->indexes as $key => $index) {
+      /* set the current index */
+      $this->index = $index;
+      $v_sql = $this->getValueSQL($tmp_tbl, $q_sql);
+      //echo "\n\n" . $v_sql;
+      $t1 = ARC2::mtime();
+      $con = $this->store->getDBCon();
+      $rs = mysql_unbuffered_query($v_sql, $con);
+      if ($er = mysql_error($con)) {
+        $this->addError($er);
+      }
+      $t2 = ARC2::mtime();
+
+      if ($rs) {
+    		while ($pre_row = mysql_fetch_array($rs)) {
+          $row = array();
+          foreach ($vars as $var) {
+            if (isset($pre_row[$var])) {
+              $row[$var] = $pre_row[$var];
+              $row[$var . ' type'] = isset($pre_row[$var . ' type']) ? $types[$pre_row[$var . ' type']] : (in_array($var, $aggregate_vars) ? 'literal' : 'uri');
+              if (isset($pre_row[$var . ' lang_dt']) && ($lang_dt = $pre_row[$var . ' lang_dt'])) {
+                if (preg_match('/^([a-z]+(\-[a-z0-9]+)*)$/i', $lang_dt)) {
+                  $row[$var . ' lang'] = $lang_dt;
+                }
+                else {
+                  $row[$var . ' datatype'] = $lang_dt;
+                }
               }
             }
           }
-        }
-        if ($row || !$vars) {
-          $rows[] = $row;
+          if ($row || !$vars) {
+            /* only merge if the value was not in the result set already */
+            if(!in_array($row, $rows)) {
+              $rows[] = $row;
+            }
+          }
         }
       }
     }
@@ -626,8 +665,8 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler {
     foreach ($id2code as $id => $code) {
       $deps[$id]['rank'] = 0;
       foreach ($id2code as $other_id => $other_code) {
-        $deps[$id]['rank'] += ($id != $other_id) && preg_match('/' . $other_id . '/', $code) ? 1 : 0;
-        $deps[$id][$other_id] = ($id != $other_id) && preg_match('/' . $other_id . '/', $code) ? 1 : 0;
+        $deps[$id]['rank'] += ($id != $other_id) && preg_match('/' . $other_id . '\\D/', $code) ? 1 : 0;
+        $deps[$id][$other_id] = ($id != $other_id) && preg_match('/' . $other_id . '\\D/', $code) ? 1 : 0;
       }
     }
     $r = '';

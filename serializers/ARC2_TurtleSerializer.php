@@ -1,12 +1,19 @@
 <?php
+/*
+    Changed the string escaping - turtle can't have single quotes.
+    Outputs "singleton bnodes" inline with [].
+    Serialises rdf:Lists as () where possible.
+    Not properly tested  ....
+*/
 /**
  * ARC2 Turtle Serializer
  *
  * @author    Benjamin Nowack
+ * @edited    Keith Alexander
  * @license   http://arc.semsol.org/license
  * @homepage <http://arc.semsol.org/>
  * @package   ARC2
- * @version   2010-11-16
+ * @version   2010-12-24
 */
 
 ARC2::inc('RDFSerializer');
@@ -19,15 +26,55 @@ class ARC2_TurtleSerializer extends ARC2_RDFSerializer {
   
   function __init() {
     parent::__init();
-    $this->content_header = 'application/x-turtle';
+    $this->content_header = 'text/turtle';
   }
+
+  function occurrencesOfIdAsObject($id, &$index) {
+      $count = 0;
+      foreach($index as $s => $ps){
+          foreach($ps as $p => $os){
+              if(in_array(array('value'=>$id,'type'=>'bnode'), $os) ) $count++;
+          }
+      }
+      return $count;
+  }
+  
+  function resourceIsRdfList($id, &$index){
+      $rdftype = $this->expandPName('rdf:type');
+      $rdfList = $this->expandPName('rdf:List');
+      $rdffirst = $this->expandPName('rdf:first');
+      if(isset($index[$id][$rdffirst])) return true;
+       if(isset($index[$id]) && isset($index[$id][$rdftype])){
+           $types = $index[$id][$rdftype];
+           return in_array(array('value' => $rdfList, 'type'=> 'uri'), $types);
+       }
+       return null;
+  }
+
+  function listToHash($listID, &$index){
+      $array = array();
+            $rdffirst = $this->expandPName('rdf:first');
+            $rdfrest = $this->expandPName('rdf:rest');
+            $rdfnil = $this->expandPName('rdf:nil');
+      while(!empty($listID) AND $listID !=$rdfnil){
+          $array[$listID]=$index[$listID][$rdffirst][0];
+          $listID = $index[$listID][$rdfrest][0]['value'];
+      }
+      return $array;
+  }
+  
 
   /*  */
   
-  function getTerm($v, $term = '', $qualifier = '') {
+  function getTerm($v, $term = '', $qualifier = '', &$index=array()) {
     if (!is_array($v)) {
       if (preg_match('/^\_\:/', $v)) {
-        return $v;
+        $objectCount =$this->occurrencesOfIdAsObject($v, $index);  
+        if($objectCount<2){ //singleton bnode 
+             return '[';  /* getSerializedIndex will fill in the  ] at the end */
+        } else {
+            return $v;
+        }
       }
       if (($term === 'p') && ($pn = $this->getPName($v))) {
         return $pn;
@@ -48,10 +95,8 @@ class ARC2_TurtleSerializer extends ARC2_RDFSerializer {
       return $this->getTerm($v['value'], $term, $qualifier);
     }
     /* literal */
-    $quot = '"';
-    if (preg_match('/\"/', $v['value'])) {
-      $quot = "'";
-      if (preg_match('/\'/', $v['value']) || preg_match('/[\x0d\x0a]/', $v['value'])) {
+    $quot = '"';        
+      if (preg_match('/\"/', $v['value']) || preg_match('/[\x0d\x0a]/', $v['value'])) {
         $quot = '"""';
         if (preg_match('/\"\"\"/', $v['value']) || preg_match('/\"$/', $v['value']) || preg_match('/^\"/', $v['value'])) {
           $quot = "'''";
@@ -60,7 +105,6 @@ class ARC2_TurtleSerializer extends ARC2_RDFSerializer {
           $v['value'] = str_replace("'''", '\\\'\\\'\\\'', $v['value']);
         }
       }
-    }
     if ((strlen($quot) == 1) && preg_match('/[\x0d\x0a]/', $v['value'])) {
       $quot = $quot . $quot . $quot;
     }
@@ -86,7 +130,25 @@ class ARC2_TurtleSerializer extends ARC2_RDFSerializer {
   function getSerializedIndex($index, $raw = 0) {
     $r = '';
     $nl = "\n";
+    $renderedResources = array();
     foreach ($index as $s => $ps) {
+        $renderedResources[$s] = $this->_serialiseResource($s, $index,$nl);
+    }
+    $topLevelSubjects = array_keys($index);
+    foreach($renderedResources as $id => $turtle){
+        if(!in_array($id, $topLevelSubjects)) unset($renderedResources[$id]);
+    }
+    $r.= implode(array_values($renderedResources));
+    if ($raw) {
+      return $r;
+    }
+    return $r ? $this->getHead() . $nl . $nl . $r : '';
+  }
+  
+  function _serialiseResource($s, &$index, $nesting=0, $nl="\n"){
+      $r='';
+      if(!isset($index[$s])) return $r;
+      else $ps = $index[$s];
       $r .= $r ? ' .' . $nl . $nl : '';
       $s = $this->getTerm($s, 's');
       $r .= $s;
@@ -102,20 +164,46 @@ class ARC2_TurtleSerializer extends ARC2_RDFSerializer {
         }
         foreach ($os as $o) {
           $r .= $first_o ? ' ' : ' ,' . $nl . str_pad('', strlen($s) + strlen($p) + 2);
-          $o = $this->getTerm($o, 'o', $p);
-          $r .= $o;
+          $termO = $this->getTerm($o, 'o', $p, $index);
+          if($termO=='['){ // we know it's a singleton bnode
+              $termID = isset($o['value'])? $o['value'] : $o;
+              if($this->resourceIsRdfList($termID, $index)){
+                  $renderAsList = true;
+                $list = $this->listToHash($termID, $index);
+                $listText= '( ';
+                foreach ($list as $listID => $listValue) {
+                    if($this->occurrencesOfIdAsObject($listID, $index) < 2 ){
+                      $listText.=$this->getTerm($listValue, 'o', null, $index).' ';  
+                    } 
+                    else {
+                        $renderAsList = false;
+                    }
+                }
+                $listText.=')';
+                if($renderAsList){ 
+                    $r.=$listText;
+                    foreach($list as $listID => $listValue) unset($index[$listID]);
+                } else {
+                    $r.=$this->_serialiseResource($termID, $index, ($nesting+1));
+                } 
+              } else {
+                $r.=$this->_serialiseResource($termID, $index, ($nesting+1));
+              }
+              unset($index[$termID]);
+          } else {
+              $r .= $termO;
+          }
           $first_o = 0;
         }
         $first_p = 0;
       }
-    }
-    $r .= $r ? ' .' : '';
-    if ($raw) {
-      return $r;
-    }
-    return $r ? $this->getHead() . $nl . $nl . $r : '';
+      if($s=='[') $r.=']';
+      $r .= $r && ($nesting < 1) ? ' . ' : '';
+      
+      return $r.$nl.$nl;
   }
   
   /*  */
 
 }
+?>
