@@ -110,7 +110,7 @@ class ARC2_TurtleParser extends ARC2_RDFParser {
     $sub_v2 = '';
     $loops = 0;
     $prologue_done = 0;
-    while ($d = $this->reader->readStream(0)) {
+    while ($d = $this->reader->readStream(0, 8192)) {
       $buffer .= $d;
       $sub_v = $buffer;
       do {
