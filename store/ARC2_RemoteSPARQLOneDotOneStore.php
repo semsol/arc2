@@ -107,17 +107,22 @@ class ARC2_RemoteSPARQLOneDotOneStore extends ARC2_Class {
     else if($infos['query']['type'] == "load")
       $q = str_replace("INTO", "INTO GRAPH", $q);
     else if($infos['query']['type'] == "insert") {
-      if(strpos("WHERE", $q) !== FALSE) 
+      if(strpos($q, "WHERE") !== FALSE) 
         $q = str_replace("INTO", "{ GRAPH", $q) . "}";
       else
         $q = str_replace("INTO", "DATA { GRAPH", $q) . "}";
     } else if($infos['query']['type'] == "delete") {
-      if(strpos("FROM", $q) !== FALSE)
+      if(strpos($q, "FROM") !== FALSE)
         $q = str_replace("FROM", "{ GRAPH", $q) . "}";
       else {
-        $q = str_replace("DELETE ", "DELETE DATA", $q);
+        if(strpos($q, "WHERE") === FALSE)
+//          $q = str_replace("DELETE ", "DELETE ", $q);
+//        else
+          $q = str_replace("DELETE ", "DELETE DATA ", $q);
       }
     }
+
+//    $q = preg_replace("/LIMIT \d+/", "", $q); 
         
     return $q;
   
@@ -158,12 +163,15 @@ class ARC2_RemoteSPARQLOneDotOneStore extends ARC2_Class {
       $mthd = 'POST';
       $url = $ep;
       $reader->setHTTPMethod($mthd);
-      $reader->setCustomHeaders("Content-Type: application/x-www-form-urlencoded");
+      //$reader->setCustomHeaders("Content-Type: application/x-www-form-urlencoded");
+      $reader->setCustomHeaders("Content-Type: application/x-www-form-urlencoded; charset=utf-8");
       $suffix = ($k = $this->v('store_write_key', '', $this->a)) ? '&key=' . rawurlencode($k) : '';
       if(in_array($qt, array('load', 'insert', 'delete', 'drop', 'clear')))
-        $reader->setMessageBody('update=' . rawurlencode($q) . $suffix);
+//        $reader->setMessageBody('update=' . rawurlencode($q) . $suffix);
+        $reader->setMessageBody('update=' .  rawurlencode(utf8_encode($q)) . $suffix);
       else
-        $reader->setMessageBody('query=' . rawurlencode($q) . $suffix);
+        $reader->setMessageBody('query=' . rawurlencode(utf8_encode($q)) . $suffix);
+//        $reader->setMessageBody('query=' . rawurlencode($q) . $suffix);
     }
     $to = $this->v('remote_store_timeout', 0, $this->a);
     $reader->activate($url, '', 0, $to);
