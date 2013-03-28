@@ -191,6 +191,12 @@ class ARC2_Class {
     return $this->ns[$m[1]];
   }
 
+  function setPrefix($prefix, $ns) {
+	 $this->ns[$prefix] = $ns;
+	 $this->nsp[$ns] = $prefix;
+	 return $this;
+  }
+  
   function getPrefix($ns) {
     if (!isset($this->nsp[$ns])) {
       $this->ns['ns' . $this->ns_count] = $ns;
