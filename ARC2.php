@@ -3,7 +3,6 @@
  * ARC2 core class (static, not instantiated)
  *
  * @author Benjamin Nowack
- * @license <http://arc.semsol.org/license>
  * @homepage <http://arc.semsol.org/>
  * @package ARC2
  */
@@ -52,12 +51,6 @@ class ARC2 {
         $port = 80;
       }
       return $proto . '://' . $server . ($port != 80 ? ':' . $port : '') . $script;
-      /*
-      return preg_replace('/^([a-z]+)\/.*$/', '\\1', strtolower($_SERVER['SERVER_PROTOCOL'])) . 
-        '://' . $_SERVER['SERVER_NAME'] .
-        ($_SERVER['SERVER_PORT'] != 80 ? ':' . $_SERVER['SERVER_PORT'] : '') .
-        $_SERVER['SCRIPT_NAME'];
-      */
     }
     elseif (isset($_SERVER['SCRIPT_FILENAME'])) {
       return 'file://' . realpath($_SERVER['SCRIPT_FILENAME']);
@@ -99,8 +92,7 @@ class ARC2 {
   /*  */
 
   static function mtime(){
-    list($msec, $sec) = explode(" ", microtime());
-    return ((float)$msec + (float)$sec);
+	  return microtime(true);
   }
   
   static function x($re, $v, $options = 'si') {
@@ -357,6 +349,12 @@ class ARC2 {
     return new $cls($a, $caller);
   }
   
+  /* graph */
+
+  static function getGraph($a = '') {
+    return ARC2::getComponent('Graph', $a);
+  }
+
   /* resource */
 
   static function getResource($a = '') {
