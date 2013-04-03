@@ -1,0 +1,16 @@
+<phpunit>
+
+    <php>
+        <ini name="memory_limit" value="512M"/>
+    </php>
+
+    <filter>
+	  <whitelist addUncoveredFilesFromWhitelist="true" processUncoveredFilesFromWhitelist="true">
+	    <directory suffix=".php">../..</directory>
+	    <exclude>
+	      <directory suffix=".php">../../tests</directory>
+	    </exclude>
+	  </whitelist>
+    </filter>
+
+</phpunit>
