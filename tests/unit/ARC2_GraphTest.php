@@ -130,8 +130,42 @@ class ARC2_GraphTest extends ARC2_TestCase {
 	}
 
 	public function testGetSubjects() {
-		$actual = $this->obj->setIndex($this->res1)->getSubjects();
+		$g = $this->obj->setIndex($this->res1);
+		
+		$actual = $g->getSubjects();
 		$this->assertEquals(array('http://example.com/s1'), $actual);
+		
+		$actual = $g->getSubjects('p');
+		$this->assertEquals(array(), $actual);
+		
+		$actual = $g->getSubjects('http://example.com/p1');
+		$this->assertEquals(array('http://example.com/s1'), $actual);
+		
+		$actual = $g->getSubjects(null, 'o');
+		$this->assertEquals(array(), $actual);
+		
+		$actual = $g->getSubjects(null, 'o1');
+		$this->assertEquals(array('http://example.com/s1'), $actual);
+		
+		$actual = $g->getSubjects(null, array('value' => 'http://example.com/o1', 'type' => 'uri'));
+		$this->assertEquals(array('http://example.com/s1'), $actual);
+		
+		$actual = $g->getSubjects('http://example.com/p1', 'o');
+		$this->assertEquals(array(), $actual);
+		
+		$actual = $g->getSubjects('http://example.com/p1', 'o1');
+		$this->assertEquals(array('http://example.com/s1'), $actual);
+		
+	}
+
+	public function testGetPredicates() {
+		$g = $this->obj->setIndex($this->res1)->addIndex($this->res2);
+		
+		$actual = $g->getPredicates();
+		$this->assertEquals(array('http://example.com/p1', 'http://example.com/p2'), $actual);
+		
+		$actual = $g->getPredicates('http://example.com/s2');
+		$this->assertEquals(array('http://example.com/p2'), $actual);
 	}
 
 	public function testGetObjects() {

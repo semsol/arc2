@@ -106,8 +106,38 @@ class ARC2_Graph extends ARC2_Class {
 		return $this;
 	}
 	
-	function getSubjects() {
-		return array_keys($this->index);
+	function getSubjects($p = null, $o = null) {
+		if (!$p && !$o) return array_keys($this->index);
+		$result = array();
+		foreach ($this->index as $s => $ps) {
+			foreach ($ps as $predicate => $os) {
+				if ($p && $predicate != $p) continue;
+				foreach ($os as $object) {
+					if (!$o) {
+						$result[] = $s;
+						break;
+					}
+					else if (is_array($o) && $object == $o) {
+						$result[] = $s;
+						break;
+					}
+					else if ($o && $object['value'] == $o) {
+						$result[] = $s;
+						break;
+					}
+				}
+			}
+		}
+		return array_unique($result);
+	}
+	
+	function getPredicates($s = null) {
+		$result = array();
+		foreach ($this->index as $subject => $ps) {
+			if ($s && $s != $subject) continue;
+			$result = array_merge($result, array_keys($ps));
+		}
+		return array_unique($result);
 	}
 	
 	function getObjects($s, $p, $plain = false) {
