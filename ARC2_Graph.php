@@ -133,7 +133,8 @@ class ARC2_Graph extends ARC2_Class {
 	
 	function getPredicates($s = null) {
 		$result = array();
-		foreach ($this->index as $subject => $ps) {
+		$index = $s ? (array($s => isset($this->index[$s]) ? $this->index[$s] : array())) : $this->index;
+		foreach ($index as $subject => $ps) {
 			if ($s && $s != $subject) continue;
 			$result = array_merge($result, array_keys($ps));
 		}
