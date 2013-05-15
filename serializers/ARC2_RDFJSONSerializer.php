@@ -49,10 +49,10 @@ class ARC2_RDFJSONSerializer extends ARC2_RDFSerializer {
 
   function jsonEscape($v) {
     if (function_exists('json_encode')) {
-        return preg_replace('/^"(.*)"$/', '\\1', json_encode($v));
+        return preg_replace('/^"(.*)"$/', '\\1', json_encode($v,JSON_UNESCAPED_SLASHES));
     }
-    $from = array("\\", "\r", "\t", "\n", '"', "\b", "\f", "/");
-    $to = array('\\\\', '\r', '\t', '\n', '\"', '\b', '\f', '\/');
+    $from = array("\\", "\r", "\t", "\n", '"', "\b", "\f");
+    $to = array('\\\\', '\r', '\t', '\n', '\"', '\b', '\f');
     return str_replace($from, $to, $v);
   }
     
