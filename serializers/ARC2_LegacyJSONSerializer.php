@@ -25,7 +25,7 @@ class ARC2_LegacyJSONSerializer extends ARC2_Class {
   
   function getSerializedArray($struct, $ind = '') {
     $n = "\n";
-    if (function_exists('json_encode')) return str_replace('","', '",' . $n . '"', json_encode($struct, JSON_UNESCAPED_SLASHES));
+    if (function_exists('json_encode')) return str_replace('","', '",' . $n . '"', str_replace("\/","/",json_encode($struct)));
     $r = '';
     $from = array("\\", "\r", "\t", "\n", '"', "\b", "\f");
     $to = array('\\\\', '\r', '\t', '\n', '\"', '\b', '\f');
