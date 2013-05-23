@@ -157,6 +157,7 @@ class ARC2_RemoteSPARQLOneDotOneStore extends ARC2_Class {
       $url = $ep;
       $url .= strpos($ep, '?') ? '&' : '?';
       $url .= 'query=' . urlencode($q);
+      $url .= '&limit=0';
       if ($k = $this->v('store_read_key', '', $this->a)) $url .= '&key=' . urlencode($k);
     }
     if ($mthd != 'GET' || strlen($url) > 255) {
@@ -166,15 +167,17 @@ class ARC2_RemoteSPARQLOneDotOneStore extends ARC2_Class {
       //$reader->setCustomHeaders("Content-Type: application/x-www-form-urlencoded");
       $reader->setCustomHeaders("Content-Type: application/x-www-form-urlencoded; charset=utf-8");
       $suffix = ($k = $this->v('store_write_key', '', $this->a)) ? '&key=' . rawurlencode($k) : '';
+      $suffix .= '&limit=0';
       if(in_array($qt, array('load', 'insert', 'delete', 'drop', 'clear')))
 //        $reader->setMessageBody('update=' . rawurlencode($q) . $suffix);
-        $reader->setMessageBody('update=' .  rawurlencode(utf8_encode($q)) . $suffix);
+        $reader->setMessageBody('action=exec&update=' .  rawurlencode(utf8_encode($q)) . $suffix);
       else
-        $reader->setMessageBody('query=' . rawurlencode(utf8_encode($q)) . $suffix);
+        $reader->setMessageBody('action=exec&query=' . rawurlencode(utf8_encode($q)) . $suffix);
 //        $reader->setMessageBody('query=' . rawurlencode($q) . $suffix);
     }
     $to = $this->v('remote_store_timeout', 0, $this->a);
     $reader->activate($url, '', 0, $to);
+
     $format = $reader->getFormat();
     $resp = '';
     while ($d = $reader->readStream()) {
@@ -183,6 +186,7 @@ class ARC2_RemoteSPARQLOneDotOneStore extends ARC2_Class {
 
     $reader->closeStream();
     $ers = $reader->getErrors();
+
     $this->a['reader_auth_infos'] = $reader->getAuthInfos();
     unset($this->reader);
     if ($ers) return array('errors' => $ers);
