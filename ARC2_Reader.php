@@ -371,7 +371,7 @@ class ARC2_Reader extends ARC2_Class {
   
   function closeStream() {
     if (isset($this->stream)) {
-      if ($this->v('type', 0, $this->stream) == 'socket') {
+      if ($this->v('type', 0, $this->stream) == 'socket' && !empty($this->stream['socket'])) {
         @fclose($this->stream['socket']);
       }
       unset($this->stream);
