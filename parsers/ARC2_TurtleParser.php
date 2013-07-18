@@ -296,6 +296,7 @@ class ARC2_TurtleParser extends ARC2_RDFParser {
         elseif ((list($sub_r, $sub_v) = $this->xCollection($sub_v)) && $sub_r) {
           $t['o'] = $sub_r['id'];
           $t['o_type'] = $sub_r['type'];
+          $t['o_datatype'] = '';
           $pre_r = array_merge($pre_r, array($t), $sub_r['triples']);
           $state = 4;
           $proceed = 1;
@@ -303,6 +304,7 @@ class ARC2_TurtleParser extends ARC2_RDFParser {
         elseif ((list($sub_r, $sub_v) = $this->xBlankNodePropertyList($sub_v)) && $sub_r) {
           $t['o'] = $sub_r['id'];
           $t['o_type'] = $sub_r['type'];
+          $t['o_datatype'] = '';
           $pre_r = array_merge($pre_r, array($t), $sub_r['triples']);
           $state = 4;
           $proceed = 1;
@@ -381,6 +383,7 @@ class ARC2_TurtleParser extends ARC2_RDFParser {
           elseif ((list($sub_r, $sub_v) = $this->xCollection($sub_v)) && $sub_r) {
             $t['o'] = $sub_r['id'];
             $t['o_type'] = $sub_r['type'];
+            $t['o_datatype'] = '';
             $r['triples'] = array_merge($r['triples'], array($t), $sub_r['triples']);
             $state = 4;
             $proceed = 1;
@@ -388,6 +391,7 @@ class ARC2_TurtleParser extends ARC2_RDFParser {
           elseif((list($sub_r, $sub_v) = $this->xBlankNodePropertyList($sub_v)) && $sub_r) {
             $t['o'] = $sub_r['id'];
             $t['o_type'] = $sub_r['type'];
+            $t['o_datatype'] = '';
             $r['triples'] = array_merge($r['triples'], array($t), $sub_r['triples']);
             $state = 4;
             $proceed = 1;
