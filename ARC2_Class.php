@@ -92,7 +92,7 @@ class ARC2_Class {
     /* decode apostrophe + s */
     $r = str_replace(' apostrophes ', "'s ", $r);
     /* typical RDF non-info URI */
-    if (($loops < 1) && preg_match('/^(self|it|this|me)$/i', $r)) {
+    if (($loops < 1) && preg_match('/^(self|it|this|me|id)$/i', $r)) {
       return $this->extractTermLabel(preg_replace('/\#.+$/', '', $uri), $loops + 1);
     }
     /* trailing hash or slash */
