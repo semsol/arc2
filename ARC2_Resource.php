@@ -35,7 +35,7 @@ class ARC2_Resource extends ARC2_Class {
     $this->index = $index;
   }
 
-  function getIndex($index) {
+  function getIndex() {
     return $this->index;
   }
 
