@@ -496,8 +496,13 @@ class ARC2_Store extends ARC2_Class {
   
   /*  */
 
-  function getValueHash($val) {
-    return abs(crc32($val));
+  function getValueHash($val, $_32bit = false) {
+    $hash = abs(crc32($val));
+	if ($_32bit && ($hash & 0x80000000)) {
+	  $hash ^= 0xffffffff;
+	  $hash += 1;
+	}
+	return $hash;
   }
 
   function getTermID($val, $term = '') {
@@ -518,6 +523,11 @@ class ARC2_Store extends ARC2_Class {
     /* via hash */
     if (preg_match('/^(s2val|o2val)$/', $tbl) && $this->hasHashColumn($tbl)) {
       $sql = "SELECT id, val FROM " . $this->getTablePrefix() . $tbl . " WHERE val_hash = '" . $this->getValueHash($val) . "'";
+	  $rs = $this->queryDB($sql, $con);
+	  if (!$rs || !mysql_num_rows($rs)) {// try 32 bit version
+	    $sql = "SELECT id, val FROM " . $this->getTablePrefix() . $tbl . " WHERE val_hash = '" . $this->getValueHash($val, true) . "'";
+		$rs = $this->queryDB($sql, $con);
+	  }
       if (($rs = $this->queryDB($sql, $con)) && mysql_num_rows($rs)) {
         while ($row = mysql_fetch_array($rs)) {
           if ($row['val'] == $val) {
