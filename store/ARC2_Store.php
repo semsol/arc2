@@ -497,11 +497,11 @@ class ARC2_Store extends ARC2_Class {
   /*  */
 
   function getValueHash($val, $_32bit = false) {
-    $hash = abs(crc32($val));
+    $hash = crc32($val);
 	if ($_32bit && ($hash & 0x80000000)) {
-	  $hash ^= 0xffffffff;
-	  $hash += 1;
+        $hash = sprintf("%u", $hash);
 	}
+    $hash = abs($hash);
 	return $hash;
   }
 
