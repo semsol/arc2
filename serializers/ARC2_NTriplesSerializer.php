@@ -131,8 +131,12 @@ class ARC2_NTriplesSerializer extends ARC2_RDFSerializer {
 		if (substr($r, 0, 1) == '"') $r = substr($r, 1);
 		if (substr($r, -1) == '"') $r = substr($r, 0, -1);
 		// uppercase hex chars
-		$r = preg_replace('/(\\\u)([0-9a-f]{4})/e', "'\\1' . strtoupper('\\2')", $r);
-		$r = preg_replace('/(\\\U)([0-9a-f]{8})/e', "'\\1' . strtoupper('\\2')", $r);
+		$r = preg_replace_callback('/(\\\u)([0-9a-f]{4})', function($matches) {
+      return $matches[1] . strtoupper($matches[2]);
+    }, $r);
+		$r = preg_replace_callback('/(\\\U)([0-9a-f]{8})', function($matches) {
+      return $matches[1] . strtoupper($matches[2]);
+    }, $r);
 	}
 	// escape byte-wise (may be wrong for mb chars and newer php versions)
 	else {
