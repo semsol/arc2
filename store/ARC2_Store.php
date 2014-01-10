@@ -522,10 +522,10 @@ class ARC2_Store extends ARC2_Class {
     $r = 0;
     /* via hash */
     if (preg_match('/^(s2val|o2val)$/', $tbl) && $this->hasHashColumn($tbl)) {
-      $sql = "SELECT id, val FROM " . $this->getTablePrefix() . $tbl . " WHERE val_hash = '" . $this->getValueHash($val) . "'";
+      $sql = "SELECT id, val FROM " . $this->getTablePrefix() . $tbl . " WHERE val_hash = '" . $this->getValueHash($val) . "' ORDER BY id";
 	  $rs = $this->queryDB($sql, $con);
 	  if (!$rs || !mysql_num_rows($rs)) {// try 32 bit version
-	    $sql = "SELECT id, val FROM " . $this->getTablePrefix() . $tbl . " WHERE val_hash = '" . $this->getValueHash($val, true) . "'";
+	    $sql = "SELECT id, val FROM " . $this->getTablePrefix() . $tbl . " WHERE val_hash = '" . $this->getValueHash($val, true) . "' ORDER BY id";
 		$rs = $this->queryDB($sql, $con);
 	  }
       if (($rs = $this->queryDB($sql, $con)) && mysql_num_rows($rs)) {
