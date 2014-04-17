@@ -75,7 +75,9 @@ class ARC2_Class {
 
   function deCamelCase($v, $uc_first = 0) {
     $r = str_replace('_', ' ', $v);
-    $r = preg_replace('/([a-z0-9])([A-Z])/e', '"\\1 " . strtolower("\\2")', $r);
+    $r = preg_replace_callback('/([a-z0-9])([A-Z])/', function($matches) {
+      return $matches[1] . ' ' . strtolower($matches[2]);
+    }, $r);
     return $uc_first ? ucfirst($r) : $r;
   }
 

@@ -116,8 +116,10 @@ class ARC2_JSONParser extends ARC2_RDFParser {
       if (preg_match('/^([^\x5c]*|.*[^\x5c]|.*\x5c{2})\"(.*)$/sU', $rest, $m)) {
         $val = $m[1];
         /* unescape chars (single-byte) */
-        $val = preg_replace('/\\\u(.{4})/e', 'chr(hexdec("\\1"))', $val);
-        //$val = preg_replace('/\\\u00(.{2})/e', 'rawurldecode("%\\1")', $val);
+        $val = preg_replace_callback('/\\\u(.{4})/', function($matches) {
+          return chr(hexdec($matches[1]));
+        }, $val);
+        //$val = preg_replace_callback('/\\\u00(.{2})', function($matches) { return rawurldecode("%" . $matches[1]); }, $val);
         /* other escaped chars */
         $from = array('\\\\', '\r', '\t', '\n', '\"', '\b', '\f', '\/');
         $to = array("\\", "\r", "\t", "\n", '"', "\b", "\f", "/");
