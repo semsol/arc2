@@ -48,7 +48,7 @@ class ARC2_SPARQLPlusParser extends ARC2_SPARQLParser {
     }
     /* * or var */
     if ((list($sub_r, $sub_v) = $this->x('\*', $v)) && $sub_r) {
-      return array(array('var' => $sub_r['value'], 'aggregate' => $aggregate, 'alias' => $aggregate ? $result_var : ''), $sub_v);
+      return array(array('var' => '*', 'aggregate' => $aggregate, 'alias' => $aggregate ? $result_var : ''), $sub_v);
     }
     if ((list($sub_r, $sub_v) = $this->xVar($v)) && $sub_r) {
       return array(array('var' => $sub_r['value'], 'aggregate' => $aggregate, 'alias' => $aggregate ? $result_var : ''), $sub_v);
