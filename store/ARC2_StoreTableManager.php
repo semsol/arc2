@@ -39,22 +39,22 @@ class ARC2_StoreTableManager extends ARC2_Store {
   function createTables() {
     $con = $this->getDBCon();
     if(!$this->createTripleTable()) {
-      return $this->addError('Could not create "triple" table (' . mysql_error($con) . ').');
+      return $this->addError('Could not create "triple" table (' . mysqli_error($con) . ').');
     }
     if(!$this->createG2TTable()) {
-      return $this->addError('Could not create "g2t" table (' . mysql_error($con) . ').');
+      return $this->addError('Could not create "g2t" table (' . mysqli_error($con) . ').');
     }
     if(!$this->createID2ValTable()) {
-      return $this->addError('Could not create "id2val" table (' . mysql_error($con) . ').');
+      return $this->addError('Could not create "id2val" table (' . mysqli_error($con) . ').');
     }
     if(!$this->createS2ValTable()) {
-      return $this->addError('Could not create "s2val" table (' . mysql_error($con) . ').');
+      return $this->addError('Could not create "s2val" table (' . mysqli_error($con) . ').');
     }
     if(!$this->createO2ValTable()) {
-      return $this->addError('Could not create "o2val" table (' . mysql_error($con) . ').');
+      return $this->addError('Could not create "o2val" table (' . mysqli_error($con) . ').');
     }
     if(!$this->createSettingTable()) {
-      return $this->addError('Could not create "setting" table (' . mysql_error($con) . ').');
+      return $this->addError('Could not create "setting" table (' . mysqli_error($con) . ').');
     }
     return 1;
   }
@@ -79,7 +79,7 @@ class ARC2_StoreTableManager extends ARC2_Store {
         UNIQUE KEY (t), " . $index_code . " KEY (misc)
       ) ". $this->getTableOptionsCode() . "
     ";
-    return mysql_query($sql, $this->getDBCon());
+    return mysqli_query( $this->getDBCon(), $sql);
   }
 
   function extendTripleTableColumns($suffix = 'triple') {
@@ -91,7 +91,7 @@ class ARC2_StoreTableManager extends ARC2_Store {
       MODIFY o int(10) UNSIGNED NOT NULL,
       MODIFY o_lang_dt int(10) UNSIGNED NOT NULL
     ";
-    return mysql_query($sql, $this->getDBCon());
+    return mysqli_query( $this->getDBCon(), $sql);
   }
   
   /*  */
@@ -104,7 +104,7 @@ class ARC2_StoreTableManager extends ARC2_Store {
         UNIQUE KEY gt (g,t), KEY tg (t,g)
       ) ". $this->getTableOptionsCode() . "
     ";
-    return mysql_query($sql, $this->getDBCon());
+    return mysqli_query( $this->getDBCon(), $sql);
   }  
   
   function extendG2tTableColumns($suffix = 'g2t') {
@@ -113,7 +113,7 @@ class ARC2_StoreTableManager extends ARC2_Store {
       MODIFY g int(10) UNSIGNED NOT NULL,
       MODIFY t int(10) UNSIGNED NOT NULL
     ";
-    return mysql_query($sql, $this->getDBCon());
+    return mysqli_query( $this->getDBCon(), $sql);
   }
 
   /*  */
@@ -128,7 +128,7 @@ class ARC2_StoreTableManager extends ARC2_Store {
         UNIQUE KEY (id,val_type), KEY v (val(64))
       ) ". $this->getTableOptionsCode() . "
     ";
-    return mysql_query($sql, $this->getDBCon());
+    return mysqli_query( $this->getDBCon(), $sql);
   }  
   
   function extendId2valTableColumns($suffix = 'id2val') {
@@ -136,7 +136,7 @@ class ARC2_StoreTableManager extends ARC2_Store {
       ALTER TABLE " . $this->getTablePrefix() . $suffix . "
       MODIFY id int(10) UNSIGNED NOT NULL
     ";
-    return mysql_query($sql, $this->getDBCon());
+    return mysqli_query( $this->getDBCon(), $sql);
   }
 
   /*  */
@@ -153,7 +153,7 @@ class ARC2_StoreTableManager extends ARC2_Store {
         " . $indexes . "
       ) " . $this->getTableOptionsCode() . "
     ";
-    return mysql_query($sql, $this->getDBCon());
+    return mysqli_query( $this->getDBCon(), $sql);
   }  
   
   function extendS2valTableColumns($suffix = 's2val') {
@@ -161,7 +161,7 @@ class ARC2_StoreTableManager extends ARC2_Store {
       ALTER TABLE " . $this->getTablePrefix() . $suffix . "
       MODIFY id int(10) UNSIGNED NOT NULL
     ";
-    return mysql_query($sql, $this->getDBCon());
+    return mysqli_query( $this->getDBCon(), $sql);
   }
 
   /*  */
@@ -179,7 +179,7 @@ class ARC2_StoreTableManager extends ARC2_Store {
         UNIQUE KEY (id), KEY vh (val_hash)" . $val_index . "
       ) ". $this->getTableOptionsCode() . "
     ";
-    return mysql_query($sql, $this->getDBCon());
+    return mysqli_query( $this->getDBCon(), $sql);
   }  
   
   function extendO2valTableColumns($suffix = 'o2val') {
@@ -187,7 +187,7 @@ class ARC2_StoreTableManager extends ARC2_Store {
       ALTER TABLE " . $this->getTablePrefix() . $suffix . "
       MODIFY id int(10) UNSIGNED NOT NULL
     ";
-    return mysql_query($sql, $this->getDBCon());
+    return mysqli_query( $this->getDBCon(), $sql);
   }
 
   /*  */
@@ -200,7 +200,7 @@ class ARC2_StoreTableManager extends ARC2_Store {
         UNIQUE KEY (k)
       ) ". $this->getTableOptionsCode() . "
     ";
-    return mysql_query($sql, $this->getDBCon());
+    return mysqli_query( $this->getDBCon(), $sql);
   }  
   
   /*  */
@@ -244,8 +244,8 @@ class ARC2_StoreTableManager extends ARC2_Store {
       INSERT IGNORE INTO ' . $new_tbl .'
       SELECT * FROM ' . $old_tbl . ' WHERE ' . $old_tbl . '.p = ' . $p_id . '
     ';
-    if ($rs = mysql_query($sql, $con)) {
-      mysql_query('DROP TABLE ' . $old_tbl, $con);
+    if ($rs = mysqli_query( $con, $sql)) {
+      mysqli_query( $con, 'DROP TABLE ' . $old_tbl);
       return 1;
     }
     else {
@@ -264,12 +264,12 @@ class ARC2_StoreTableManager extends ARC2_Store {
       INSERT IGNORE INTO ' . $new_tbl .'
       SELECT * FROM ' . $old_tbl . ' WHERE ' . $old_tbl . '.p = ' . $p_id . '
     ';
-    if ($rs = mysql_query($sql, $con)) {
-      mysql_query('DELETE FROM ' . $old_tbl . ' WHERE ' . $old_tbl . '.p = ' . $p_id, $con);
+    if ($rs = mysqli_query( $con, $sql)) {
+      mysqli_query( $con, 'DELETE FROM ' . $old_tbl . ' WHERE ' . $old_tbl . '.p = ' . $p_id);
       return 1;
     }
     else {
-      mysql_query('DROP TABLE ' . $new_tbl, $con);
+      mysqli_query( $con, 'DROP TABLE ' . $new_tbl);
       return 0;
     }
   }

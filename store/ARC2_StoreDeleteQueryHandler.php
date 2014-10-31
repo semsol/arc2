@@ -65,8 +65,8 @@ class ARC2_StoreDeleteQueryHandler extends ARC2_StoreQueryHandler {
     $con = $this->store->getDBCon();
     foreach ($this->infos['query']['target_graphs'] as $g) {
       if ($g_id = $this->getTermID($g, 'g')) {
-        $rs = mysql_query('DELETE FROM ' . $tbl_prefix . 'g2t WHERE g = ' .$g_id, $con);
-        $r += mysql_affected_rows($con);
+        $rs = mysqli_query( $con, 'DELETE FROM ' . $tbl_prefix . 'g2t WHERE g = ' .$g_id);
+        $r += mysqli_affected_rows($con);
       }
     }
     $this->refs_deleted = $r ? 1 : 0;
@@ -128,10 +128,11 @@ class ARC2_StoreDeleteQueryHandler extends ARC2_StoreQueryHandler {
       }
       //$rs = mysql_query($sql, $con);
       $rs = $this->queryDB($sql, $con);
-      if ($er = mysql_error($con)) {
+      $er = mysqli_error($con);
+      if (!empty($er)) {
         $this->addError($er .' in ' . $sql);
       }
-      $r += mysql_affected_rows($con);
+      $r += mysqli_affected_rows($con);
     }
     return $r;
   }
@@ -161,7 +162,7 @@ class ARC2_StoreDeleteQueryHandler extends ARC2_StoreQueryHandler {
       SELECT T.t FROM '. $tbl_prefix . 'triple T LEFT JOIN '. $tbl_prefix . 'g2t G ON ( G.t = T.t )
       WHERE G.t IS NULL LIMIT 1
     ';
-    if (($rs = mysql_query($sql, $con)) && mysql_num_rows($rs)) {
+    if (($rs = mysqli_query( $con, $sql)) && mysqli_num_rows($rs)) {
       /* delete unconnected triples */
       $sql = ($dbv < '04-01') ? 'DELETE ' . $tbl_prefix . 'triple' : 'DELETE T';
       $sql .= '
@@ -169,7 +170,7 @@ class ARC2_StoreDeleteQueryHandler extends ARC2_StoreQueryHandler {
         LEFT JOIN ' . $tbl_prefix . 'g2t G ON (G.t = T.t)
         WHERE G.t IS NULL
       ';
-      mysql_query($sql, $con);
+      mysqli_query( $con, $sql);
     }
     /* check for unconnected graph refs */
     if ((rand(1, 10) == 1)) {
@@ -177,7 +178,7 @@ class ARC2_StoreDeleteQueryHandler extends ARC2_StoreQueryHandler {
         SELECT G.g FROM '. $tbl_prefix . 'g2t G LEFT JOIN '. $tbl_prefix . 'triple T ON ( T.t = G.t )
         WHERE T.t IS NULL LIMIT 1
       ';
-      if (($rs = mysql_query($sql, $con)) && mysql_num_rows($rs)) {
+      if (($rs = mysqli_query( $con, $sql)) && mysqli_num_rows($rs)) {
         /* delete unconnected graph refs */
         $sql = ($dbv < '04-01') ? 'DELETE ' . $tbl_prefix . 'g2t' : 'DELETE G';
         $sql .= '
@@ -185,7 +186,7 @@ class ARC2_StoreDeleteQueryHandler extends ARC2_StoreQueryHandler {
           LEFT JOIN ' . $tbl_prefix . 'triple T ON (T.t = G.t)
           WHERE T.t IS NULL
         ';
-        mysql_query($sql, $con);
+        mysqli_query( $con, $sql);
       }
     }
     /* release lock */
@@ -207,7 +208,7 @@ class ARC2_StoreDeleteQueryHandler extends ARC2_StoreQueryHandler {
       LEFT JOIN ' . $tbl_prefix . 'triple T ON (T.o = V.id)
       WHERE T.t IS NULL
     ';
-    mysql_query($sql, $con);
+    mysqli_query( $con, $sql);
     /* s2val */
     $sql = ($dbv < '04-01') ? 'DELETE ' . $tbl_prefix . 's2val' : 'DELETE V';
     $sql .= '
@@ -215,7 +216,7 @@ class ARC2_StoreDeleteQueryHandler extends ARC2_StoreQueryHandler {
       LEFT JOIN ' . $tbl_prefix . 'triple T ON (T.s = V.id)
       WHERE T.t IS NULL
     ';
-    mysql_query($sql, $con);
+    mysqli_query( $con, $sql);
     /* id2val */
     $sql = ($dbv < '04-01') ? 'DELETE ' . $tbl_prefix . 'id2val' : 'DELETE V';
     $sql .= '

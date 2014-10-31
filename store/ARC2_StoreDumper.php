@@ -45,7 +45,7 @@ class ARC2_StoreDumper extends ARC2_Class {
       $proceed = 0;
       $rs = $this->getRecordset($offset);
       if (!$rs) break;
-      while ($row = mysql_fetch_array($rs)) {
+      while ($row = mysqli_fetch_array($rs)) {
         echo $this->getEntry($row);
         $proceed = 1;
       }
@@ -65,7 +65,7 @@ class ARC2_StoreDumper extends ARC2_Class {
       $proceed = 0;
       $rs = $this->getRecordset($offset);
       if (!$rs) break;
-      while ($row = mysql_fetch_array($rs)) {
+      while ($row = mysqli_fetch_array($rs)) {
         fwrite($fp, $this->getEntry($row));
         $proceed = 1;
       }
@@ -116,8 +116,9 @@ class ARC2_StoreDumper extends ARC2_Class {
     ';
     if ($this->limit) $sql .= ' LIMIT ' . $this->limit;
     if ($offset) $sql .= ' OFFSET ' . $offset;
-    $rs = mysql_unbuffered_query($sql, $con);
-    if (($err = mysql_error($con))) {
+    $rs = mysqli_query( $con, $sql, MYSQLI_USE_RESULT);
+    $err = mysqli_error($con);
+    if (!empty($err)) {
       return $this->addError($err);
     }
     return $rs;

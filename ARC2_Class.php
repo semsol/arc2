@@ -484,7 +484,7 @@ class ARC2_Class {
 
   function queryDB($sql, $con, $log_errors = 0) {
     $t1 = ARC2::mtime();
-    $r = mysql_query($sql, $con);
+    $r = mysqli_query( $con, $sql);
     if (0) {
       $t2 = ARC2::mtime() - $t1;
       $call_obj = $this;
@@ -495,7 +495,8 @@ class ARC2_Class {
       }
       echo "\n" . $call_path . " needed " . $t2 . ' secs for ' . str_replace("\n" , ' ', $sql);;
     }
-    if ($log_errors && ($er = mysql_error($con))) $this->addError($er);
+    $er = mysqli_error($con);
+    if ($log_errors && !empty($er)) $this->addError($er);
     return $r;
   }
 
