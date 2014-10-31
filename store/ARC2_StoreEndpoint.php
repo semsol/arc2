@@ -425,15 +425,15 @@ class ARC2_StoreEndpoint extends ARC2_Store {
           $r .= '        "' .$var. '": {';
           if ($row[$var . ' type'] == 'uri') {
             $r .= $nl . '          "type": "uri",';
-            $r .= $nl . '          "value": "' .mysql_real_escape_string($row[$var], $con). '"';
+            $r .= $nl . '          "value": "' .mysqli_real_escape_string( $con, $row[$var]). '"';
           }
           elseif ($row[$var . ' type'] == 'bnode') {
             $r .= $nl . '          "type": "bnode",';
             $r .= $nl . '          "value": "' . substr($row[$var], 2) . '"';
           }
           else {
-            $dt = isset($row[$var . ' datatype']) ? ',' . $nl .'          "datatype": "' .mysql_real_escape_string($row[$var . ' datatype'], $con). '"' : '';
-            $lang = isset($row[$var . ' lang']) ? ',' . $nl .'          "xml:lang": "' .mysql_real_escape_string($row[$var . ' lang'], $con). '"' : '';
+            $dt = isset($row[$var . ' datatype']) ? ',' . $nl .'          "datatype": "' .mysqli_real_escape_string( $con, $row[$var . ' datatype']). '"' : '';
+            $lang = isset($row[$var . ' lang']) ? ',' . $nl .'          "xml:lang": "' .mysqli_real_escape_string( $con, $row[$var . ' lang']). '"' : '';
             $type = $dt ? 'typed-literal' : 'literal';
             $r .= $nl . '          "type": "' . $type . '",';
             $r .= $nl . '          "value": "' . $this->jsonEscape($row[$var]) . '"';

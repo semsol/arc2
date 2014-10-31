@@ -115,10 +115,11 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler {
     $tmp_sql .= (($v < '04-01-00') && ($v >= '04-00-18')) ? 'ENGINE' : (($v >= '04-01-02') ? 'ENGINE' : 'TYPE');
     $tmp_sql .= '=' . $this->engine_type;/* HEAP doesn't support AUTO_INCREMENT, and MySQL breaks on MEMORY sometimes */
     if (!$this->queryDB($tmp_sql, $con) && !$this->queryDB(str_replace('CREATE TEMPORARY', 'CREATE', $tmp_sql), $con)) {
-      return $this->addError(mysql_error($con));
+      return $this->addError(mysqli_error($con));
     }
-    mysql_unbuffered_query('INSERT INTO ' . $tbl . ' ' . "\n" . $q_sql, $con);
-    if ($er = mysql_error($con)) $this->addError($er);
+    mysqli_query( $con, 'INSERT INTO ' . $tbl . ' ' . "\n" . $q_sql, MYSQLI_USE_RESULT);
+    $er = mysqli_error($con);
+    if (!empty($er)) $this->addError($er);
     return $tbl;
   }
 
@@ -179,15 +180,16 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler {
     //echo "\n\n" . $v_sql;
     $t1 = ARC2::mtime();
     $con = $this->store->getDBCon();
-    $rs = mysql_unbuffered_query($v_sql, $con);
-    if ($er = mysql_error($con)) {
+    $rs = mysqli_query( $con, $v_sql, MYSQLI_USE_RESULT);
+    $er = mysqli_error($con);
+    if (!empty($er)) {
       $this->addError($er);
     }
     $t2 = ARC2::mtime();
     $rows = array();
     $types = array(0 => 'uri', 1 => 'bnode', 2 => 'literal');
     if ($rs) {
-  		while ($pre_row = mysql_fetch_array($rs)) {
+  		while ($pre_row = mysqli_fetch_array($rs)) {
         $row = array();
         foreach ($vars as $var) {
           if (isset($pre_row[$var])) {
@@ -1368,7 +1370,7 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler {
   function getUriExpressionSQL($pattern, $context, $val_type = '') {
     $val = $pattern['uri'];
     $r = $pattern['operator'];
-    $r .= is_numeric($val) ? ' ' . $val : ' "' . mysql_real_escape_string($val, $this->store->getDBCon()) . '"';
+    $r .= is_numeric($val) ? ' ' . $val : ' "' . mysqli_real_escape_string( $this->store->getDBCon(), $val) . '"';
     return $r;
   }
   
@@ -1384,11 +1386,11 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler {
       $r .= ' ' . strtoupper($val);
     }
     elseif ($parent_type == 'regex') {
-      $sub_r = mysql_real_escape_string($val, $this->store->getDBCon());
+      $sub_r = mysqli_real_escape_string( $this->store->getDBCon(), $val);
       $r .= ' "' . preg_replace('/\x5c\x5c/', '\\', $sub_r) . '"';
     }
     else {
-      $r .= ' "' . mysql_real_escape_string($val, $this->store->getDBCon()) . '"';
+      $r .= ' "' . mysqli_real_escape_string( $this->store->getDBCon(), $val) . '"';
     }
     if (($lang_dt = $this->v1('lang', '', $pattern)) || ($lang_dt = $this->v1('datatype', '', $pattern))) {
       /* try table/alias via var in siblings */
@@ -1703,11 +1705,11 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler {
     $limit = $this->v('limit', -1, $this->infos['query']);
     $offset = $this->v('offset', -1, $this->infos['query']);
     if ($limit != -1) {
-      $offset = ($offset == -1) ? 0 : mysql_real_escape_string($offset, $this->store->getDBCon());
+      $offset = ($offset == -1) ? 0 : mysqli_real_escape_string( $this->store->getDBCon(), $offset);
       $r = 'LIMIT ' . $offset . ',' . $limit; 
     }
     elseif ($offset != -1) {
-      $r = 'LIMIT ' . mysql_real_escape_string($offset, $this->store->getDBCon()) . ',999999999999'; /* mysql doesn't support stand-alone offsets .. */
+      $r = 'LIMIT ' . mysqli_real_escape_string( $this->store->getDBCon(), $offset) . ',999999999999'; /* mysql doesn't support stand-alone offsets .. */
     }
     return $r ? $nl . $r : '';
   }
