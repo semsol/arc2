@@ -214,6 +214,7 @@ class ARC2_Reader extends ARC2_Class {
     /* relative redirect */
     if (!isset($parts['scheme']) && $prev_parts) $parts['scheme'] = $prev_parts['scheme'];
     if (!isset($parts['host']) && $prev_parts) $parts['host'] = $prev_parts['host'];
+    if (!isset($parts['port']) && $prev_parts) $parts['port'] = $prev_parts['port'];
     /* no scheme */
     if (!$this->v('scheme', '', $parts)) return $this->addError('Socket error: Missing URI scheme.');
     /* port tweaks */
