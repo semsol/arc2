@@ -9,7 +9,7 @@ It also provides a MySQL-based triplestore with SPARQL support.
 Feature-wise, ARC2 is now in a stable state with no further feature additions planned. 
 Issues are still being fixed and Pull Requests are welcome, though.
 
-## Instalation
+## Installation
 
 Package available on [Composer](https://packagist.org/packages/semsol/arc2).
 
