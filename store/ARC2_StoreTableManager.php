@@ -121,11 +121,13 @@ class ARC2_StoreTableManager extends ARC2_Store {
   function createID2ValTable() {
     $sql = "
       CREATE TABLE IF NOT EXISTS " . $this->getTablePrefix() . "id2val (
-        id mediumint UNSIGNED NOT NULL,
+        id mediumint UNSIGNED NOT NULL AUTO_INCREMENT,
         misc tinyint(1) NOT NULL default 0,
         val text NOT NULL,
         val_type tinyint(1) NOT NULL default 0,     /* uri/bnode/literal => 0/1/2 */
-        UNIQUE KEY (id,val_type), KEY v (val(64))
+        PRIMARY KEY (`id`), 
+        UNIQUE KEY (id,val_type), 
+        KEY v (val(64))
       ) ". $this->getTableOptionsCode() . "
     ";
     return mysqli_query( $this->getDBCon(), $sql);
