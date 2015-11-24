@@ -3,8 +3,8 @@
  * ARC2 N-Triples Serializer
  *
  * @author Benjamin Nowack
- * @license <http://arc.semsol.org/license>
- * @homepage <http://arc.semsol.org/>
+ * @license W3C Software License and GPL
+ * @homepage <https://github.com/semsol/arc2>
  * @package ARC2
 */
 

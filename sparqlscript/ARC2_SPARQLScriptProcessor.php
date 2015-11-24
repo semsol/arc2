@@ -3,7 +3,7 @@
  * ARC2 SPARQLScript Processor
  *
  * @author Benjamin Nowack <bnowack@semsol.com>
- * @license http://arc.semsol.org/license
+ * @license W3C Software License and GPL
  * @package ARC2
  * @version 2010-11-16
 */

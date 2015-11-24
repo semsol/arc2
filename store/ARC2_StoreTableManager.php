@@ -2,7 +2,7 @@
 /**
  * ARC2 RDF Store Table Manager
  *
- * @license   http://arc.semsol.org/license
+ * @license   W3C Software License and GPL
  * @author    Benjamin Nowack
  * @version   2010-11-16
  *

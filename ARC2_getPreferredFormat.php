@@ -3,8 +3,8 @@
  * ARC2 result format detection
  *
  * @author Benjamin Nowack
- * @license <http://arc.semsol.org/license>
- * @homepage <http://arc.semsol.org/>
+ * @license W3C Software License and GPL
+ * @homepage <https://github.com/semsol/arc2>
  * @package ARC2
  * @version 2010-11-16
 */

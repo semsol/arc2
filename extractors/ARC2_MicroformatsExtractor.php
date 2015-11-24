@@ -1,7 +1,7 @@
 <?php
 /*
-homepage: http://arc.semsol.org/
-license:  http://arc.semsol.org/license
+@homepage <https://github.com/semsol/arc2>
+@license W3C Software License and GPL
 
 class:    ARC2 microformats Extractor
 author:   Benjamin Nowack

@@ -4,7 +4,7 @@
  *
  * @author Benjamin Nowack <mail@bnowack.de>
  * @license W3C Software License
- * @homepage <http://arc.semsol.org/>
+ * @homepage <https://github.com/semsol/arc2>
  * @package ARC2
 */
 
