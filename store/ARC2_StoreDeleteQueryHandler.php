@@ -227,6 +227,8 @@ class ARC2_StoreDeleteQueryHandler extends ARC2_StoreQueryHandler {
       WHERE G.g IS NULL AND T1.t IS NULL AND T2.t IS NULL
     ';
     //mysql_query($sql, $con);
+    /* release lock */
+    $this->store->releaseLock();
   }
   
   /*  */
