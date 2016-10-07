@@ -473,6 +473,10 @@ class ARC2 {
     return ARC2::getSer('RSS10', $a);
   }
 
+  static function getJSONLDSerializer($a = '') {
+    return ARC2::getSer('JSONLD', $a);
+  }
+
   /* sparqlscript */
 
   static function getSPARQLScriptProcessor($a = '') {
