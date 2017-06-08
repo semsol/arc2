@@ -1,7 +1,5 @@
 <?php
 
-require_once '../ARC2_TestCase.php';
-
 class ARC2_getPreferredFormatTest extends ARC2_TestCase {
 
 	public function testGetPreferredFormat() {

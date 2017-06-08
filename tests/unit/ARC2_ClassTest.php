@@ -1,12 +1,11 @@
 <?php
 
-require_once '../ARC2_TestCase.php';
-require_once ARC2_DIR . '/ARC2_Class.php';
-
-class ARC2_ClassTest extends PHPUnit_Framework_TestCase {
+class ARC2_ClassTest extends PHPUnit\Framework\TestCase {
 
     public function setUp() {
-         $this->arc2 = new ARC2_Class(array(), new stdClass);
+        $array = array();
+        $stdClass = new stdClass;
+        $this->arc2 = new ARC2_Class($array, $stdClass);
     }
 
     public function testCamelCase() {
