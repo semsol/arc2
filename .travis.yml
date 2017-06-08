@@ -1,0 +1,32 @@
+language: php
+dist: trusty
+
+php:
+    - '5.3'
+    - '5.4'
+    - '5.5'
+    - '5.6'
+    - '7.0'
+    - '7.1'
+    - nightly
+
+matrix:
+    fast_finish: true
+    include:
+        - php: hhvm
+    allow_failures:
+        - php: hhvm
+
+cache:
+    directories:
+        - $HOME/.composer/cache
+
+sudo: true
+
+before_install:
+    - composer require satooshi/php-coveralls:* --ignore-platform-reqs
+    - travis_retry composer install --dev --no-interaction --ignore-platform-reqs
+
+script: vendor/bin/phpunit --coverage-clover gen/coverage/clover.xml
+
+after_script: php vendor/bin/coveralls -v
