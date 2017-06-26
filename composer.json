@@ -1,14 +1,13 @@
 {
     "name": "semsol/arc2",
 	"type": "library",
-    "description": "Semsol's ARC2 RDF library",
+    "description": "ARC2 RDF library for PHP",
 	"keywords": ["rdf","sparql"],
 	"homepage": "https://github.com/semsol/arc2",
     "license": "W3C",
     "authors": [
         {
             "name": "Benji Nowack",
-            "email": "mail@bnowack.de",
             "homepage": "http://bnowack.de/"
         }
     ],
@@ -16,7 +15,7 @@
         "php": ">=5.3.0"
     },
     "require-dev": {
-        "phpunit/phpunit": "*"
+        "phpunit/phpunit": "^5.0"
     },
      "autoload": {
         "classmap": ["./","parsers/","serializers/"]
