@@ -7,7 +7,7 @@ ARC2
 [![Latest Unstable Version](https://poser.pugx.org/semsol/arc2/v/unstable.svg)](https://packagist.org/packages/semsol/arc2)
 [![License](https://poser.pugx.org/semsol/arc2/license.svg)](https://packagist.org/packages/semsol/arc2)
 
-ARC2 is a PHP 5.3+ library for working with RDF.
+ARC2 is a PHP 5.6+ library for working with RDF (It is compatible with PHP 5.3+ but old versions are no longer tested).
 It also provides a MySQL-based triplestore with SPARQL support.
 
 Feature-wise, ARC2 is now in a stable state with no further feature additions planned. 
