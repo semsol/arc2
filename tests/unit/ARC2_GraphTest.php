@@ -1,12 +1,16 @@
 <?php
 
+namespace Tests\unit;
+
+use Tests\ARC2_TestCase;
+
 class ARC2_GraphTest extends ARC2_TestCase {
 
 	public function setUp()
 	{
 		parent::setUp();
 
-		$this->obj = ARC2::getGraph();
+		$this->obj = \ARC2::getGraph();
 		$this->res1 = array(
 			'http://example.com/s1' => array(
 				'http://example.com/p1' => array(
@@ -68,7 +72,7 @@ class ARC2_GraphTest extends ARC2_TestCase {
 
 	public function testAddGraph() {
 		$this->obj->addIndex($this->res1);
-		$g2 = ARC2::getGraph()->addIndex($this->res2);
+		$g2 = \ARC2::getGraph()->addIndex($this->res2);
 
 		$actual = $this->obj->addGraph($g2);
 		$this->assertSame($this->obj, $actual);
@@ -78,7 +82,7 @@ class ARC2_GraphTest extends ARC2_TestCase {
 	}
 
 	public function testAddGraphWithNamespaces() {
-		$g2 = ARC2::getGraph()->setPrefix('ex', 'http://example.com/');
+		$g2 = \ARC2::getGraph()->setPrefix('ex', 'http://example.com/');
 
 		$actual = $this->obj->addGraph($g2);
 		$this->assertArrayHasKey('ex', $actual->ns);

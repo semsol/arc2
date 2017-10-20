@@ -21,6 +21,7 @@ cache:
 sudo: true
 
 before_install:
+    - mysql -e 'CREATE DATABASE IF NOT EXISTS testdb;'
     - composer require satooshi/php-coveralls:* --ignore-platform-reqs
     - travis_retry composer install --dev --no-interaction --ignore-platform-reqs
 

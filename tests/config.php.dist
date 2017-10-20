@@ -1,0 +1,12 @@
+<?php
+
+/*
+ * adapt this file, if you want to define custom database credentials.
+ */
+
+return array(
+    'db_name' => 'testdb',
+    'db_user' => 'root',
+    'db_pwd'  => 'Pass123',
+    'db_host' => 'localhost',
+);
