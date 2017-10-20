@@ -4,3 +4,4 @@ triggers/*
 tests/coverage/*
 /composer.lock
 vendor/
+tests/config.php
