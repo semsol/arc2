@@ -353,7 +353,16 @@ abstract class ComplianceTest extends ARC2_TestCase
             $this->assertFalse(empty($testQuery), 'Can not test, because test query is empty.');
 
             $arc2Result = $this->store->query($testQuery);
-            $this->assertEquals(0, count($arc2Result['result']['rows']));
+            if (0 == $arc2Result) {
+                $this->assertEquals(0, $arc2Result);
+
+            } elseif (isset($arc2Result['result']['rows'])) {
+                $this->assertEquals(0, count($arc2Result['result']['rows']));
+
+            } else {
+                throw new \Exception('Invalid result by query method: '. json_encode($arc2Result));
+            }
+
 
         // test has to be SUCCESSFUL
         } else {
