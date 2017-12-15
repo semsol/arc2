@@ -107,7 +107,7 @@ class ConstructTest extends ComplianceTest
 
         $this->markTestSkipped(
             'This kind of query is currently not supported. '
-            . 'ARC2_Store::query returns 0 for query: '. PHP_EOL . preg_replace('/\s\s+/', ' ', $query)
+            . 'ARC2_Store::query returns 0 for query: '. PHP_EOL . $this->makeQueryA1Liner($query)
         );
     }
 

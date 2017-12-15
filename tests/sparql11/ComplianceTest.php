@@ -310,6 +310,12 @@ abstract class ComplianceTest extends ARC2_TestCase
             $w->endElement();
         }
 
+        // add <result></result> if no data were found
+        if (0 == count($result['result']['rows'])) {
+            $w->startElement('result');
+            $w->endElement();
+        }
+
         // end sparql > results
         $w->endElement();
 
@@ -330,6 +336,14 @@ abstract class ComplianceTest extends ARC2_TestCase
         $parser = \ARC2::getTurtleParser();
         $parser->parse($folderPath .'/manifest.ttl');
         $this->store->insert($parser->getSimpleIndex(), $this->manifestGraphUri);
+    }
+
+    /**
+     * @param string $query
+     */
+    protected function makeQueryA1Liner($query)
+    {
+        return preg_replace('/(\s\s+|\n+)/', ' ', $query);
     }
 
     /**
@@ -362,7 +376,6 @@ abstract class ComplianceTest extends ARC2_TestCase
             } else {
                 throw new \Exception('Invalid result by query method: '. json_encode($arc2Result));
             }
-
 
         // test has to be SUCCESSFUL
         } else {
