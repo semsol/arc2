@@ -182,18 +182,12 @@ class AggregatesTest extends ComplianceTest
 
     public function test_agg01()
     {
-        $this->markTestSkipped(
-            'Test skipped, because of COUNT function fails. '
-            . 'Maybe related to https://github.com/semsol/arc2/issues/100'
-        );
+        $this->runTestFor('agg01');
     }
 
     public function test_agg02()
     {
-        $this->markTestSkipped(
-            'Test skipped, because of COUNT function fails. '
-            . 'Maybe related to https://github.com/semsol/arc2/issues/100'
-        );
+        $this->runTestFor('agg02');
     }
 
     public function test_agg03()
@@ -210,18 +204,12 @@ class AggregatesTest extends ComplianceTest
 
     public function test_agg04()
     {
-        $this->markTestSkipped(
-            'Test skipped, because of COUNT function fails. '
-            . 'Maybe related to https://github.com/semsol/arc2/issues/100'
-        );
+        $this->runTestFor('agg04');
     }
 
     public function test_agg05()
     {
-        $this->markTestSkipped(
-            'Test skipped, because of COUNT function fails. '
-            . 'Maybe related to https://github.com/semsol/arc2/issues/100'
-        );
+        $this->runTestFor('agg05');
     }
 
     public function test_agg06()
@@ -263,5 +251,25 @@ class AggregatesTest extends ComplianceTest
             'This kind of query is currently not supported. '
             . 'ARC2_Store::query returns 0 for query: '. PHP_EOL . $this->makeQueryA1Liner($query)
         );
+    }
+
+    public function test_agg09()
+    {
+        $this->runTestFor('agg09');
+    }
+
+    public function test_agg10()
+    {
+        $this->runTestFor('agg10');
+    }
+
+    public function test_agg11()
+    {
+        $this->runTestFor('agg11');
+    }
+
+    public function test_agg12()
+    {
+        $this->runTestFor('agg12');
     }
 }
