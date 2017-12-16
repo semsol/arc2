@@ -59,6 +59,7 @@ abstract class ComplianceTest extends ARC2_TestCase
     public function tearDown()
     {
         $this->store->reset();
+        $this->store->closeDBCon();
 
         parent::tearDown();
     }
