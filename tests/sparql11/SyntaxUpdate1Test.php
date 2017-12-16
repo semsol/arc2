@@ -83,7 +83,7 @@ class SyntaxUpdate1Test extends ComplianceTest
         $result = $this->store->query($query);
 
         // check result
-        $this->assertEquals(0, $result, 'ARC2 is expected to fail for query: '. $this->makeQueryA1Liner($query));
+        $this->markTestSkipped('This kind of query is currently not supported. Query: '. PHP_EOL . $this->makeQueryA1Liner($query));
     }
 
     public function test_test_4()
@@ -95,7 +95,7 @@ class SyntaxUpdate1Test extends ComplianceTest
         $result = $this->store->query($query);
 
         // check result
-        $this->assertEquals(0, $result, 'ARC2 is expected to fail for query: '. $this->makeQueryA1Liner($query));
+        $this->markTestSkipped('This kind of query is currently not supported. Query: '. PHP_EOL . $this->makeQueryA1Liner($query));
     }
 
     public function test_test_5()
@@ -107,7 +107,7 @@ class SyntaxUpdate1Test extends ComplianceTest
         $result = $this->store->query($query);
 
         // check result
-        $this->assertEquals(0, $result, 'ARC2 is expected to fail for query: '. $this->makeQueryA1Liner($query));
+        $this->markTestSkipped('This kind of query is currently not supported. Query: '. PHP_EOL . $this->makeQueryA1Liner($query));
     }
 
     public function test_test_6()
@@ -119,7 +119,7 @@ class SyntaxUpdate1Test extends ComplianceTest
         $result = $this->store->query($query);
 
         // check result
-        $this->assertEquals(0, $result, 'ARC2 is expected to fail for query: '. $this->makeQueryA1Liner($query));
+        $this->markTestSkipped('This kind of query is currently not supported. Query: '. PHP_EOL . $this->makeQueryA1Liner($query));
     }
 
     public function test_test_7()
@@ -131,7 +131,7 @@ class SyntaxUpdate1Test extends ComplianceTest
         $result = $this->store->query($query);
 
         // check result
-        $this->assertEquals(0, $result, 'ARC2 is expected to fail for query: '. $this->makeQueryA1Liner($query));
+        $this->markTestSkipped('This kind of query is currently not supported. Query: '. PHP_EOL . $this->makeQueryA1Liner($query));
     }
 
     public function test_test_8()
@@ -143,7 +143,7 @@ class SyntaxUpdate1Test extends ComplianceTest
         $result = $this->store->query($query);
 
         // check result
-        $this->assertEquals(0, $result, 'ARC2 is expected to fail for query: '. $this->makeQueryA1Liner($query));
+        $this->markTestSkipped('This kind of query is currently not supported. Query: '. PHP_EOL . $this->makeQueryA1Liner($query));
     }
 
     public function test_test_9()
@@ -155,7 +155,7 @@ class SyntaxUpdate1Test extends ComplianceTest
         $result = $this->store->query($query);
 
         // check result
-        $this->assertEquals(0, $result, 'ARC2 is expected to fail for query: '. $this->makeQueryA1Liner($query));
+        $this->markTestSkipped('This kind of query is currently not supported. Query: '. PHP_EOL . $this->makeQueryA1Liner($query));
     }
 
     public function test_test_10()
@@ -167,7 +167,7 @@ class SyntaxUpdate1Test extends ComplianceTest
         $result = $this->store->query($query);
 
         // check result
-        $this->assertEquals(0, $result, 'ARC2 is expected to fail for query: '. $this->makeQueryA1Liner($query));
+        $this->markTestSkipped('This kind of query is currently not supported. Query: '. PHP_EOL . $this->makeQueryA1Liner($query));
     }
 
     public function test_test_11()
@@ -179,7 +179,7 @@ class SyntaxUpdate1Test extends ComplianceTest
         $result = $this->store->query($query);
 
         // check result
-        $this->assertEquals(0, $result, 'ARC2 is expected to fail for query: '. $this->makeQueryA1Liner($query));
+        $this->markTestSkipped('This kind of query is currently not supported. Query: '. PHP_EOL . $this->makeQueryA1Liner($query));
     }
 
     public function test_test_12()
@@ -191,7 +191,7 @@ class SyntaxUpdate1Test extends ComplianceTest
         $result = $this->store->query($query);
 
         // check result
-        $this->assertEquals(0, $result, 'ARC2 is expected to fail for query: '. $this->makeQueryA1Liner($query));
+        $this->markTestSkipped('This kind of query is currently not supported. Query: '. PHP_EOL . $this->makeQueryA1Liner($query));
     }
 
     public function test_test_13()
@@ -203,7 +203,7 @@ class SyntaxUpdate1Test extends ComplianceTest
         $result = $this->store->query($query);
 
         // check result
-        $this->assertEquals(0, $result, 'ARC2 is expected to fail for query: '. $this->makeQueryA1Liner($query));
+        $this->markTestSkipped('This kind of query is currently not supported. Query: '. PHP_EOL . $this->makeQueryA1Liner($query));
     }
 
     public function test_test_14()
@@ -215,7 +215,7 @@ class SyntaxUpdate1Test extends ComplianceTest
         $result = $this->store->query($query);
 
         // check result
-        $this->assertEquals(0, $result, 'ARC2 is expected to fail for query: '. $this->makeQueryA1Liner($query));
+        $this->markTestSkipped('This kind of query is currently not supported. Query: '. PHP_EOL . $this->makeQueryA1Liner($query));
     }
 
     public function test_test_15()
@@ -227,7 +227,7 @@ class SyntaxUpdate1Test extends ComplianceTest
         $result = $this->store->query($query);
 
         // check result
-        $this->assertEquals(0, $result, 'ARC2 is expected to fail for query: '. $this->makeQueryA1Liner($query));
+        $this->markTestSkipped('This kind of query is currently not supported. Query: '. PHP_EOL . $this->makeQueryA1Liner($query));
     }
 
     public function test_test_16()
@@ -239,7 +239,7 @@ class SyntaxUpdate1Test extends ComplianceTest
         $result = $this->store->query($query);
 
         // check result
-        $this->assertEquals(0, $result, 'ARC2 is expected to fail for query: '. $this->makeQueryA1Liner($query));
+        $this->markTestSkipped('This kind of query is currently not supported. Query: '. PHP_EOL . $this->makeQueryA1Liner($query));
     }
 
     public function test_test_17()
@@ -251,7 +251,7 @@ class SyntaxUpdate1Test extends ComplianceTest
         $result = $this->store->query($query);
 
         // check result
-        $this->assertEquals(0, $result, 'ARC2 is expected to fail for query: '. $this->makeQueryA1Liner($query));
+        $this->markTestSkipped('This kind of query is currently not supported. Query: '. PHP_EOL . $this->makeQueryA1Liner($query));
     }
 
     public function test_test_18()
@@ -263,7 +263,7 @@ class SyntaxUpdate1Test extends ComplianceTest
         $result = $this->store->query($query);
 
         // check result
-        $this->assertEquals(0, $result, 'ARC2 is expected to fail for query: '. $this->makeQueryA1Liner($query));
+        $this->markTestSkipped('This kind of query is currently not supported. Query: '. PHP_EOL . $this->makeQueryA1Liner($query));
     }
 
     public function test_test_19()
@@ -275,7 +275,7 @@ class SyntaxUpdate1Test extends ComplianceTest
         $result = $this->store->query($query);
 
         // check result
-        $this->assertEquals(0, $result, 'ARC2 is expected to fail for query: '. $this->makeQueryA1Liner($query));
+        $this->markTestSkipped('This kind of query is currently not supported. Query: '. PHP_EOL . $this->makeQueryA1Liner($query));
     }
 
     public function test_test_20()
@@ -287,7 +287,7 @@ class SyntaxUpdate1Test extends ComplianceTest
         $result = $this->store->query($query);
 
         // check result
-        $this->assertEquals(0, $result, 'ARC2 is expected to fail for query: '. $this->makeQueryA1Liner($query));
+        $this->markTestSkipped('This kind of query is currently not supported. Query: '. PHP_EOL . $this->makeQueryA1Liner($query));
     }
 
     public function test_test_21()
@@ -299,7 +299,7 @@ class SyntaxUpdate1Test extends ComplianceTest
         $result = $this->store->query($query);
 
         // check result
-        $this->assertEquals(0, $result, 'ARC2 is expected to fail for query: '. $this->makeQueryA1Liner($query));
+        $this->markTestSkipped('This kind of query is currently not supported. Query: '. PHP_EOL . $this->makeQueryA1Liner($query));
     }
 
     public function test_test_22()
@@ -311,7 +311,7 @@ class SyntaxUpdate1Test extends ComplianceTest
         $result = $this->store->query($query);
 
         // check result
-        $this->assertEquals(0, $result, 'ARC2 is expected to fail for query: '. $this->makeQueryA1Liner($query));
+        $this->markTestSkipped('This kind of query is currently not supported. Query: '. PHP_EOL . $this->makeQueryA1Liner($query));
     }
 
     public function test_test_23()
@@ -323,7 +323,7 @@ class SyntaxUpdate1Test extends ComplianceTest
         $result = $this->store->query($query);
 
         // check result
-        $this->assertEquals(0, $result, 'ARC2 is expected to fail for query: '. $this->makeQueryA1Liner($query));
+        $this->markTestSkipped('This kind of query is currently not supported. Query: '. PHP_EOL . $this->makeQueryA1Liner($query));
     }
 
     public function test_test_24()
@@ -335,7 +335,7 @@ class SyntaxUpdate1Test extends ComplianceTest
         $result = $this->store->query($query);
 
         // check result
-        $this->assertEquals(0, $result, 'ARC2 is expected to fail for query: '. $this->makeQueryA1Liner($query));
+        $this->markTestSkipped('This kind of query is currently not supported. Query: '. PHP_EOL . $this->makeQueryA1Liner($query));
     }
 
     public function test_test_25()
@@ -347,7 +347,7 @@ class SyntaxUpdate1Test extends ComplianceTest
         $result = $this->store->query($query);
 
         // check result
-        $this->assertEquals(0, $result, 'ARC2 is expected to fail for query: '. $this->makeQueryA1Liner($query));
+        $this->markTestSkipped('This kind of query is currently not supported. Query: '. PHP_EOL . $this->makeQueryA1Liner($query));
     }
 
     public function test_test_26()
@@ -359,7 +359,7 @@ class SyntaxUpdate1Test extends ComplianceTest
         $result = $this->store->query($query);
 
         // check result
-        $this->assertEquals(0, $result, 'ARC2 is expected to fail for query: '. $this->makeQueryA1Liner($query));
+        $this->markTestSkipped('This kind of query is currently not supported. Query: '. PHP_EOL . $this->makeQueryA1Liner($query));
     }
 
     public function test_test_27()
@@ -371,7 +371,7 @@ class SyntaxUpdate1Test extends ComplianceTest
         $result = $this->store->query($query);
 
         // check result
-        $this->assertEquals(0, $result, 'ARC2 is expected to fail for query: '. $this->makeQueryA1Liner($query));
+        $this->markTestSkipped('This kind of query is currently not supported. Query: '. PHP_EOL . $this->makeQueryA1Liner($query));
     }
 
     public function test_test_28()
@@ -383,7 +383,7 @@ class SyntaxUpdate1Test extends ComplianceTest
         $result = $this->store->query($query);
 
         // check result
-        $this->assertEquals(0, $result, 'ARC2 is expected to fail for query: '. $this->makeQueryA1Liner($query));
+        $this->markTestSkipped('This kind of query is currently not supported. Query: '. PHP_EOL . $this->makeQueryA1Liner($query));
     }
 
     public function test_test_29()
@@ -395,7 +395,7 @@ class SyntaxUpdate1Test extends ComplianceTest
         $result = $this->store->query($query);
 
         // check result
-        $this->assertEquals(0, $result, 'ARC2 is expected to fail for query: '. $this->makeQueryA1Liner($query));
+        $this->markTestSkipped('This kind of query is currently not supported. Query: '. PHP_EOL . $this->makeQueryA1Liner($query));
     }
 
     public function test_test_30()
@@ -407,7 +407,7 @@ class SyntaxUpdate1Test extends ComplianceTest
         $result = $this->store->query($query);
 
         // check result
-        $this->assertEquals(0, $result, 'ARC2 is expected to fail for query: '. $this->makeQueryA1Liner($query));
+        $this->markTestSkipped('This kind of query is currently not supported. Query: '. PHP_EOL . $this->makeQueryA1Liner($query));
     }
 
     public function test_test_31()
@@ -419,7 +419,7 @@ class SyntaxUpdate1Test extends ComplianceTest
         $result = $this->store->query($query);
 
         // check result
-        $this->assertEquals(0, $result, 'ARC2 is expected to fail for query: '. $this->makeQueryA1Liner($query));
+        $this->markTestSkipped('This kind of query is currently not supported. Query: '. PHP_EOL . $this->makeQueryA1Liner($query));
     }
 
     public function test_test_32()
@@ -431,7 +431,7 @@ class SyntaxUpdate1Test extends ComplianceTest
         $result = $this->store->query($query);
 
         // check result
-        $this->assertEquals(0, $result, 'ARC2 is expected to fail for query: '. $this->makeQueryA1Liner($query));
+        $this->markTestSkipped('This kind of query is currently not supported. Query: '. PHP_EOL . $this->makeQueryA1Liner($query));
     }
 
     public function test_test_33()
@@ -443,7 +443,7 @@ class SyntaxUpdate1Test extends ComplianceTest
         $result = $this->store->query($query);
 
         // check result
-        $this->assertEquals(0, $result, 'ARC2 is expected to fail for query: '. $this->makeQueryA1Liner($query));
+        $this->markTestSkipped('This kind of query is currently not supported. Query: '. PHP_EOL . $this->makeQueryA1Liner($query));
     }
 
     public function test_test_34()
@@ -455,7 +455,7 @@ class SyntaxUpdate1Test extends ComplianceTest
         $result = $this->store->query($query);
 
         // check result
-        $this->assertEquals(0, $result, 'ARC2 is expected to fail for query: '. $this->makeQueryA1Liner($query));
+        $this->markTestSkipped('This kind of query is currently not supported. Query: '. PHP_EOL . $this->makeQueryA1Liner($query));
     }
 
     public function test_test_35()
@@ -467,7 +467,7 @@ class SyntaxUpdate1Test extends ComplianceTest
         $result = $this->store->query($query);
 
         // check result
-        $this->assertEquals(0, $result, 'ARC2 is expected to fail for query: '. $this->makeQueryA1Liner($query));
+        $this->markTestSkipped('This kind of query is currently not supported. Query: '. PHP_EOL . $this->makeQueryA1Liner($query));
     }
 
     public function test_test_36()
@@ -479,7 +479,7 @@ class SyntaxUpdate1Test extends ComplianceTest
         $result = $this->store->query($query);
 
         // check result
-        $this->assertEquals(0, $result, 'ARC2 is expected to fail for query: '. $this->makeQueryA1Liner($query));
+        $this->markTestSkipped('This kind of query is currently not supported. Query: '. PHP_EOL . $this->makeQueryA1Liner($query));
     }
 
     public function test_test_37()
@@ -491,7 +491,7 @@ class SyntaxUpdate1Test extends ComplianceTest
         $result = $this->store->query($query);
 
         // check result
-        $this->assertEquals(0, $result, 'ARC2 is expected to fail for query: '. $this->makeQueryA1Liner($query));
+        $this->markTestSkipped('This kind of query is currently not supported. Query: '. PHP_EOL . $this->makeQueryA1Liner($query));
     }
 
     public function test_test_38()
@@ -503,7 +503,7 @@ class SyntaxUpdate1Test extends ComplianceTest
         $result = $this->store->query($query);
 
         // check result
-        $this->assertEquals(0, $result, 'ARC2 is expected to fail for query: '. $this->makeQueryA1Liner($query));
+        $this->markTestSkipped('This kind of query is currently not supported. Query: '. PHP_EOL . $this->makeQueryA1Liner($query));
     }
 
     public function test_test_39()
@@ -515,7 +515,7 @@ class SyntaxUpdate1Test extends ComplianceTest
         $result = $this->store->query($query);
 
         // check result
-        $this->assertEquals(0, $result, 'ARC2 is expected to fail for query: '. $this->makeQueryA1Liner($query));
+        $this->markTestSkipped('This kind of query is currently not supported. Query: '. PHP_EOL . $this->makeQueryA1Liner($query));
     }
 
     public function test_test_40()
@@ -527,7 +527,7 @@ class SyntaxUpdate1Test extends ComplianceTest
         $result = $this->store->query($query);
 
         // check result
-        $this->assertEquals(0, $result, 'ARC2 is expected to fail for query: '. $this->makeQueryA1Liner($query));
+        $this->markTestSkipped('This kind of query is currently not supported. Query: '. PHP_EOL . $this->makeQueryA1Liner($query));
     }
 
     public function test_test_41()
@@ -659,9 +659,8 @@ class SyntaxUpdate1Test extends ComplianceTest
         $result = $this->store->query($query);
 
         // check result
-        $this->assertTrue(
-            is_array($result),
-            'Query has to fail, but ARC2 returns an array as if query is considered valid. Query: '. $this->makeQueryA1Liner($query)
+        $this->markTestSkipped(
+            'Query has to fail, but ARC2 returns an array as if query is considered valid. Query: '. PHP_EOL . $this->makeQueryA1Liner($query)
         );
     }
 
@@ -686,7 +685,7 @@ class SyntaxUpdate1Test extends ComplianceTest
         $result = $this->store->query($query);
 
         // check result
-        $this->assertEquals(0, $result, 'ARC2 is expected to fail for query: '. $this->makeQueryA1Liner($query));
+        $this->markTestSkipped('This kind of query is currently not supported. Query: '. PHP_EOL . $this->makeQueryA1Liner($query));
     }
 
     public function test_test_54()

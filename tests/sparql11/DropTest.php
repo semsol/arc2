@@ -29,12 +29,14 @@ class DropTest extends ComplianceTest
         // table names
         $g2t = 'arc_g2t';
         $id2val = 'arc_id2val';
+
         /*
          * for id2val table
          */
         $query = 'INSERT INTO '. $id2val .' (val) VALUES("'. $graphUri .'")';
         $this->store->queryDB($query, $this->store->getDBCon());
         $usedId = $this->store->getDBCon()->insert_id;
+
         /*
          * for g2t table
          */
@@ -44,119 +46,85 @@ class DropTest extends ComplianceTest
         $usedId = $this->store->getDBCon()->insert_id;
     }
 
+    /**
+     * Helper function to get test query for a given test.
+     *
+     * @param string $testUri
+     * @return string Query to test.
+     */
+    protected function getTestQuery($testUri)
+    {
+        /*
+            example:
+
+            :group1 mf:action [
+                qt:query  <group01.rq>
+            ]
+         */
+        $query = $this->store->query('
+            PREFIX mf: <http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#> .
+            PREFIX ut: <http://www.w3.org/2009/sparql/tests/test-update#> .
+            SELECT * FROM <'. $this->manifestGraphUri .'> WHERE {
+                <'. $testUri .'> mf:action [ ut:request ?queryFile ] .
+            }
+        ');
+
+        return $query['result']['rows'][0]['queryFile'];
+    }
+
     /*
      * tests
      */
 
     public function test_dawg_drop_all_01()
     {
-        $graphUri = 'http://example.org/g1';
+        // get failing query
+        $this->loadManifestFileIntoStore($this->w3cTestsFolderPath);
+        $query = $this->getTestQuery($this->testPref . 'dawg-drop-all-01');
 
-        // create graph
-        $this->createGraph($graphUri);
-
-        // load test data into graph
-        $parser = \ARC2::getTurtleParser();
-        $parser->parse($this->w3cTestsFolderPath .'/drop-g1.ttl');
-        $this->store->insert($parser->getSimpleIndex(), $graphUri);
-
-        // check if graph really contains data
-        $res = $this->store->query('SELECT * FROM <'. $graphUri .'> WHERE {?s ?p ?o.}');
-        $this->assertTrue(0 < count($res['result']['rows']), 'No test data in graph found.');
-
-        // run test query
-        $query = file_get_contents($this->w3cTestsFolderPath . '/drop-all-01.ru');
-        $res = $this->store->query($query);
-
-        // check if test data are still available
-        $res = $this->store->query('SELECT * FROM <'. $graphUri .'> WHERE {?s ?p ?o.}');
-        $this->assertTrue(
-            0 < count($res['result']['rows']),
-            'ARC2 is expected to fail with query: '. $this->makeQueryA1Liner($query)
+        $this->markTestSkipped(
+            'This kind of drop query is currently not supported. '
+            . 'See https://github.com/semsol/arc2/wiki/SPARQL-'
+            . PHP_EOL . 'Query: ' . $this->makeQueryA1Liner($query)
         );
     }
 
     public function test_dawg_drop_default_01()
     {
-        $graphUri = 'http://example.org/g1';
+        // get failing query
+        $this->loadManifestFileIntoStore($this->w3cTestsFolderPath);
+        $query = $this->getTestQuery($this->testPref . 'dawg-drop-default-01');
 
-        // create graph
-        $this->createGraph($graphUri);
-
-        // load test data into graph
-        $parser = \ARC2::getTurtleParser();
-        $parser->parse($this->w3cTestsFolderPath .'/drop-g1.ttl');
-        $this->store->insert($parser->getSimpleIndex(), $graphUri);
-
-        // check if graph really contains data
-        $res = $this->store->query('SELECT * FROM <'. $graphUri .'> WHERE {?s ?p ?o.}');
-        $this->assertTrue(0 < count($res['result']['rows']), 'No test data in graph found.');
-
-        // run test query
-        $query = file_get_contents($this->w3cTestsFolderPath . '/drop-default-01.ru');
-        $res = $this->store->query($query);
-
-        // check if test data are still available
-        $res = $this->store->query('SELECT * FROM <'. $graphUri .'> WHERE {?s ?p ?o.}');
-        $this->assertTrue(
-            0 < count($res['result']['rows']),
-            'ARC2 is expected to fail with query: '. $this->makeQueryA1Liner($query)
+        $this->markTestSkipped(
+            'This kind of drop query is currently not supported. '
+            . 'See https://github.com/semsol/arc2/wiki/SPARQL-'
+            . PHP_EOL . 'Query: ' . $this->makeQueryA1Liner($query)
         );
     }
 
     public function test_dawg_drop_graph_01()
     {
-        $graphUri = 'http://example.org/g1';
+        // get failing query
+        $this->loadManifestFileIntoStore($this->w3cTestsFolderPath);
+        $query = $this->getTestQuery($this->testPref . 'dawg-drop-graph-01');
 
-        // create graph
-        $this->createGraph($graphUri);
-
-        // load test data into graph
-        $parser = \ARC2::getTurtleParser();
-        $parser->parse($this->w3cTestsFolderPath .'/drop-g1.ttl');
-        $this->store->insert($parser->getSimpleIndex(), $graphUri);
-
-        // check if graph really contains data
-        $res = $this->store->query('SELECT * FROM <'. $graphUri .'> WHERE {?s ?p ?o.}');
-        $this->assertTrue(0 < count($res['result']['rows']), 'No test data in graph found.');
-
-        // run test query
-        $query = file_get_contents($this->w3cTestsFolderPath . '/drop-graph-01.ru');
-        $res = $this->store->query($query);
-
-        // check if test data are still available
-        $res = $this->store->query('SELECT * FROM <'. $graphUri .'> WHERE {?s ?p ?o.}');
-        $this->assertTrue(
-            0 < count($res['result']['rows']),
-            'ARC2 is expected to fail with query: '. $this->makeQueryA1Liner($query)
+        $this->markTestSkipped(
+            'This kind of drop query is currently not supported. '
+            . 'See https://github.com/semsol/arc2/wiki/SPARQL-'
+            . PHP_EOL . 'Query: ' . $this->makeQueryA1Liner($query)
         );
     }
 
     public function test_dawg_drop_named_01()
     {
-        $graphUri = 'http://example.org/g1';
+        // get failing query
+        $this->loadManifestFileIntoStore($this->w3cTestsFolderPath);
+        $query = $this->getTestQuery($this->testPref . 'dawg-drop-named-01');
 
-        // create graph
-        $this->createGraph($graphUri);
-
-        // load test data into graph
-        $parser = \ARC2::getTurtleParser();
-        $parser->parse($this->w3cTestsFolderPath .'/drop-g1.ttl');
-        $this->store->insert($parser->getSimpleIndex(), $graphUri);
-
-        // check if graph really contains data
-        $res = $this->store->query('SELECT * FROM <'. $graphUri .'> WHERE {?s ?p ?o.}');
-        $this->assertTrue(0 < count($res['result']['rows']), 'No test data in graph found.');
-
-        // run test query
-        $query = file_get_contents($this->w3cTestsFolderPath . '/drop-named-01.ru');
-        $res = $this->store->query($query);
-
-        // check if test data are still available
-        $res = $this->store->query('SELECT * FROM <'. $graphUri .'> WHERE {?s ?p ?o.}');
-        $this->assertTrue(
-            0 < count($res['result']['rows']),
-            'ARC2 is expected to fail with query: '. $this->makeQueryA1Liner($query)
+        $this->markTestSkipped(
+            'This kind of drop query is currently not supported. '
+            . 'See https://github.com/semsol/arc2/wiki/SPARQL-'
+            . PHP_EOL . 'Query: ' . $this->makeQueryA1Liner($query)
         );
     }
 
