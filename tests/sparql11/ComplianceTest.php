@@ -64,33 +64,6 @@ abstract class ComplianceTest extends ARC2_TestCase
     }
 
     /**
-     * @param string $graphUri
-     * @todo Check that $graphUri is a valid URI
-     * @todo port this functionality to ARC2_Store->query
-     */
-    protected function createGraph($graphUri)
-    {
-        // table names
-        $g2t = 'arc_g2t';
-        $id2val = 'arc_id2val';
-
-        /*
-         * for id2val table
-         */
-        $query = 'INSERT INTO '. $id2val .' (val) VALUES("'. $graphUri .'")';
-        $this->store->queryDB($query, $this->store->getDBCon());
-        $usedId = $this->store->getDBCon()->insert_id;
-
-        /*
-         * for g2t table
-         */
-        $newIdg2t = 1 + $this->getRowCount($g2t);
-        $query = 'INSERT INTO '. $g2t .' (t, g) VALUES('. $newIdg2t .', '. $usedId .')';
-        $this->store->queryDB($query, $this->store->getDBCon());
-        $usedId = $this->store->getDBCon()->insert_id;
-    }
-
-    /**
      * Helper function to get expected query result.
      *
      * @param string $testUri
@@ -203,7 +176,11 @@ abstract class ComplianceTest extends ARC2_TestCase
             ');
         }
 
-        return file_get_contents($query['result']['rows'][0]['queryFile']);
+        $query = file_get_contents($query['result']['rows'][0]['queryFile']);
+
+        // add data graph information as FROM clause, because ARC2 can't handle default graph
+        // queries. for more information see https://github.com/semsol/arc2/issues/72.
+        return str_replace('WHERE', 'FROM <'. $this->dataGraphUri .'> WHERE', $query);
     }
 
     /**
