@@ -327,7 +327,7 @@ abstract class ComplianceTest extends ARC2_TestCase
      */
     protected function makeQueryA1Liner($query)
     {
-        return preg_replace('/(\s\s+|\n+)/', ' ', $query);
+        return preg_replace('/\s\s+/', ' ', $query);
     }
 
     /**
