@@ -140,4 +140,128 @@ class AggregatesTest extends ComplianceTest
             $this->makeQueryA1Liner($query)
         );
     }
+
+    public function test_agg_min_01()
+    {
+        $this->runTestFor('agg-min-01');
+    }
+
+    public function test_agg_min_02()
+    {
+        // get failing query
+        $this->loadManifestFileIntoStore($this->w3cTestsFolderPath);
+        $query = $this->getTestQuery($this->testPref . 'agg-min-02');
+
+        $this->markTestSkipped(
+            'This kind of query is currently not supported. '
+            . 'Result is missing multiple entries.'
+            . PHP_EOL
+            . 'for query: '.
+            $this->makeQueryA1Liner($query)
+        );
+    }
+
+    public function test_agg_sample_01()
+    {
+        // get failing query
+        $this->loadManifestFileIntoStore($this->w3cTestsFolderPath);
+        $query = $this->getTestQuery($this->testPref . 'agg-sample-01');
+
+        $this->markTestSkipped(
+            'This kind of query is currently not supported. '
+            . 'ARC2_Store::query returns 0 for query: '. PHP_EOL . $this->makeQueryA1Liner($query)
+        );
+    }
+
+    public function test_agg_sum_01()
+    {
+        $this->markTestSkipped(
+            'Test skipped, because of rounding bug in SUM function. See https://github.com/semsol/arc2/issues/100'
+        );
+    }
+
+    public function test_agg01()
+    {
+        $this->markTestSkipped(
+            'Test skipped, because of COUNT function fails. '
+            . 'Maybe related to https://github.com/semsol/arc2/issues/100'
+        );
+    }
+
+    public function test_agg02()
+    {
+        $this->markTestSkipped(
+            'Test skipped, because of COUNT function fails. '
+            . 'Maybe related to https://github.com/semsol/arc2/issues/100'
+        );
+    }
+
+    public function test_agg03()
+    {
+        // get failing query
+        $this->loadManifestFileIntoStore($this->w3cTestsFolderPath);
+        $query = $this->getTestQuery($this->testPref . 'agg03');
+
+        $this->markTestSkipped(
+            'This kind of query is currently not supported. '
+            . 'ARC2_Store::query returns 0 for query: '. PHP_EOL . $this->makeQueryA1Liner($query)
+        );
+    }
+
+    public function test_agg04()
+    {
+        $this->markTestSkipped(
+            'Test skipped, because of COUNT function fails. '
+            . 'Maybe related to https://github.com/semsol/arc2/issues/100'
+        );
+    }
+
+    public function test_agg05()
+    {
+        $this->markTestSkipped(
+            'Test skipped, because of COUNT function fails. '
+            . 'Maybe related to https://github.com/semsol/arc2/issues/100'
+        );
+    }
+
+    public function test_agg06()
+    {
+        // get failing query
+        $this->loadManifestFileIntoStore($this->w3cTestsFolderPath);
+        $query = $this->getTestQuery($this->testPref . 'agg06');
+
+        $this->markTestSkipped(
+            'This kind of query is currently not supported. '
+            . 'ARC2_Store::query returns 0 for query: '. PHP_EOL . $this->makeQueryA1Liner($query)
+        );
+    }
+
+    public function test_agg07()
+    {
+        // get failing query
+        $this->loadManifestFileIntoStore($this->w3cTestsFolderPath);
+        $query = $this->getTestQuery($this->testPref . 'agg07');
+
+        $this->markTestSkipped(
+            'This kind of query is currently not supported. '
+            . 'ARC2_Store::query returns 0 for query: '. PHP_EOL . $this->makeQueryA1Liner($query)
+        );
+    }
+
+    public function test_agg08()
+    {
+        $this->runTestFor('agg08');
+    }
+
+    public function test_agg08b()
+    {
+        // get failing query
+        $this->loadManifestFileIntoStore($this->w3cTestsFolderPath);
+        $query = $this->getTestQuery($this->testPref . 'agg08b');
+
+        $this->markTestSkipped(
+            'This kind of query is currently not supported. '
+            . 'ARC2_Store::query returns 0 for query: '. PHP_EOL . $this->makeQueryA1Liner($query)
+        );
+    }
 }
