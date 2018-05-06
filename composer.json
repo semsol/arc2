@@ -17,8 +17,7 @@
     "require-dev": {
         "doctrine/instantiator": "1.0.*",
         "friendsofphp/php-cs-fixer": "2.*",
-        "phpunit/phpunit": "^5.0",
-        "symfony/yaml": "2.*"
+        "phpunit/phpunit": "^5.0"
     },
     "autoload": {
         "classmap": ["parsers/", "serializers/"],
