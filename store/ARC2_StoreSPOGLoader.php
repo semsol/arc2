@@ -22,7 +22,7 @@ class ARC2_StoreSPOGLoader extends ARC2_SPOGParser
         parent::__init();
     }
 
-    public function addT($s, $p, $o, $s_type, $o_type, $o_dt = '', $o_lang = '', $g)
+    public function addT($s = '', $p = '', $o = '', $s_type = '', $o_type = '', $o_dt = '', $o_lang = '', $g = '')
     {
         if (!($s && $p && $o)) {
             return 0;

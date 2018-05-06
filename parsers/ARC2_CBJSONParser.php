@@ -30,8 +30,8 @@ class ARC2_CBJSONParser extends ARC2_JSONParser {
   function done() {
     $this->extractRDF();
   }
-  
-  function extractRDF() {
+
+  function extractRDF($formats = '') {
     $struct = $this->struct;
     if ($type = $this->getStructType($struct)) {
       $s = $this->getResourceID($struct, $type);

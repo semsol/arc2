@@ -27,7 +27,7 @@ class ARC2_StoreSGAJSONLoader extends ARC2_SGAJSONParser
         $this->extractRDF();
     }
 
-    public function addT($s, $p, $o, $s_type, $o_type, $o_dt = '', $o_lang = '')
+    public function addT($s = '', $p = '', $o = '', $s_type = '', $o_type = '', $o_dt = '', $o_lang = '')
     {
         $this->caller->addT($s, $p, $o, $s_type, $o_type, $o_dt, $o_lang);
         ++$this->t_count;

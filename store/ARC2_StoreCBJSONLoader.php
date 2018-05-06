@@ -27,7 +27,7 @@ class ARC2_StoreCBJSONLoader extends ARC2_CBJSONParser
         $this->extractRDF();
     }
 
-    public function addT($s, $p, $o, $s_type, $o_type, $o_dt = '', $o_lang = '')
+    public function addT($s = '', $p = '', $o = '', $s_type = '', $o_type = '', $o_dt = '', $o_lang = '')
     {
         $o = $this->toUTF8($o);
         $this->caller->addT($s, $p, $o, $s_type, $o_type, $o_dt, $o_lang);
