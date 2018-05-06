@@ -94,6 +94,9 @@ class ARC2_Store extends ARC2_Class
         return $this->a['db_con'];
     }
 
+    /**
+     * @todo make property $a private, but provide access via a getter
+     */
     public function closeDBCon()
     {
         if ($this->v('db_con', false, $this->a)) {
@@ -806,6 +809,12 @@ class ARC2_Store extends ARC2_Class
         return $row ? $row['val'] : '';
     }
 
+    /**
+     * @param string $q
+     *
+     * @todo make file path configurable
+     * @todo add try/catch in case file creation/writing fails
+     */
     public function logQuery($q)
     {
         $fp = fopen('arc_query_log.txt', 'a');
