@@ -13,13 +13,18 @@ matrix:
     include:
         - php: hhvm
     allow_failures:
+        - php: nightly
         - php: hhvm
+
+git:
+    depth: 1
 
 cache:
     directories:
-        - $HOME/.composer/cache
+        - $HOME/.composer
+        - $HOME/bin
 
-sudo: true
+sudo: false
 
 before_install:
     - mysql -e 'CREATE DATABASE IF NOT EXISTS testdb;'
