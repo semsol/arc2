@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\integration;
+namespace Tests\integration\store;
 
 use Tests\ARC2_TestCase;
 
