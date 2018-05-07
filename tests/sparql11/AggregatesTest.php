@@ -25,8 +25,34 @@ class AggregatesTest extends ComplianceTest
 
     public function test_agg_avg_01()
     {
+        $this->loadManifestFileIntoStore($this->w3cTestsFolderPath);
+
+        $testname = 'agg-avg-01';
+
+        // get test data
+        $data = $this->getTestData($this->testPref . $testname);
+
+        // load test data into graph
+        $this->store->insert($data, $this->dataGraphUri);
+
+        // get query to test
+        $testQuery = $this->getTestQuery($this->testPref . $testname);
+
+        // get expected result
+        $expectedResult = $this->getExpectedResult($this->testPref . $testname);
+
+        // get actual result for given test query
+        $actualResult = $this->store->query($testQuery);
+        $actualResultAsXml = $this->getXmlVersionOfResult($actualResult);
+
+        $this->assertEquals(
+            '2',
+            (string) $actualResultAsXml->results->result->binding->literal[0]
+        );
+
+        // remember current behavior, but skip test anyway to show developer here is still a problem.
         $this->markTestSkipped(
-            'Test skipped, because of rounding bug in AVG function. See https://github.com/semsol/arc2/issues/99'
+            'Rounding bug in AVG function. See https://github.com/semsol/arc2/issues/99'
         );
     }
 

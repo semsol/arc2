@@ -34,6 +34,10 @@
     </logging>
     <filter>
         <whitelist processUncoveredFilesFromWhitelist="true">
+            <directory suffix=".php">./extractors</directory>
+            <directory suffix=".php">./parsers</directory>
+            <directory suffix=".php">./serializers</directory>
+            <directory suffix=".php">./sparqlscript</directory>
             <directory suffix=".php">./store</directory>
         </whitelist>
     </filter>

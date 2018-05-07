@@ -161,6 +161,148 @@ class SelectQueryTest extends ARC2_TestCase
     }
 
     /*
+     * OFFSET and LIMIT
+     */
+
+    public function testSelectOffset()
+    {
+        // test data
+        $this->fixture->query('INSERT INTO <http://example.com/> {
+            <http://person1> <http://id> "1" .
+            <http://person3> <http://id> "3" .
+            <http://person2> <http://id> "2" .
+        }');
+
+        $res = $this->fixture->query('
+            SELECT * WHERE { ?s ?p ?o . }
+            OFFSET 1
+        ');
+
+        $this->assertEquals(
+            [
+                'query_type' => 'select',
+                'result' => [
+                    'variables' => [
+                        's', 'p', 'o'
+                    ],
+                    'rows' => [
+                        [
+                            's' => 'http://person3',
+                            's type' => 'uri',
+                            'p' => 'http://id',
+                            'p type' => 'uri',
+                            'o' => '3',
+                            'o type' => 'literal',
+                        ],
+                        [
+                            's' => 'http://person2',
+                            's type' => 'uri',
+                            'p' => 'http://id',
+                            'p type' => 'uri',
+                            'o' => '2',
+                            'o type' => 'literal',
+                        ],
+                    ],
+                ],
+                'query_time' => $res['query_time']
+            ],
+            $res
+        );
+    }
+
+    public function testSelectOffsetLimit()
+    {
+        // test data
+        $this->fixture->query('INSERT INTO <http://example.com/> {
+            <http://person1> <http://id> "1" .
+            <http://person3> <http://id> "3" .
+            <http://person2> <http://id> "2" .
+        }');
+
+        $res = $this->fixture->query('
+            SELECT * WHERE { ?s ?p ?o . }
+            OFFSET 1 LIMIT 2
+        ');
+
+        $this->assertEquals(
+            [
+                'query_type' => 'select',
+                'result' => [
+                    'variables' => [
+                        's', 'p', 'o'
+                    ],
+                    'rows' => [
+                        [
+                            's' => 'http://person3',
+                            's type' => 'uri',
+                            'p' => 'http://id',
+                            'p type' => 'uri',
+                            'o' => '3',
+                            'o type' => 'literal',
+                        ],
+                        [
+                            's' => 'http://person2',
+                            's type' => 'uri',
+                            'p' => 'http://id',
+                            'p type' => 'uri',
+                            'o' => '2',
+                            'o type' => 'literal',
+                        ],
+                    ],
+                ],
+                'query_time' => $res['query_time']
+            ],
+            $res
+        );
+    }
+
+    public function testSelectLimit()
+    {
+        // test data
+        $this->fixture->query('INSERT INTO <http://example.com/> {
+            <http://person1> <http://id> "1" .
+            <http://person3> <http://id> "3" .
+            <http://person2> <http://id> "2" .
+        }');
+
+        $res = $this->fixture->query('
+            SELECT * WHERE { ?s ?p ?o . }
+            LIMIT 2
+        ');
+
+        $this->assertEquals(
+            [
+                'query_type' => 'select',
+                'result' => [
+                    'variables' => [
+                        's', 'p', 'o'
+                    ],
+                    'rows' => [
+                        [
+                            's' => 'http://person1',
+                            's type' => 'uri',
+                            'p' => 'http://id',
+                            'p type' => 'uri',
+                            'o' => '1',
+                            'o type' => 'literal',
+                        ],
+                        [
+                            's' => 'http://person3',
+                            's type' => 'uri',
+                            'p' => 'http://id',
+                            'p type' => 'uri',
+                            'o' => '3',
+                            'o type' => 'literal',
+                        ],
+                    ],
+                ],
+                'query_time' => $res['query_time']
+            ],
+            $res
+        );
+    }
+
+    /*
      * ORDER BY
      */
 
