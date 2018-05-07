@@ -27,8 +27,8 @@ class ARC2_SGAJSONParser extends ARC2_JSONParser {
   function done() {
     $this->extractRDF();
   }
-  
-  function extractRDF() {
+
+  function extractRDF($formats = '') {
     $s = $this->getContext();
     $os = $this->getURLs($this->struct);
     foreach ($os as $o) {

@@ -13,19 +13,30 @@ matrix:
     include:
         - php: hhvm
     allow_failures:
+        - php: nightly
         - php: hhvm
+
+git:
+    depth: 1
 
 cache:
     directories:
-        - $HOME/.composer/cache
+        - $HOME/.composer
+        - $HOME/bin
 
-sudo: true
+sudo: false
 
 before_install:
     - mysql -e 'CREATE DATABASE IF NOT EXISTS testdb;'
-    - composer require satooshi/php-coveralls:* --ignore-platform-reqs
-    - travis_retry composer install --dev --no-interaction --ignore-platform-reqs
+    # Install composer packages, will also trigger dump-autoload
+    - travis_retry composer install --no-interaction
+    # Install coveralls.phar
+    - wget -c -nc --retry-connrefused --tries=0 https://github.com/satooshi/php-coveralls/releases/download/v1.0.1/coveralls.phar
+    - chmod +x coveralls.phar
+    - php coveralls.phar --version
 
 script: vendor/bin/phpunit --coverage-clover gen/coverage/clover.xml
 
-after_script: php vendor/bin/coveralls -v
+after_success:
+    # Submit coverage report to Coveralls servers, see .coveralls.yml
+    - travis_retry php coveralls.phar -v
