@@ -268,4 +268,30 @@ class InsertIntoQueryTest extends ARC2_TestCase
             $res['result']['rows']
         );
     }
+
+    public function testInsertIntoWhere()
+    {
+        // test data
+        $this->fixture->query('INSERT INTO <http://example.com/> CONSTRUCT {
+            <http://baz> <http://location> "Leipzig" .
+            <http://baz2> <http://location> "Grimma" .
+        } WHERE {
+            ?s <http://location> "Leipzig" .
+        }');
+
+        // we expect that 1 element gets added to the store, because of the WHERE clause.
+        // but ARC2 added none.
+        $res = $this->fixture->query('SELECT * FROM <http://example.com/> {?s ?p ?o.}');
+        $this->assertEquals(0, \count($res['result']['rows']));
+        // no errors or warnings by ARC2
+        $this->assertTrue(0 == \count($this->fixture->warnings));
+        $this->assertTrue(0 == \count($this->fixture->errors));
+
+        $this->markTestSkipped(
+            'ARC2 does not check the WHERE clause when inserting data. No data added at all.'
+            .PHP_EOL
+            .PHP_EOL.'FYI: https://www.w3.org/Submission/SPARQL-Update/#sec_examples and '
+            .PHP_EOL.'https://github.com/semsol/arc2/wiki/SPARQL-#insert-example'
+        );
+    }
 }

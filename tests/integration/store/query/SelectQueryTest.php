@@ -74,6 +74,198 @@ class SelectQueryTest extends ARC2_TestCase
         );
     }
 
+    public function testSelectRelationalGreatThan()
+    {
+        // test data
+        $this->fixture->query('INSERT INTO <http://example.com/> {
+            <http://container1> <http://weight> "150" .
+            <http://container2> <http://weight> "50" .
+        }');
+
+        $res = $this->fixture->query('SELECT ?c WHERE {
+            ?c <http://weight> ?w .
+
+            FILTER (?w > 100)
+        }');
+        $this->assertEquals(
+            [
+                'query_type' => 'select',
+                'result' => [
+                    'variables' => [
+                        'c'
+                    ],
+                    'rows' => [
+                        [
+                            'c' => 'http://container1',
+                            'c type' => 'uri',
+                        ],
+                    ],
+                ],
+                'query_time' => $res['query_time']
+            ],
+            $res
+        );
+    }
+
+    public function testSelectRelationalSmallerThan()
+    {
+        // test data
+        $this->fixture->query('INSERT INTO <http://example.com/> {
+            <http://container1> <http://weight> "150" .
+            <http://container2> <http://weight> "50" .
+        }');
+
+        $res = $this->fixture->query('SELECT ?c WHERE {
+            ?c <http://weight> ?w .
+
+            FILTER (?w < 100)
+        }');
+        $this->assertEquals(
+            [
+                'query_type' => 'select',
+                'result' => [
+                    'variables' => [
+                        'c'
+                    ],
+                    'rows' => [
+                        [
+                            'c' => 'http://container2',
+                            'c type' => 'uri',
+                        ],
+                    ],
+                ],
+                'query_time' => $res['query_time']
+            ],
+            $res
+        );
+    }
+
+    public function testSelectRelationalEqual()
+    {
+        // test data
+        $this->fixture->query('INSERT INTO <http://example.com/> {
+            <http://container1> <http://weight> "150" .
+            <http://container2> <http://weight> "50" .
+        }');
+
+        $res = $this->fixture->query('SELECT ?c WHERE {
+            ?c <http://weight> ?w .
+
+            FILTER (?w = 150)
+        }');
+        $this->assertEquals(
+            [
+                'query_type' => 'select',
+                'result' => [
+                    'variables' => [
+                        'c'
+                    ],
+                    'rows' => [
+                        [
+                            'c' => 'http://container1',
+                            'c type' => 'uri',
+                        ],
+                    ],
+                ],
+                'query_time' => $res['query_time']
+            ],
+            $res
+        );
+    }
+
+    public function testSelectRelationalNotEqual()
+    {
+        // test data
+        $this->fixture->query('INSERT INTO <http://example.com/> {
+            <http://container1> <http://weight> "150" .
+            <http://container2> <http://weight> "50" .
+        }');
+
+        $res = $this->fixture->query('SELECT ?c WHERE {
+            ?c <http://weight> ?w .
+
+            FILTER (?w != 150)
+        }');
+        $this->assertEquals(
+            [
+                'query_type' => 'select',
+                'result' => [
+                    'variables' => [
+                        'c'
+                    ],
+                    'rows' => [
+                        [
+                            'c' => 'http://container2',
+                            'c type' => 'uri',
+                        ],
+                    ],
+                ],
+                'query_time' => $res['query_time']
+            ],
+            $res
+        );
+    }
+
+    public function testSelectSameTerm()
+    {
+        // test data
+        $this->fixture->query('INSERT INTO <http://example.com/> {
+            <http://container1> <http://weight> "100" .
+            <http://container2> <http://weight> "100" .
+        }');
+
+        $res = $this->fixture->query('SELECT ?c1 ?c2 WHERE {
+            ?c1 ?weight ?w1.
+
+            ?c2 ?weight ?w2.
+
+            FILTER (sameTerm(?w1, ?w2))
+        }');
+        $this->assertEquals(
+            [
+                'query_type' => 'select',
+                'result' => [
+                    'variables' => [
+                        'c1', 'c2'
+                    ],
+                    'rows' => [
+                        [
+                            'c1' => 'http://container1',
+                            'c1 type' => 'uri',
+                            'c2' => 'http://container1',
+                            'c2 type' => 'uri',
+                        ],
+                        [
+                            'c1' => 'http://container2',
+                            'c1 type' => 'uri',
+                            'c2' => 'http://container1',
+                            'c2 type' => 'uri',
+                        ],
+                        [
+                            'c1' => 'http://container1',
+                            'c1 type' => 'uri',
+                            'c2' => 'http://container2',
+                            'c2 type' => 'uri',
+                        ],
+                        [
+                            'c1' => 'http://container2',
+                            'c1 type' => 'uri',
+                            'c2' => 'http://container2',
+                            'c2 type' => 'uri',
+                        ],
+                    ],
+                ],
+                'query_time' => $res['query_time']
+            ],
+            $res
+        );
+
+        $this->markTestSkipped(
+            'ARC2: solving sameterm does not work properly. The result contains elements multiple times. '
+            . PHP_EOL . 'Expected behavior is described here: https://www.w3.org/TR/rdf-sparql-query/#func-sameTerm'
+        );
+    }
+
     /*
      * SELECT COUNT
      */
@@ -404,5 +596,18 @@ class SelectQueryTest extends ARC2_TestCase
             ],
             $res
         );
+    }
+
+    public function testSelectOrderByWithoutContent()
+    {
+        $res = $this->fixture->query('
+            SELECT * WHERE {
+                ?s <http://id> ?id .
+            }
+            ORDER BY
+        ');
+
+        // query false, therefore 0 as result
+        $this->assertEquals(0, $res);
     }
 }

@@ -108,6 +108,8 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler
     {
         $this->dependency_log = [];
         $this->index = $this->getEmptyIndex();
+        // if no pattern is in the query, the index "pattern" is undefined, which leads to an error.
+        // TODO throw an exception/raise an error and avoid "Undefined index: pattern" notification
         $this->buildIndex($this->infos['query']['pattern'], 0);
         $tmp = $this->index;
         $this->analyzeIndex($this->getPattern('0'));
