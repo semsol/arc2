@@ -20,7 +20,7 @@
         "phpunit/phpunit": "^5.0"
     },
     "autoload": {
-        "classmap": ["parsers/", "serializers/"],
+        "classmap": ["parsers/", "serializers/", "store/"],
         "files": [
             "./ARC2.php",
             "./ARC2_Class.php",

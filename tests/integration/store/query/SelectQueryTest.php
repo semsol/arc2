@@ -257,7 +257,11 @@ class SelectQueryTest extends ARC2_TestCase
                 ],
                 'query_time' => $res['query_time']
             ],
-            $res
+            $res,
+            '',
+            0,
+            10,
+            true
         );
 
         $this->markTestSkipped(
