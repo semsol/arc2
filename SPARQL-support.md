@@ -35,7 +35,7 @@ GROUP BY ?who
 | Support | x (but [bugged](https://github.com/semsol/arc2/issues/99)) |   x   |  x  |  x  |  x  |
 
 
-## Relational
+### Relational
 
 #### Supported relational terms
 
@@ -133,19 +133,4 @@ DeleteQuery ::= 'DELETE' ( 'FROM' IRIref )* 'CONSTRUCT'? ConstructTemplate? Data
 SolutionModifier ::= GroupClause? OrderClause? LimitOffsetClauses?
 
 GroupClause ::= 'GROUP' 'BY' Var ( ',' Var )*
-```
-
-## Unclear
-
-### Insert Into Construct Where
-
-Is there a working example of queries such as:
-
-```sql
-INSERT INTO <http://example.com/inferred> CONSTRUCT {
-  ?s foaf:knows ?o .
-}
-WHERE {
-  ?s xfn:contact ?o .
-}
 ```

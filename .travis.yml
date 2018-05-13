@@ -24,7 +24,7 @@ cache:
         - $HOME/.composer
         - $HOME/bin
 
-sudo: false
+sudo: true
 
 before_install:
     - mysql -e 'CREATE DATABASE IF NOT EXISTS testdb;'
