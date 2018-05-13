@@ -57,11 +57,11 @@ class ARC2_Store extends ARC2_Class
             /* try to create it */
             if ($this->a['db_name']) {
                 $this->queryDB('
-          CREATE DATABASE IF NOT EXISTS `'.$this->a['db_name'].'`
-          DEFAULT CHARACTER SET utf8
-          DEFAULT COLLATE utf8_general_ci
-          ', $db_con, 1
-        );
+                  CREATE DATABASE IF NOT EXISTS `'.$this->a['db_name'].'`
+                  DEFAULT CHARACTER SET utf8
+                  DEFAULT COLLATE utf8_general_ci
+                  ', $db_con, 1
+                );
                 if (mysqli_query($db_con, 'USE `'.$this->a['db_name'].'`')) {
                     $this->queryDB("SET NAMES 'utf8'", $db_con);
                     $fixed = 1;
