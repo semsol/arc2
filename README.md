@@ -10,7 +10,7 @@ ARC2
 ARC2 is a PHP 5.6+ library for working with RDF (It is compatible with PHP 5.3+ but old versions are no longer tested).
 It also provides a MySQL-based triplestore with SPARQL support.
 
-Feature-wise, ARC2 is now in a stable state with no further feature additions planned. 
+Feature-wise, ARC2 is now in a stable state with no further feature additions planned.
 Issues are still being fixed and Pull Requests are welcome, though.
 
 ## Installation
@@ -19,4 +19,6 @@ Package available on [Composer](https://packagist.org/packages/semsol/arc2).
 
 If you're using Composer to manage dependencies, you can use
 
-    $ composer require "semsol/arc2": "dev-master"
+```bash
+composer require semsol/arc2:2.4.*
+```
