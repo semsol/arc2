@@ -1,12 +1,12 @@
 {
     "name": "semsol/arc2",
-	"type": "library",
+    "type": "library",
     "description": "ARC2 is a PHP 5.6+ library for working with RDF (It is compatible with PHP 5.3+ but old versions are no longer tested). It also provides a MySQL-based triplestore with SPARQL support.",
-	"keywords": ["rdf","sparql"],
-	"homepage": "https://github.com/semsol/arc2",
+    "keywords": ["rdf","sparql"],
+    "homepage": "https://github.com/semsol/arc2",
     "license": [
        "GPL-2.0-or-later",
-       "W3C-software-license"
+       "W3C"
     ],
     "support": {
         "issues": "https://github.com/semsol/arc2/issues"
