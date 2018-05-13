@@ -36,7 +36,7 @@ before_install:
     #
     # install and init database (see matrix => include => env)
     #
-    - ./travis/install-and-init-db.sh
+    - ./.travis/install-and-init-db.sh
 
     #
     # run tests
