@@ -80,7 +80,7 @@ git:
 
 cache:
     directories:
-        - $HOME/.composer
+        - $HOME/.composer/cache
 
 before_script:
     #
