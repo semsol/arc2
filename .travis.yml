@@ -8,6 +8,9 @@ php:
     - '7.2'
     - nightly
 
+env:
+    - ARC2_DATABASE=mysql5.6
+
 matrix:
     fast_finish: true
     include:
@@ -27,6 +30,15 @@ cache:
 sudo: true
 
 before_install:
+    #
+    # prepare database
+    #
+    - if [[ "$ARC2_DATABASE" == "mysql5.6" ]]; then ./scripts/tests/mysql_5.6_uninstall.sh; fi
+    - if [[ "$ARC2_DATABASE" == "mysql5.6" ]]; then ./scripts/tests/mysql_5.6_install.sh; fi
+
+    #
+    # run tests
+    #
     - mysql -e 'CREATE DATABASE IF NOT EXISTS testdb;'
     # Install composer packages, will also trigger dump-autoload
     - travis_retry composer install --no-interaction
