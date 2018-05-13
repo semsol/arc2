@@ -99,18 +99,6 @@ class ConstructTest extends ComplianceTest
      * tests
      */
 
-    public function test_constructwhere01()
-    {
-        // get failing query
-        $this->loadManifestFileIntoStore($this->w3cTestsFolderPath);
-        $query = $this->getTestQuery($this->testPref . 'constructwhere01');
-
-        $this->markTestSkipped(
-            'This kind of query is currently not supported. '
-            . 'ARC2_Store::query returns 0 for query: '. PHP_EOL . $this->makeQueryA1Liner($query)
-        );
-    }
-
     public function test_constructwhere02()
     {
         $this->runTestFor('constructwhere02');

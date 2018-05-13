@@ -76,58 +76,6 @@ class DropTest extends ComplianceTest
      * tests
      */
 
-    public function test_dawg_drop_all_01()
-    {
-        // get failing query
-        $this->loadManifestFileIntoStore($this->w3cTestsFolderPath);
-        $query = $this->getTestQuery($this->testPref . 'dawg-drop-all-01');
-
-        $this->markTestSkipped(
-            'This kind of drop query is currently not supported. '
-            . 'See https://github.com/semsol/arc2/wiki/SPARQL-'
-            . PHP_EOL . 'Query: ' . $this->makeQueryA1Liner($query)
-        );
-    }
-
-    public function test_dawg_drop_default_01()
-    {
-        // get failing query
-        $this->loadManifestFileIntoStore($this->w3cTestsFolderPath);
-        $query = $this->getTestQuery($this->testPref . 'dawg-drop-default-01');
-
-        $this->markTestSkipped(
-            'This kind of drop query is currently not supported. '
-            . 'See https://github.com/semsol/arc2/wiki/SPARQL-'
-            . PHP_EOL . 'Query: ' . $this->makeQueryA1Liner($query)
-        );
-    }
-
-    public function test_dawg_drop_graph_01()
-    {
-        // get failing query
-        $this->loadManifestFileIntoStore($this->w3cTestsFolderPath);
-        $query = $this->getTestQuery($this->testPref . 'dawg-drop-graph-01');
-
-        $this->markTestSkipped(
-            'This kind of drop query is currently not supported. '
-            . 'See https://github.com/semsol/arc2/wiki/SPARQL-'
-            . PHP_EOL . 'Query: ' . $this->makeQueryA1Liner($query)
-        );
-    }
-
-    public function test_dawg_drop_named_01()
-    {
-        // get failing query
-        $this->loadManifestFileIntoStore($this->w3cTestsFolderPath);
-        $query = $this->getTestQuery($this->testPref . 'dawg-drop-named-01');
-
-        $this->markTestSkipped(
-            'This kind of drop query is currently not supported. '
-            . 'See https://github.com/semsol/arc2/wiki/SPARQL-'
-            . PHP_EOL . 'Query: ' . $this->makeQueryA1Liner($query)
-        );
-    }
-
     // this test is not part of the W3C test collection
     // it tests DELETE FROM <...> command which is the ARC2 equivalent to DROP GRAPH <...>
     public function test_delete_graph()

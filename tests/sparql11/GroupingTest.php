@@ -33,30 +33,6 @@ class GroupingTest extends ComplianceTest
         $this->runTestFor('group02');
     }
 
-    public function test_group03()
-    {
-        // get failing query
-        $this->loadManifestFileIntoStore($this->w3cTestsFolderPath);
-        $query = $this->getTestQuery($this->testPref . 'group03');
-
-        $this->markTestSkipped(
-            'This kind of query is currently not supported. '
-            . 'Query: '. PHP_EOL . $this->makeQueryA1Liner($query)
-        );
-    }
-
-    public function test_group04()
-    {
-        // get failing query
-        $this->loadManifestFileIntoStore($this->w3cTestsFolderPath);
-        $query = $this->getTestQuery($this->testPref . 'group04');
-
-        $this->markTestSkipped(
-            'This kind of query is currently not supported. '
-            . 'Query: '. PHP_EOL . $this->makeQueryA1Liner($query)
-        );
-    }
-
     public function test_group05()
     {
         $this->runTestFor('group05');
