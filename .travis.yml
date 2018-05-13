@@ -6,20 +6,18 @@ services:
   - docker
 
 php:
-    - '5.6'
-    - '7.0'
-    - '7.1'
-    - '7.2'
+    - 5.6
     - nightly
 
 matrix:
     fast_finish: true
     allow_failures:
         - php: nightly
+          env: DB=mysql:5.5
     include:
         # define versions of MySQL and MariaDB to test against
-        - env:
-            - DB=mysql:5.5
+        - php: 5.6
+          env: DB=mysql:5.5
 
 git:
     depth: 1

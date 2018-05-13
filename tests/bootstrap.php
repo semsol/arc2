@@ -18,6 +18,6 @@ if (file_exists(__DIR__ .'/config.php')) {
         'db_name' => 'testdb',
         'db_user' => 'root',
         'db_pwd'  => '',
-        'db_host' => 'localhost',
+        'db_host' => '127.0.0.1',
     );
 }

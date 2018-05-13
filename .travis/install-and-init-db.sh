@@ -47,15 +47,9 @@ if [ ! -z "${DB}" ]; then
     fi
 
     mysql -uroot -e 'create database testdb DEFAULT CHARACTER SET utf8mb4'
-
-    # required?
-    # cp .travis/docker.json pymysql/tests/databases.json
 else
     cat ~/.my.cnf
 
     mysql -e 'select VERSION()'
     mysql -e 'create database testdb DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;'
-
-    # required?
-    # cp .travis/database.json pymysql/tests/databases.json
 fi
