@@ -21,5 +21,5 @@ composer require semsol/arc2:2.4.*
 
 * **PHP**: 5.6+ (It is compatible with PHP 5.3+ but old versions are no longer tested)
 * The following database systems are supported:
-  * MySQL, in version 5.5, 5.6, 5.7 and 8.0
-  * MariaDB, in version 10.0, 10.1, 10.2 and 10.3
+  * **MySQL**, in version 5.5, 5.6 and 5.7
+  * **MariaDB**, in version 10.0, 10.1, 10.2 and 10.3
