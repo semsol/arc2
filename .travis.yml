@@ -1,6 +1,9 @@
 language: php
 dist: trusty
 
+services:
+  - docker
+
 php:
     - '5.6'
     - '7.0'
@@ -8,16 +11,16 @@ php:
     - '7.2'
     - nightly
 
-env:
-    - ARC2_DATABASE=mysql5.6
-
 matrix:
     fast_finish: true
-    include:
-        - php: hhvm
     allow_failures:
         - php: nightly
         - php: hhvm
+    include:
+        - php: hhvm
+        # define versions of MySQL and MariaDB to test against
+        - env:
+            - DB=mysql:5.5
 
 git:
     depth: 1
@@ -27,14 +30,13 @@ cache:
         - $HOME/.composer
         - $HOME/bin
 
-sudo: true
+sudo: required
 
 before_install:
     #
-    # prepare database
+    # install and init database (see matrix => include => env)
     #
-    - if [[ "$ARC2_DATABASE" == "mysql5.6" ]]; then ./scripts/tests/mysql_5.6_uninstall.sh; fi
-    - if [[ "$ARC2_DATABASE" == "mysql5.6" ]]; then ./scripts/tests/mysql_5.6_install.sh; fi
+    - ./travis/install-and-init-db.sh
 
     #
     # run tests
