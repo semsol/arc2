@@ -469,17 +469,19 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler
         $nl = "\n";
         $where_sql = $this->getWHERESQL();  /* pre-fills $index['sub_joins'] $index['constraints'] */
         $order_sql = $this->getORDERSQL();  /* pre-fills $index['sub_joins'] $index['constraints'] */
-        return ''.
-      ($this->is_union_query ? 'SELECT' : 'SELECT'.$this->getDistinctSQL()).$nl.
-      $this->getResultVarsSQL().$nl. /* fills $index['sub_joins'] */
-      $this->getFROMSQL().
-      $this->getAllJoinsSQL().
-      $this->getWHERESQL().
-      $this->getGROUPSQL().
-      $this->getORDERSQL().
-      ($this->is_union_query ? '' : $this->getLIMITSQL()).
-      $nl.
-    '';
+        return ''. (
+            $this->is_union_query
+                ? 'SELECT'
+                : 'SELECT'.$this->getDistinctSQL()).$nl.
+                    $this->getResultVarsSQL().$nl. /* fills $index['sub_joins'] */
+                    $this->getFROMSQL().
+                    $this->getAllJoinsSQL().
+                    $this->getWHERESQL().
+                    $this->getGROUPSQL().
+                    $this->getORDERSQL().
+                    ($this->is_union_query
+                        ? ''
+                        : $this->getLIMITSQL()).$nl.'';
     }
 
     public function getDistinctSQL()
@@ -843,7 +845,8 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler
     }
 
     public function getRequiredSubJoinSQL($id, $prefix = '')
-    {/* id is a triple pattern id. Optional FILTERS and GRAPHs are getting added to the join directly */
+    {
+        /* id is a triple pattern id. Optional FILTERS and GRAPHs are getting added to the join directly */
         $nl = "\n";
         $r = '';
         foreach ($this->index['sub_joins'] as $alias) {
@@ -863,7 +866,6 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler
                     $sub_sub_r = 'T_'.$id.'.o_type = 2';
                     $sub_r .= $nl.'  AND ('.$sub_sub_r.')';
                 }
-                //$cur_prefix = $prefix ? $prefix . ' ' : 'STRAIGHT_';
                 $cur_prefix = $prefix ? $prefix.' ' : '';
                 if ('g' == $col) {
                     $r .= trim($cur_prefix.'JOIN '.$this->getValueTable($col).' V_'.$id.'_'.$col.' ON ('.$nl.'  (G_'.$id.'.'.$col.' = V_'.$id.'_'.$col.'.id) '.$sub_r.$nl.')');
@@ -885,7 +887,7 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler
                         $added_gts[] = $set['graph'];
                     }
                 }
-                $sub_r .= ('' !== $sub_sub_r) ? $nl.' AND (G_'.$id.'.g IN ('.$sub_sub_r.'))' : ''; // /* ' . str_replace('#' , '::', $set['graph']) . ' */';
+                $sub_r .= ('' !== $sub_sub_r) ? $nl.' AND (G_'.$id.'.g IN ('.$sub_sub_r.'))' : '';
                 /* other graph join conditions */
                 foreach ($this->index['graph_vars'] as $var => $occurs) {
                     $occur_tbls = [];
@@ -901,7 +903,6 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler
                         }
                     }
                 }
-                //$cur_prefix = $prefix ? $prefix . ' ' : 'STRAIGHT_';
                 $cur_prefix = $prefix ? $prefix.' ' : '';
                 $r .= trim($cur_prefix.'JOIN '.$this->getGraphTable().' G_'.$id.' ON ('.$nl.'  (T_'.$id.'.t = G_'.$id.'.t)'.$sub_r.$nl.')');
             }
@@ -928,14 +929,14 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler
             $d_joins = $this->getDependentJoins($id);
             $added = [];
             $d_aliases = [];
-            //echo $id . ' =>' . print_r($d_joins, 1);
             $id_alias = 'T_'.$id.'.s';
             foreach ($d_joins as $alias) {
                 if (preg_match('/^(T|V|G)_([0-9\_]+)(_[spo])?\.([a-z\_]+)/', $alias, $m)) {
                     $tbl_type = $m[1];
                     $tbl_pattern_id = $m[2];
                     $suffix = $m[3];
-                    if (($tbl_pattern_id >= $id) && $this->sameOptional($tbl_pattern_id, $id)) {/* get rid of dependency permutations and nested optionals */
+                    /* get rid of dependency permutations and nested optionals */
+                    if (($tbl_pattern_id >= $id) && $this->sameOptional($tbl_pattern_id, $id)) {
                         if (!in_array($tbl_type.'_'.$tbl_pattern_id.$suffix, $added)) {
                             $sub_r .= $sub_r ? ' AND ' : '';
                             $sub_r .= $alias.' IS NULL';
@@ -946,7 +947,8 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler
                     }
                 }
             }
-            if (count($d_aliases) > 2) {/* @@todo fix this! */
+            /* TODO fix this! */
+            if (count($d_aliases) > 2) {
                 $sub_r1 = '  /* '.$id_alias.' dependencies */';
                 $sub_r2 = '(('.$id_alias.' IS NULL) OR (CONCAT('.implode(', ', $d_aliases).') IS NOT NULL))';
                 $r .= $r ? $nl.$sub_r1.$nl.'  AND '.$sub_r2 : $sub_r1.$nl.$sub_r2;

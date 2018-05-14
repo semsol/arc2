@@ -53,6 +53,171 @@ class SelectQueryTest extends ARC2_TestCase
             <http://s> <http://p1> "baz" .
         }');
 
+        $res = $this->fixture->query('SELECT * FROM <http://example.com/> WHERE {<http://s> <http://p1> ?o.}');
+        $this->assertEquals(
+            [
+                'query_type' => 'select',
+                'result' => [
+                    'variables' => [
+                        'o'
+                    ],
+                    'rows' => [
+                        [
+                            'o' => 'baz',
+                            'o type' => 'literal'
+                        ]
+                    ],
+                ],
+                'query_time' => $res['query_time']
+            ],
+            $res
+        );
+    }
+
+    // simulate a LEFT JOIN using OPTIONAL
+    public function testSelectLeftJoinUsingOptional()
+    {
+        // test data
+        $this->fixture->query('INSERT INTO <http://example.com/> {
+            <http://s1> <http://p1> <http://s2> .
+            <http://s1> <http://p1> <http://s3> .
+
+            <http://s2> <http://p1> <http://s3> .
+            <http://s2> <http://p1> <http://s4> .
+
+            <http://s3> <http://p1> <http://s1> .
+        }');
+
+        $res = $this->fixture->query('
+            SELECT * WHERE {
+                ?s <http://p1> ?o .
+                OPTIONAL {
+                    ?o <http://p1> ?o2 .
+                }
+            }
+        ');
+        $this->assertEquals(
+            [
+                'query_type' => 'select',
+                'result' => [
+                    'variables' => [
+                        's', 'o', 'o2'
+                    ],
+                    'rows' => [
+                        [
+                            's' => 'http://s3',
+                            's type' => 'uri',
+                            'o' => 'http://s1',
+                            'o type' => 'uri',
+                            'o2' => 'http://s2',
+                            'o2 type' => 'uri'
+                        ],
+                        [
+                            's' => 'http://s3',
+                            's type' => 'uri',
+                            'o' => 'http://s1',
+                            'o type' => 'uri',
+                            'o2' => 'http://s3',
+                            'o2 type' => 'uri'
+                        ],
+                        [
+                            's' => 'http://s1',
+                            's type' => 'uri',
+                            'o' => 'http://s2',
+                            'o type' => 'uri',
+                            'o2' => 'http://s3',
+                            'o2 type' => 'uri'
+                        ],
+                        [
+                            's' => 'http://s1',
+                            's type' => 'uri',
+                            'o' => 'http://s2',
+                            'o type' => 'uri',
+                            'o2' => 'http://s4',
+                            'o2 type' => 'uri'
+                        ],
+                        [
+                            's' => 'http://s1',
+                            's type' => 'uri',
+                            'o' => 'http://s3',
+                            'o type' => 'uri',
+                            'o2' => 'http://s1',
+                            'o2 type' => 'uri'
+                        ],
+                        [
+                            's' => 'http://s2',
+                            's type' => 'uri',
+                            'o' => 'http://s3',
+                            'o type' => 'uri',
+                            'o2' => 'http://s1',
+                            'o2 type' => 'uri'
+                        ],
+                        [
+                            's' => 'http://s2',
+                            's type' => 'uri',
+                            'o' => 'http://s4',
+                            'o type' => 'uri'
+                        ],
+                    ],
+                ],
+                'query_time' => $res['query_time']
+            ],
+            $res,
+            '',
+            0,
+            10,
+            true
+        );
+    }
+
+    // OPTIONAL, artifical query to extend coverage for store code. (ARC2_StoreSelectQueryHandler::sameOptional)
+    public function testSelectOptional()
+    {
+        // test data
+        $this->fixture->query('INSERT INTO <http://example.com/> {
+            <http://s1> <http://p1> <http://s2> .
+        }');
+
+        $res = $this->fixture->query('
+            SELECT * WHERE {
+                ?s <http://p1> ?o .
+                OPTIONAL {
+                    ?o <http://p1> ?o2 .
+                }
+                OPTIONAL {
+                    ?o <http://p1> ?o2 .
+                }
+            }
+        ');
+        $this->assertEquals(
+            [
+                'query_type' => 'select',
+                'result' => [
+                    'variables' => [
+                        's', 'o', 'o2'
+                    ],
+                    'rows' => [
+                        [
+                            's' => 'http://s1',
+                            's type' => 'uri',
+                            'o' => 'http://s2',
+                            'o type' => 'uri',
+                        ],
+                    ],
+                ],
+                'query_time' => $res['query_time']
+            ],
+            $res
+        );
+    }
+
+    public function testSelectNoWhereClause()
+    {
+        // test data
+        $this->fixture->query('INSERT INTO <http://example.com/> {
+            <http://s> <http://p1> "baz" .
+        }');
+
         $res = $this->fixture->query('SELECT * FROM <http://example.com/> {<http://s> <http://p1> ?o.}');
         $this->assertEquals(
             [
@@ -74,7 +239,596 @@ class SelectQueryTest extends ARC2_TestCase
         );
     }
 
-    public function testSelectRelationalGreatThan()
+    /*
+     * FILTER
+     */
+
+    // bound: is variable set?
+    public function testSelectFilterBoundNotBounding()
+    {
+        // test data
+        $this->fixture->query('INSERT INTO <http://example.com/> {
+            <http://s> <http://p1> "foo" .
+        }');
+
+        $res = $this->fixture->query('
+            SELECT ?s ?o WHERE {
+                ?s <http://p2> ?o .
+                FILTER (bound(?o))
+            }
+        ');
+        $this->assertEquals(
+            [
+                'query_type' => 'select',
+                'result' => [
+                    'variables' => [
+                        's', 'o'
+                    ],
+                    'rows' => []
+                ],
+                'query_time' => $res['query_time']
+            ],
+            $res
+        );
+    }
+
+    // bound: is variable set?
+    public function testSelectFilterBoundVariableBounded()
+    {
+        // test data
+        $this->fixture->query('INSERT INTO <http://example.com/> {
+            <http://s> <http://p1> "foo" .
+        }');
+
+        $res = $this->fixture->query('
+            SELECT ?s ?o WHERE {
+                ?s <http://p1> ?o .
+                FILTER (bound(?o))
+            }
+        ');
+        $this->assertEquals(
+            [
+                'query_type' => 'select',
+                'result' => [
+                    'variables' => [
+                        's', 'o'
+                    ],
+                    'rows' => [
+                        [
+                            's' => 'http://s',
+                            's type' => 'uri',
+                            'o' => 'foo',
+                            'o type' => 'literal',
+                        ]
+                    ]
+                ],
+                'query_time' => $res['query_time']
+            ],
+            $res
+        );
+    }
+
+    // datatype
+    public function testSelectFilterDatatype()
+    {
+        // test data
+        $this->fixture->query('INSERT INTO <http://example.com/> {
+            <http://s> <http://p1> 3 .
+        }');
+
+        $res = $this->fixture->query('
+            SELECT ?s ?o WHERE {
+                ?s <http://p1> ?o .
+                FILTER (datatype(?o) = xsd:integer)
+            }
+        ');
+        $this->assertEquals(
+            [
+                'query_type' => 'select',
+                'result' => [
+                    'variables' => [
+                        's', 'o'
+                    ],
+                    'rows' => [
+                        [
+                            's' => 'http://s',
+                            's type' => 'uri',
+                            'o' => '3',
+                            'o type' => 'literal',
+                            'o datatype' => 'http://www.w3.org/2001/XMLSchema#integer',
+                        ]
+                    ]
+                ],
+                'query_time' => $res['query_time']
+            ],
+            $res
+        );
+    }
+
+    // isBlank
+    public function testSelectFilterIsBlankFound()
+    {
+        // test data
+        $this->fixture->query('INSERT INTO <http://example.com/> {
+            <http://s> <http://p1> _:foo .
+        }');
+
+        $res = $this->fixture->query('
+            SELECT ?s ?o WHERE {
+                ?s <http://p1> ?o .
+                FILTER (isBlank(?o))
+            }
+        ');
+        $this->assertEquals(
+            [
+                'query_type' => 'select',
+                'result' => [
+                    'variables' => [
+                        's', 'o'
+                    ],
+                    'rows' => [
+                        [
+                            's' => 'http://s',
+                            's type' => 'uri',
+                            'o' => $res['result']['rows'][0]['o'],
+                            'o type' => 'bnode',
+                        ]
+                    ]
+                ],
+                'query_time' => $res['query_time']
+            ],
+            $res
+        );
+    }
+
+    // isBlank
+    public function testSelectFilterIsBlankNotFound()
+    {
+        // test data
+        $this->fixture->query('INSERT INTO <http://example.com/> {
+            <http://s> <http://p1> <http://foo> .
+        }');
+
+        $res = $this->fixture->query('
+            SELECT ?s ?o WHERE {
+                ?s <http://p1> ?o .
+                FILTER (isBlank(?o))
+            }
+        ');
+        $this->assertEquals(
+            [
+                'query_type' => 'select',
+                'result' => [
+                    'variables' => [
+                        's', 'o'
+                    ],
+                    'rows' => []
+                ],
+                'query_time' => $res['query_time']
+            ],
+            $res
+        );
+    }
+
+    // isIri
+    public function testSelectFilterIsIriFound()
+    {
+        // test data
+        $this->fixture->query('INSERT INTO <http://example.com/> {
+            <http://s> <http://p1> <urn:id> .
+        }');
+
+        $res = $this->fixture->query('
+            SELECT ?s ?o WHERE {
+                ?s <http://p1> ?o .
+                FILTER (isIri(?o))
+            }
+        ');
+        $this->assertEquals(
+            [
+                'query_type' => 'select',
+                'result' => [
+                    'variables' => [
+                        's', 'o'
+                    ],
+                    'rows' => [
+                        [
+                            's' => 'http://s',
+                            's type' => 'uri',
+                            'o' => 'urn:id',
+                            'o type' => 'uri',
+                        ]
+                    ]
+                ],
+                'query_time' => $res['query_time']
+            ],
+            $res
+        );
+    }
+
+    // isIri
+    public function testSelectFilterIsIriNotFound()
+    {
+        // test data
+        $this->fixture->query('INSERT INTO <http://example.com/> {
+            <http://s> <http://p1> "foo" .
+        }');
+
+        $res = $this->fixture->query('
+            SELECT ?s ?o WHERE {
+                ?s <http://p1> ?o .
+                FILTER (isIri(?o))
+            }
+        ');
+        $this->assertEquals(
+            [
+                'query_type' => 'select',
+                'result' => [
+                    'variables' => [
+                        's', 'o'
+                    ],
+                    'rows' => []
+                ],
+                'query_time' => $res['query_time']
+            ],
+            $res
+        );
+    }
+
+    // isLiteral
+    public function testSelectFilterIsLiteralFound()
+    {
+        // test data
+        $this->fixture->query('INSERT INTO <http://example.com/> {
+            <http://s> <http://p1> "foo" .
+        }');
+
+        $res = $this->fixture->query('
+            SELECT ?s ?o WHERE {
+                ?s <http://p1> ?o .
+                FILTER (isLiteral(?o))
+            }
+        ');
+        $this->assertEquals(
+            [
+                'query_type' => 'select',
+                'result' => [
+                    'variables' => [
+                        's', 'o'
+                    ],
+                    'rows' => [
+                        [
+                            's' => 'http://s',
+                            's type' => 'uri',
+                            'o' => 'foo',
+                            'o type' => 'literal',
+                        ]
+                    ]
+                ],
+                'query_time' => $res['query_time']
+            ],
+            $res
+        );
+    }
+
+    // isLiteral
+    public function testSelectFilterIsLiteralNotFound()
+    {
+        // test data
+        $this->fixture->query('INSERT INTO <http://example.com/> {
+            <http://s> <http://p1> <http://foo> .
+        }');
+
+        $res = $this->fixture->query('
+            SELECT ?s ?o WHERE {
+                ?s <http://p1> ?o .
+                FILTER (isLiteral(?o))
+            }
+        ');
+        $this->assertEquals(
+            [
+                'query_type' => 'select',
+                'result' => [
+                    'variables' => [
+                        's', 'o'
+                    ],
+                    'rows' => []
+                ],
+                'query_time' => $res['query_time']
+            ],
+            $res
+        );
+    }
+
+    // isUri
+    public function testSelectFilterIsUriFound()
+    {
+        // test data
+        $this->fixture->query('INSERT INTO <http://example.com/> {
+            <http://s> <http://p1> <urn:id> .
+        }');
+
+        $res = $this->fixture->query('
+            SELECT ?s ?o WHERE {
+                ?s <http://p1> ?o .
+                FILTER (isUri(?o))
+            }
+        ');
+        $this->assertEquals(
+            [
+                'query_type' => 'select',
+                'result' => [
+                    'variables' => [
+                        's', 'o'
+                    ],
+                    'rows' => [
+                        [
+                            's' => 'http://s',
+                            's type' => 'uri',
+                            'o' => 'urn:id',
+                            'o type' => 'uri',
+                        ]
+                    ]
+                ],
+                'query_time' => $res['query_time']
+            ],
+            $res
+        );
+    }
+
+    // isUri
+    public function testSelectFilterIsUriNotFound()
+    {
+        // test data
+        $this->fixture->query('INSERT INTO <http://example.com/> {
+            <http://s> <http://p1> "foo" .
+        }');
+
+        $res = $this->fixture->query('
+            SELECT ?s ?o WHERE {
+                ?s <http://p1> ?o .
+                FILTER (isUri(?o))
+            }
+        ');
+        $this->assertEquals(
+            [
+                'query_type' => 'select',
+                'result' => [
+                    'variables' => [
+                        's', 'o'
+                    ],
+                    'rows' => []
+                ],
+                'query_time' => $res['query_time']
+            ],
+            $res
+        );
+    }
+
+    // lang: test behavior when using a language
+    public function testSelectFilterLang()
+    {
+        // test data
+        $this->fixture->query('INSERT INTO <http://example.com/> {
+            <http://s> <http://p1> "foo" .
+            <http://s> <http://p1> "in de"@de .
+            <http://s> <http://p1> "in en"@en .
+        }');
+
+        $res = $this->fixture->query('
+            SELECT ?s ?o WHERE {
+                ?s <http://p1> ?o .
+                FILTER (lang(?o) = "en")
+            }
+        ');
+        $this->assertEquals(
+            [
+                'query_type' => 'select',
+                'result' => [
+                    'variables' => [
+                        's', 'o'
+                    ],
+                    'rows' => [
+                        [
+                            's' => 'http://s',
+                            's type' => 'uri',
+                            'o' => 'in en',
+                            'o type' => 'literal',
+                            'o lang' => 'en'
+                        ]
+                    ],
+                ],
+                'query_time' => $res['query_time']
+            ],
+            $res
+        );
+    }
+
+    // langMatches
+    public function testSelectFilterLangMatches()
+    {
+        // test data
+        $this->fixture->query('INSERT INTO <http://example.com/> {
+            <http://s> <http://p1> "foo" .
+            <http://s> <http://p1> "in de"@de .
+            <http://s> <http://p1> "in en"@en .
+        }');
+
+        $res = $this->fixture->query('
+            SELECT ?s ?o WHERE {
+                ?s <http://p1> ?o .
+                FILTER langMatches (lang(?o), "en")
+            }
+        ');
+        $this->assertEquals(
+            [
+                'query_type' => 'select',
+                'result' => [
+                    'variables' => [
+                        's', 'o'
+                    ],
+                    'rows' => [
+                        [
+                            's' => 'http://s',
+                            's type' => 'uri',
+                            'o' => 'in en',
+                            'o type' => 'literal',
+                            'o lang' => 'en'
+                        ]
+                    ],
+                ],
+                'query_time' => $res['query_time']
+            ],
+            $res
+        );
+    }
+
+    // regex
+    public function testSelectFilterRegex()
+    {
+        // test data
+        $this->fixture->query('INSERT INTO <http://example.com/> {
+            <http://s> <http://p1> "Alice".
+            <http://s2> <http://p1> "Bob" .
+        }');
+
+        $res = $this->fixture->query('
+            SELECT ?s ?o WHERE {
+                ?s <http://p1> ?o .
+                FILTER regex (?o, "^Ali")
+            }
+        ');
+        $this->assertEquals(
+            [
+                'query_type' => 'select',
+                'result' => [
+                    'variables' => [
+                        's', 'o'
+                    ],
+                    'rows' => [
+                        [
+                            's' => 'http://s',
+                            's type' => 'uri',
+                            'o' => 'Alice',
+                            'o type' => 'literal'
+                        ]
+                    ],
+                ],
+                'query_time' => $res['query_time']
+            ],
+            $res
+        );
+    }
+
+    // regex
+    public function testSelectFilterRegexWithModifier()
+    {
+        // test data
+        $this->fixture->query('INSERT INTO <http://example.com/> {
+            <http://s> <http://p1> "Alice".
+            <http://s2> <http://p1> "Bob" .
+        }');
+
+        $res = $this->fixture->query('
+            SELECT ?s ?o WHERE {
+                ?s <http://p1> ?o .
+                FILTER regex (?o, "^ali", "i")
+            }
+        ');
+        $this->assertEquals(
+            [
+                'query_type' => 'select',
+                'result' => [
+                    'variables' => [
+                        's', 'o'
+                    ],
+                    'rows' => [
+                        [
+                            's' => 'http://s',
+                            's type' => 'uri',
+                            'o' => 'Alice',
+                            'o type' => 'literal'
+                        ]
+                    ],
+                ],
+                'query_time' => $res['query_time']
+            ],
+            $res
+        );
+    }
+
+    // str
+    public function testSelectFilterStr()
+    {
+        // test data
+        $this->fixture->query('INSERT INTO <http://example.com/> {
+            <http://s> <http://p1> "foo" .
+            <http://s> <http://p1> "in de"@de .
+            <http://s> <http://p1> "in en"@en .
+        }');
+
+        $res = $this->fixture->query('
+            SELECT ?s ?o WHERE {
+                ?s <http://p1> ?o .
+                FILTER (str(?o) = "in en")
+            }
+        ');
+        $this->assertEquals(
+            [
+                'query_type' => 'select',
+                'result' => [
+                    'variables' => [
+                        's', 'o'
+                    ],
+                    'rows' => [
+                        [
+                            's' => 'http://s',
+                            's type' => 'uri',
+                            'o' => 'in en',
+                            'o type' => 'literal',
+                            'o lang' => 'en'
+                        ]
+                    ],
+                ],
+                'query_time' => $res['query_time']
+            ],
+            $res
+        );
+    }
+
+    // str
+    public function testSelectFilterStrNotFound()
+    {
+        // test data
+        $this->fixture->query('INSERT INTO <http://example.com/> {
+            <http://s> <http://p1> "foo" .
+            <http://s> <http://p1> "in de"@de .
+            <http://s> <http://p1> "in en"@en .
+        }');
+
+        $res = $this->fixture->query('
+            SELECT ?s ?o WHERE {
+                ?s <http://p1> ?o .
+                FILTER (str(?o) = "in it")
+            }
+        ');
+        $this->assertEquals(
+            [
+                'query_type' => 'select',
+                'result' => [
+                    'variables' => [
+                        's', 'o'
+                    ],
+                    'rows' => [],
+                ],
+                'query_time' => $res['query_time']
+            ],
+            $res
+        );
+    }
+
+    // >
+    public function testSelectFilterRelationalGreatThan()
     {
         // test data
         $this->fixture->query('INSERT INTO <http://example.com/> {
@@ -107,7 +861,8 @@ class SelectQueryTest extends ARC2_TestCase
         );
     }
 
-    public function testSelectRelationalSmallerThan()
+    // <
+    public function testSelectFilterRelationalSmallerThan()
     {
         // test data
         $this->fixture->query('INSERT INTO <http://example.com/> {
@@ -140,7 +895,8 @@ class SelectQueryTest extends ARC2_TestCase
         );
     }
 
-    public function testSelectRelationalEqual()
+    // =
+    public function testSelectFilterRelationalEqual()
     {
         // test data
         $this->fixture->query('INSERT INTO <http://example.com/> {
@@ -173,7 +929,8 @@ class SelectQueryTest extends ARC2_TestCase
         );
     }
 
-    public function testSelectRelationalNotEqual()
+    // !=
+    public function testSelectFilterRelationalNotEqual()
     {
         // test data
         $this->fixture->query('INSERT INTO <http://example.com/> {
@@ -203,70 +960,6 @@ class SelectQueryTest extends ARC2_TestCase
                 'query_time' => $res['query_time']
             ],
             $res
-        );
-    }
-
-    public function testSelectSameTerm()
-    {
-        // test data
-        $this->fixture->query('INSERT INTO <http://example.com/> {
-            <http://container1> <http://weight> "100" .
-            <http://container2> <http://weight> "100" .
-        }');
-
-        $res = $this->fixture->query('SELECT ?c1 ?c2 WHERE {
-            ?c1 ?weight ?w1.
-
-            ?c2 ?weight ?w2.
-
-            FILTER (sameTerm(?w1, ?w2))
-        }');
-        $this->assertEquals(
-            [
-                'query_type' => 'select',
-                'result' => [
-                    'variables' => [
-                        'c1', 'c2'
-                    ],
-                    'rows' => [
-                        [
-                            'c1' => 'http://container1',
-                            'c1 type' => 'uri',
-                            'c2' => 'http://container1',
-                            'c2 type' => 'uri',
-                        ],
-                        [
-                            'c1' => 'http://container2',
-                            'c1 type' => 'uri',
-                            'c2' => 'http://container1',
-                            'c2 type' => 'uri',
-                        ],
-                        [
-                            'c1' => 'http://container1',
-                            'c1 type' => 'uri',
-                            'c2' => 'http://container2',
-                            'c2 type' => 'uri',
-                        ],
-                        [
-                            'c1' => 'http://container2',
-                            'c1 type' => 'uri',
-                            'c2' => 'http://container2',
-                            'c2 type' => 'uri',
-                        ],
-                    ],
-                ],
-                'query_time' => $res['query_time']
-            ],
-            $res,
-            '',
-            0,
-            10,
-            true
-        );
-
-        $this->markTestSkipped(
-            'ARC2: solving sameterm does not work properly. The result contains elements multiple times. '
-            . PHP_EOL . 'Expected behavior is described here: https://www.w3.org/TR/rdf-sparql-query/#func-sameTerm'
         );
     }
 
@@ -623,5 +1316,52 @@ class SelectQueryTest extends ARC2_TestCase
 
         // query false, therefore 0 as result
         $this->assertEquals(0, $res);
+    }
+
+    /*
+     * UNION
+     */
+
+    public function testSelectUnion()
+    {
+        // test data
+        $this->fixture->query('INSERT INTO <http://example.com/> {
+            <http://person1> <http://id> "1" .
+            <http://person3> <http://id> "3" .
+            <http://person2> <http://id> "2" .
+        }');
+
+        $res = $this->fixture->query('
+            SELECT * WHERE {
+                {
+                    ?p <http://id> "1" .
+                } UNION {
+                    ?p <http://id> "3" .
+                }
+            }
+        ');
+
+        $this->assertEquals(
+            [
+                'query_type' => 'select',
+                'result' => [
+                    'variables' => [
+                        'p'
+                    ],
+                    'rows' => [
+                        [
+                            'p' => 'http://person1',
+                            'p type' => 'uri',
+                        ],
+                        [
+                            'p' => 'http://person3',
+                            'p type' => 'uri',
+                        ],
+                    ],
+                ],
+                'query_time' => $res['query_time']
+            ],
+            $res
+        );
     }
 }

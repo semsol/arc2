@@ -40,7 +40,8 @@ class InsertIntoQueryTest extends ARC2_TestCase
             <http://s2> <http://foo> 2.0 .
             <http://s2> <http://foo> "3" .
             <http://s2> <http://foo> "4"^^xsd:integer .
-            _:foo <http://foo> "5" .
+            <http://s2> <http://foo> "5"@en .
+            _:foo <http://foo> "6" .
         }');
 
         $res = $this->fixture->query('SELECT * FROM <http://example.com/> {?s ?p ?o.}');
@@ -113,11 +114,20 @@ class InsertIntoQueryTest extends ARC2_TestCase
                     'o datatype' => 'http://www.w3.org/2001/XMLSchema#integer',
                 ],
                 [
-                    's' => $res['result']['rows'][7]['s'],
-                    's type' => 'bnode',
+                    's' => 'http://s2',
+                    's type' => 'uri',
                     'p' => 'http://foo',
                     'p type' => 'uri',
                     'o' => '5',
+                    'o type' => 'literal',
+                    'o lang' => 'en',
+                ],
+                [
+                    's' => $res['result']['rows'][8]['s'],
+                    's type' => 'bnode',
+                    'p' => 'http://foo',
+                    'p type' => 'uri',
+                    'o' => '6',
                     'o type' => 'literal',
                 ],
             ],
