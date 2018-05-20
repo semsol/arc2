@@ -1320,6 +1320,9 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler
         return '';
     }
 
+    /**
+     * @todo not in use, so remove?
+     */
     public function getRelationalExpressionSQL($pattern, $context, $val_type = '', $parent_type = '')
     {
         $r = '';
@@ -1338,6 +1341,9 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler
         return $r ? '('.$r.')' : $r;
     }
 
+    /**
+     * @todo not in use, so remove?
+     */
     public function getAdditiveExpressionSQL($pattern, $context, $val_type = '', $parent_type = '')
     {
         $r = '';
@@ -1354,6 +1360,9 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler
         return $r;
     }
 
+    /**
+     * @todo not in use, so remove?
+     */
     public function getMultiplicativeExpressionSQL($pattern, $context, $val_type = '', $parent_type = '')
     {
         $r = '';
@@ -1685,6 +1694,9 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler
         return '';
     }
 
+    /**
+     * @todo not in use, so remove?
+     */
     public function getSametermCallSQL($pattern, $context)
     {
         if (2 == count($pattern['args'])) {

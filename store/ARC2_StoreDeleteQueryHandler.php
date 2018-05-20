@@ -46,9 +46,13 @@ class ARC2_StoreDeleteQueryHandler extends ARC2_StoreQueryHandler
         if ($tc && ($this->refs_deleted || (1 == rand(1, 100)))) {
             $this->cleanTableReferences();
         }
+        // TODO What does this rand() call here? remove it and think about a cleaner way
+        //      when to trigger optimizeTables
         if ($tc && (1 == rand(1, 100))) {
             $this->store->optimizeTables();
         }
+        // TODO What does this rand() call here? remove it and think about a cleaner way
+        //      when to trigger cleanValueTables
         if ($tc && (1 == rand(1, 500))) {
             $this->cleanValueTables();
         }
@@ -120,7 +124,7 @@ class ARC2_StoreDeleteQueryHandler extends ARC2_StoreQueryHandler
             if ($gq) {
                 $sql = ($dbv < '04-01') ? 'DELETE '.$tbl_prefix.'g2t' : 'DELETE G';
                 $sql .= '
-          FROM '.$tbl_prefix.'g2t G 
+          FROM '.$tbl_prefix.'g2t G
           JOIN '.$this->getTripleTable().' T ON (T.t = G.t'.$gq.')
           WHERE '.$q.'
         ';
@@ -171,7 +175,7 @@ class ARC2_StoreDeleteQueryHandler extends ARC2_StoreQueryHandler
             /* delete unconnected triples */
             $sql = ($dbv < '04-01') ? 'DELETE '.$tbl_prefix.'triple' : 'DELETE T';
             $sql .= '
-        FROM '.$tbl_prefix.'triple T 
+        FROM '.$tbl_prefix.'triple T
         LEFT JOIN '.$tbl_prefix.'g2t G ON (G.t = T.t)
         WHERE G.t IS NULL
       ';
@@ -187,7 +191,7 @@ class ARC2_StoreDeleteQueryHandler extends ARC2_StoreQueryHandler
                 /* delete unconnected graph refs */
                 $sql = ($dbv < '04-01') ? 'DELETE '.$tbl_prefix.'g2t' : 'DELETE G';
                 $sql .= '
-          FROM '.$tbl_prefix.'g2t G 
+          FROM '.$tbl_prefix.'g2t G
           LEFT JOIN '.$tbl_prefix.'triple T ON (T.t = G.t)
           WHERE T.t IS NULL
         ';
@@ -210,7 +214,7 @@ class ARC2_StoreDeleteQueryHandler extends ARC2_StoreQueryHandler
         /* o2val */
         $sql = ($dbv < '04-01') ? 'DELETE '.$tbl_prefix.'o2val' : 'DELETE V';
         $sql .= '
-      FROM '.$tbl_prefix.'o2val V 
+      FROM '.$tbl_prefix.'o2val V
       LEFT JOIN '.$tbl_prefix.'triple T ON (T.o = V.id)
       WHERE T.t IS NULL
     ';
@@ -218,7 +222,7 @@ class ARC2_StoreDeleteQueryHandler extends ARC2_StoreQueryHandler
         /* s2val */
         $sql = ($dbv < '04-01') ? 'DELETE '.$tbl_prefix.'s2val' : 'DELETE V';
         $sql .= '
-      FROM '.$tbl_prefix.'s2val V 
+      FROM '.$tbl_prefix.'s2val V
       LEFT JOIN '.$tbl_prefix.'triple T ON (T.s = V.id)
       WHERE T.t IS NULL
     ';
@@ -226,7 +230,7 @@ class ARC2_StoreDeleteQueryHandler extends ARC2_StoreQueryHandler
         /* id2val */
         $sql = ($dbv < '04-01') ? 'DELETE '.$tbl_prefix.'id2val' : 'DELETE V';
         $sql .= '
-      FROM '.$tbl_prefix.'id2val V 
+      FROM '.$tbl_prefix.'id2val V
       LEFT JOIN '.$tbl_prefix.'g2t G ON (G.g = V.id)
       LEFT JOIN '.$tbl_prefix.'triple T1 ON (T1.p = V.id)
       LEFT JOIN '.$tbl_prefix.'triple T2 ON (T2.o_lang_dt = V.id)

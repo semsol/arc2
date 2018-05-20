@@ -173,6 +173,55 @@ class InsertIntoQueryTest extends ARC2_TestCase
         );
     }
 
+    public function testInsertIntoDate()
+    {
+        // test data
+        $this->fixture->query('INSERT INTO <http://example.com/> {
+            <http://s> <http://p1> "2009-05-28T18:03:38+09:00" .
+            <http://s> <http://p1> "2009-05-28T18:03:38+09:00GMT" .
+            <http://s> <http://p1> "21 August 2007" .
+        }');
+
+        $res = $this->fixture->query('SELECT * FROM <http://example.com/> {?s ?p ?o.}');
+
+        $this->assertEquals(
+            [
+                'query_type' => 'select',
+                'result' => [
+                    'variables' => ['s', 'p', 'o'],
+                    'rows' => [
+                        [
+                            's' => 'http://s',
+                            's type' => 'uri',
+                            'p' => 'http://p1',
+                            'p type' => 'uri',
+                            'o' => '2009-05-28T18:03:38+09:00',
+                            'o type' => 'literal',
+                        ],
+                        [
+                            's' => 'http://s',
+                            's type' => 'uri',
+                            'p' => 'http://p1',
+                            'p type' => 'uri',
+                            'o' => '2009-05-28T18:03:38+09:00GMT',
+                            'o type' => 'literal',
+                        ],
+                        [
+                            's' => 'http://s',
+                            's type' => 'uri',
+                            'p' => 'http://p1',
+                            'p type' => 'uri',
+                            'o' => '21 August 2007',
+                            'o type' => 'literal',
+                        ],
+                    ]
+                ],
+                'query_time' => $res['query_time']
+            ],
+            $res
+        );
+    }
+
     public function testInsertIntoList()
     {
         // test data
@@ -214,6 +263,35 @@ class InsertIntoQueryTest extends ARC2_TestCase
             ],
             $res['result']['rows']
         );
+    }
+
+    // show that ARC2 can't store long values
+    public function testInsertIntoLongValue()
+    {
+        // create long URI (ca. 250 chars)
+        $longURI = 'http://'.hash('sha512', 'long')
+            .hash('sha512', 'URI');
+
+        // test data
+        $this->fixture->query('INSERT INTO <http://graph> {
+            <'.$longURI.'/s> <'.$longURI.'/p> <'.$longURI.'/o> ;
+                             <'.$longURI.'/p2> <'.$longURI.'/o2> .
+        ');
+
+        $res = $this->fixture->query('SELECT * {?s ?p ?o.}');
+        $this->assertEquals(
+            [
+                'query_type' => 'select',
+                'result' => [
+                    'variables' => ['s', 'p', 'o'],
+                    'rows' => []
+                ],
+                'query_time' => $res['query_time']
+            ],
+            $res
+        );
+
+        $this->markTestSkipped('ARC2 can not store long values, e.g. URIs with around 250 chars.');
     }
 
     public function testInsertIntoListMoreComplex()
