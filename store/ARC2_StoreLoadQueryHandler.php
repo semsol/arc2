@@ -300,7 +300,9 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler
                 if (isset($m[3]) && ('Z' != $m[3])) {
                     $uts = strtotime(str_replace('T', ' ', $val));
                     if (preg_match('/([\+\-])([0-9]{2})\:?([0-9]{2})$/', $m[3], $sub_m)) {
-                        $diff_mins = (3600 * ltrim($sub_m[2], '0')) + ltrim($sub_m[3], '0');
+                        // without the explicit (int) casting, you will get the following error with PHP 7.1+
+                        // A non-numeric value encountered
+                        $diff_mins = (3600 * (int)ltrim($sub_m[2], '0')) + (int)ltrim($sub_m[3], '0');
                         $uts = ('-' == $sub_m[1]) ? $uts + $diff_mins : $uts - $diff_mins;
                         $val = date('Y-m-d\TH:i:s\Z', $uts);
                     }
