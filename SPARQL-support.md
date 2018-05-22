@@ -28,6 +28,8 @@ SELECT ?who COUNT(?contact) AS ?contacts WHERE {
 GROUP BY ?who
 ```
 
+ARC2 currently has a bug in the `SUM` ([100](https://github.com/semsol/arc2/issues/100)) and `AVG` ([99](https://github.com/semsol/arc2/issues/99)) function.
+
 #### Supported aggregate functions
 
 |         |                            AVG                             | COUNT | MIN | MAX | SUM |
@@ -35,13 +37,17 @@ GROUP BY ?who
 | Support | x (but [bugged](https://github.com/semsol/arc2/issues/99)) |   x   |  x  |  x  |  x  |
 
 
-### Relational
-
-#### Supported relational terms
+### Supported relational terms
 
 |         | = | != | < | > |
 |:--------|:-:|:--:|:-:|:-:|
 | Support | x | x  | x | x |
+
+### Supported FILTER functions
+
+|         | bound | datatype | isBlank | isIri | isLiteral | isUri | lang | langMatches | regex | str |
+|:--------|:-----:|:--------:|:-------:|:-----:|:---------:|:-----:|:----:|:-----------:|:-----:|:---:|
+| Support |   x   |    x     |    x    |   x   |     x     |   x   |  x   |      x      |   x   |  x  |
 
 ## LOAD
 ```sql
