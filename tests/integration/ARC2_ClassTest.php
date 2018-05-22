@@ -13,6 +13,7 @@ class ARC2_ClassTest extends ARC2_TestCase
         parent::setUp();
 
         $store = \ARC2::getStore($this->dbConfig);
+        $store->setup();
         $this->dbConnection = $store->getDBCon();
 
         $this->fixture = new \ARC2_Class([], $this);
