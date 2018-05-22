@@ -189,6 +189,11 @@ class ARC2_Store extends ARC2_Class
         return ($rs = $this->queryDB('SHOW PROCESSLIST', $this->getDBCon())) ? mysqli_num_rows($rs) : 0;
     }
 
+    /**
+     * Manipulating database processes using ARC2 is discouraged.
+     *
+     * @deprecated
+     */
     public function killDBProcesses($needle = '', $runtime = 30)
     {
         $dbcon = $this->getDBCon();

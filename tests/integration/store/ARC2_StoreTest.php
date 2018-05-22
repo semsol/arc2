@@ -324,6 +324,16 @@ XML;
         $this->assertEquals('bar', $this->fixture->getSetting('foo'));
     }
 
+    public function testGetAndSetSettingExistingSetting()
+    {
+        $this->assertEquals(0, $this->fixture->getSetting('foo'));
+
+        $this->fixture->setSetting('foo', 'bar');
+        $this->fixture->setSetting('foo', 'bar2'); // overrides existing setting
+
+        $this->assertEquals('bar2', $this->fixture->getSetting('foo'));
+    }
+
     /*
      * Tests for getLabelProps
      */
