@@ -38,3 +38,8 @@ composer require semsol/arc2:2.4.*
 | **MariaDB** | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |
 
 (1) As long as ARC2 uses mysqli, a connection to MySQL Server 8.0 is not possible. For more information, please look [here](https://github.com/semsol/arc2/commit/0ad48d61753b15ae02ff19f615b14aa52b6557f1). But its planned to switch to PDO ([issue](https://github.com/semsol/arc2/issues/109))
+
+
+## RDF triple store
+
+Please have a look into [SPARQL-support.md](SPARQL-support.md) to see which SPARQL 1.0/1.1 features are currently supported.
