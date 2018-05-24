@@ -114,6 +114,16 @@ class ARC2_Store extends ARC2_Class
         return $this->db_version;
     }
 
+    /**
+     * @return string Returns DBS name. Possible values: MySQL, MariaDB
+     */
+    public function getDBSName()
+    {
+        return false !== strpos($this->a['db_con']->server_info, 'MariaDB')
+            ? 'MariaDB'
+            : 'MySQL';
+    }
+
     public function getCollation()
     {
         $rs = $this->queryDB('SHOW TABLE STATUS LIKE "'.$this->getTablePrefix().'setting"', $this->getDBCon());

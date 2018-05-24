@@ -7,14 +7,15 @@ use Tests\ARC2_TestCase;
 class ARC2_ClassTest extends ARC2_TestCase
 {
     protected $dbConnection;
+    protected $store;
 
     public function setUp()
     {
         parent::setUp();
 
-        $store = \ARC2::getStore($this->dbConfig);
-        $store->setup();
-        $this->dbConnection = $store->getDBCon();
+        $this->store = \ARC2::getStore($this->dbConfig);
+        $this->store->setup();
+        $this->dbConnection = $this->store->getDBCon();
 
         $this->fixture = new \ARC2_Class([], $this);
     }
@@ -42,7 +43,8 @@ class ARC2_ClassTest extends ARC2_TestCase
         $this->assertFalse($result);
         $this->assertEquals(
             [
-                'You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near \'invalid-query\' at line 1'
+                'You have an error in your SQL syntax; check the manual that corresponds to your '
+                .$this->store->getDBSName().' server version for the right syntax to use near \'invalid-query\' at line 1'
             ],
             $this->fixture->errors
         );
