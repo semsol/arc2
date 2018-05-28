@@ -115,13 +115,13 @@ class ARC2_Store extends ARC2_Class
     }
 
     /**
-     * @return string Returns DBS name. Possible values: MySQL, MariaDB
+     * @return string Returns DBS name. Possible values: mysql, mariadb
      */
     public function getDBSName()
     {
         return false !== strpos($this->a['db_con']->server_info, 'MariaDB')
-            ? 'MariaDB'
-            : 'MySQL';
+            ? 'mariadb'
+            : 'mysql';
     }
 
     public function getCollation()

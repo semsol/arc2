@@ -41,10 +41,17 @@ class ARC2_ClassTest extends ARC2_TestCase
     {
         $result = $this->fixture->queryDB('invalid-query', $this->dbConnection, true);
         $this->assertFalse($result);
+
+        if ('mysql' == $this->store->getDBSName()) {
+            $dbsName = 'MySQL';
+        } else {
+            $dbsName = 'MariaDB';
+        }
+
         $this->assertEquals(
             [
                 'You have an error in your SQL syntax; check the manual that corresponds to your '
-                .$this->store->getDBSName().' server version for the right syntax to use near \'invalid-query\' at line 1'
+                .$dbsName.' server version for the right syntax to use near \'invalid-query\' at line 1'
             ],
             $this->fixture->errors
         );
