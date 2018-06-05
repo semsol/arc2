@@ -134,13 +134,12 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler
         $tmp_sql = 'CREATE TEMPORARY TABLE '.$tbl.' ( '.$this->getTempTableDef($tbl, $q_sql).') ';
         $tmp_sql .= (($v < '04-01-00') && ($v >= '04-00-18')) ? 'ENGINE' : (($v >= '04-01-02') ? 'ENGINE' : 'TYPE');
         $tmp_sql .= '='.$this->engine_type; /* HEAP doesn't support AUTO_INCREMENT, and MySQL breaks on MEMORY sometimes */
-        if (!$this->queryDB($tmp_sql, $con) && !$this->queryDB(str_replace('CREATE TEMPORARY', 'CREATE', $tmp_sql), $con)) {
-            return $this->addError(mysqli_error($con));
+        if (!$this->store->a['db_object']->mysqli()->query($tmp_sql)
+            && !$this->store->a['db_object']->mysqli()->query(str_replace('CREATE TEMPORARY', 'CREATE', $tmp_sql))) {
+            return $this->addError($this->store->a['db_object']->mysqli()->error);
         }
-        mysqli_query($con, 'INSERT INTO '.$tbl.' '."\n".$q_sql, MYSQLI_USE_RESULT);
-        $er = mysqli_error($con);
-        if (!empty($er)) {
-            $this->addError($er);
+        if (false == $this->store->a['db_object']->mysqli()->query('INSERT INTO '.$tbl.' '."\n".$q_sql)) {
+            $this->addError($this->store->a['db_object']->mysqli()->error);
         }
 
         return $tbl;
@@ -205,19 +204,22 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler
         /* result */
         $r = ['variables' => $vars];
         $v_sql = $this->getValueSQL($tmp_tbl, $q_sql);
-        //echo "\n\n" . $v_sql;
+
         $t1 = ARC2::mtime();
-        $con = $this->store->getDBCon();
-        $rs = mysqli_query($con, $v_sql, MYSQLI_USE_RESULT);
-        $er = mysqli_error($con);
-        if (!empty($er)) {
-            $this->addError($er);
+
+        try {
+            $entries = []; // in case an exception gets thrown
+
+            $entries = $this->store->a['db_object']->rawQuery($v_sql);
+        } catch (\Exception $e) {
+            $this->addError($e->getMessage());
         }
+
         $t2 = ARC2::mtime();
         $rows = [];
         $types = [0 => 'uri', 1 => 'bnode', 2 => 'literal'];
-        if ($rs) {
-            while ($pre_row = mysqli_fetch_array($rs)) {
+        if (0 < count($entries)) {
+            foreach($entries as $pre_row) {
                 $row = [];
                 foreach ($vars as $var) {
                     if (isset($pre_row[$var])) {
@@ -1443,7 +1445,7 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler
     {
         $val = $pattern['uri'];
         $r = $pattern['operator'];
-        $r .= is_numeric($val) ? ' '.$val : ' "'.mysqli_real_escape_string($this->store->getDBCon(), $val).'"';
+        $r .= is_numeric($val) ? ' '.$val : ' "'.$this->store->a['db_object']->escape($val).'"';
 
         return $r;
     }
@@ -1457,10 +1459,10 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler
         } elseif (preg_match('/^(true|false)$/i', $val) && ('http://www.w3.org/2001/XMLSchema#boolean' == $this->v1('datatype', '', $pattern))) {
             $r .= ' '.strtoupper($val);
         } elseif ('regex' == $parent_type) {
-            $sub_r = mysqli_real_escape_string($this->store->getDBCon(), $val);
+            $sub_r = $this->store->a['db_object']->escape($val);
             $r .= ' "'.preg_replace('/\x5c\x5c/', '\\', $sub_r).'"';
         } else {
-            $r .= ' "'.mysqli_real_escape_string($this->store->getDBCon(), $val).'"';
+            $r .= ' "'.$this->store->a['db_object']->escape($val).'"';
         }
         if (($lang_dt = $this->v1('lang', '', $pattern)) || ($lang_dt = $this->v1('datatype', '', $pattern))) {
             /* try table/alias via var in siblings */
@@ -1480,8 +1482,10 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler
                                 } else {
                                     $context_pattern_id = $pattern['id'];
                                 }
-                                if ($tbl == $context_pattern_id) {/* @todo better dependency check */
-                                    if ($term_id || ('http://www.w3.org/2001/XMLSchema#integer' != $lang_dt)) {/* skip if simple int, but no id */
+                                // TODO better dependency check
+                                if ($tbl == $context_pattern_id) {
+                                    if ($term_id || ('http://www.w3.org/2001/XMLSchema#integer' != $lang_dt)) {
+                                        /* skip, if simple int, but no id */
                                         $this->addConstraintSQLEntry($context_pattern_id, 'T_'.$tbl.'.o_lang_dt = '.$term_id.' /* '.preg_replace('/[\#\*\>]/', '::', $lang_dt).' */');
                                     }
                                 }
@@ -1806,10 +1810,11 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler
         $limit = $this->v('limit', -1, $this->infos['query']);
         $offset = $this->v('offset', -1, $this->infos['query']);
         if ($limit != -1) {
-            $offset = ($offset == -1) ? 0 : mysqli_real_escape_string($this->store->getDBCon(), $offset);
+            $offset = ($offset == -1) ? 0 : $this->store->a['db_object']->escape($offset);
             $r = 'LIMIT '.$offset.','.$limit;
         } elseif ($offset != -1) {
-            $r = 'LIMIT '.mysqli_real_escape_string($this->store->getDBCon(), $offset).',999999999999'; /* mysql doesn't support stand-alone offsets .. */
+            // mysql doesn't support stand-alone offsets
+            $r = 'LIMIT '.$this->store->a['db_object']->escape($offset).',999999999999';
         }
 
         return $r ? $nl.$r : '';

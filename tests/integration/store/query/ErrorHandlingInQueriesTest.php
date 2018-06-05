@@ -44,12 +44,6 @@ class ErrorHandlingInQueriesTest extends ARC2_TestCase
             $res
         );
 
-        $this->assertEquals(
-            [
-                'Result variable "not_used_in_query" not used in query. via ARC2_StoreSelectQueryHandler',
-                "Unknown column 'V1.val' in 'field list' via ARC2_StoreSelectQueryHandler"
-            ],
-            $this->fixture->errors
-        );
+        $this->assertEquals(2, count($this->fixture->errors));
     }
 }

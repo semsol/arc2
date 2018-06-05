@@ -32,17 +32,18 @@ class ARC2_StoreHelper extends ARC2_Class
             $con = $this->store->getDBCon();
             foreach (['id', 's', 'o'] as $id_col) {
                 $tbl = $this->store->getTablePrefix().$id_col.'2val';
-                $sql = 'SELECT id, val FROM '.$tbl.' WHERE val LIKE "'.mysqli_real_escape_string($con, $old_uri).'%"';
-                $rs = mysqli_query($con, $sql);
-                if (!$rs) {
+                $sql = 'SELECT id, val FROM '.$tbl.' WHERE val LIKE "'.$this->store->a['db_object']->escape($old_uri).'%"';
+                $rows = $this->store->a['db_object']->rawQuery($sql);
+
+                if (false == is_array($rows)) {
                     continue;
                 }
-                while ($row = mysqli_fetch_array($rs)) {
+                foreach($rows as $row) {
                     $new_val = str_replace($old_uri, $new_uri, $row['val']);
                     $new_id = $this->store->getTermID($new_val, $id_col);
                     if (!$new_id) {/* unknown ns uri, overwrite current id value */
-                        $sub_sql = 'UPDATE '.$tbl." SET val = '".mysqli_real_escape_string($con, $new_val)."' WHERE id = ".$row['id'];
-                        $sub_r = mysqli_query($con, $sub_sql);
+                        $sub_sql = 'UPDATE '.$tbl." SET val = '".$this->store->a['db_object']->escape($new_val)."' WHERE id = ".$row['id'];
+                        $sub_r = $this->store->a['db_object']->mysqli()->query($sub_sql);
                         ++$id_changes;
                     } else {/* replace ids */
                         $t_tbls = $this->store->getTables();
@@ -50,8 +51,8 @@ class ARC2_StoreHelper extends ARC2_Class
                             if (preg_match('/^triple/', $t_tbl)) {
                                 foreach (['s', 'p', 'o', 'o_lang_dt'] as $t_col) {
                                     $sub_sql = 'UPDATE '.$this->store->getTablePrefix().$t_tbl.' SET '.$t_col.' = '.$new_id.' WHERE '.$t_col.' = '.$row['id'];
-                                    $sub_r = mysqli_query($con, $sub_sql);
-                                    $t_changes += mysqli_affected_rows($con);
+                                    $sub_r = $this->store->a['db_object']->mysqli()->query($sub_sql);
+                                    $t_changes += $this->store->a['db_object']->mysqli()->affected_rows;
                                 }
                             }
                         }

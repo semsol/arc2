@@ -43,11 +43,11 @@ class ARC2_StoreDumper extends ARC2_Class
         $offset = 0;
         do {
             $proceed = 0;
-            $rs = $this->getRecordset($offset);
-            if (!$rs) {
+            $rows = $this->getRecordset($offset);
+            if (false == is_array($rows)) {
                 break;
             }
-            while ($row = mysqli_fetch_array($rs)) {
+            foreach($rows as $row) {
                 echo $this->getEntry($row);
                 $proceed = 1;
             }
@@ -68,11 +68,11 @@ class ARC2_StoreDumper extends ARC2_Class
         $offset = 0;
         do {
             $proceed = 0;
-            $rs = $this->getRecordset($offset);
-            if (!$rs) {
+            $rows = $this->getRecordset($offset);
+            if (false == is_array($rows)) {
                 break;
             }
-            while ($row = mysqli_fetch_array($rs)) {
+            foreach($rows as $row) {
                 fwrite($fp, $this->getEntry($row));
                 $proceed = 1;
             }
@@ -101,7 +101,6 @@ class ARC2_StoreDumper extends ARC2_Class
     public function getRecordset($offset)
     {
         $prefix = $this->store->getTablePrefix();
-        $con = $this->store->getDBCon();
         $sql = '
       SELECT
         VS.val AS s,
@@ -128,13 +127,13 @@ class ARC2_StoreDumper extends ARC2_Class
         if ($offset) {
             $sql .= ' OFFSET '.$offset;
         }
-        $rs = mysqli_query($con, $sql, MYSQLI_USE_RESULT);
-        $err = mysqli_error($con);
-        if (!empty($err)) {
-            return $this->addError($err);
+
+        $rows = $this->store->a['db_object']->rawQuery($sql);
+        if (false == empty($this->store->a['db_object']->mysqli()->error)) {
+            return $this->addError($this->store->a['db_object']->mysqli()->error);
         }
 
-        return $rs;
+        return $rows;
     }
 
     public function getHeader()

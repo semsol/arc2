@@ -71,11 +71,10 @@ class ARC2_StoreDeleteQueryHandler extends ARC2_StoreQueryHandler
     {
         $tbl_prefix = $this->store->getTablePrefix();
         $r = 0;
-        $con = $this->store->getDBCon();
         foreach ($this->infos['query']['target_graphs'] as $g) {
             if ($g_id = $this->getTermID($g, 'g')) {
-                $rs = mysqli_query($con, 'DELETE FROM '.$tbl_prefix.'g2t WHERE g = '.$g_id);
-                $r += mysqli_affected_rows($con);
+                $this->store->a['db_object']->mysqli()->query('DELETE FROM '.$tbl_prefix.'g2t WHERE g = '.$g_id);
+                $r += $this->store->a['db_object']->mysqli()->affected_rows;
             }
         }
         $this->refs_deleted = $r ? 1 : 0;
@@ -88,7 +87,6 @@ class ARC2_StoreDeleteQueryHandler extends ARC2_StoreQueryHandler
         $r = 0;
         $dbv = $this->store->getDBVersion();
         $tbl_prefix = $this->store->getTablePrefix();
-        $con = $this->store->getDBCon();
         /* graph restriction */
         $tgs = $this->infos['query']['target_graphs'];
         $gq = '';
@@ -133,13 +131,11 @@ class ARC2_StoreDeleteQueryHandler extends ARC2_StoreQueryHandler
                 $sql = ($dbv < '04-01') ? 'DELETE '.$this->getTripleTable() : 'DELETE T';
                 $sql .= ' FROM '.$this->getTripleTable().' T WHERE '.$q;
             }
-            //$rs = mysql_query($sql, $con);
-            $rs = $this->queryDB($sql, $con);
-            $er = mysqli_error($con);
-            if (!empty($er)) {
-                $this->addError($er.' in '.$sql);
+            $this->store->a['db_object']->mysqli()->query($sql);
+            if (!empty($this->store->a['db_object']->mysqli()->error)) {
+                $this->addError($this->store->a['db_object']->mysqli()->error.' in '.$sql);
             }
-            $r += mysqli_affected_rows($con);
+            $r += $this->store->a['db_object']->mysqli()->affected_rows;
         }
 
         return $r;
@@ -163,7 +159,6 @@ class ARC2_StoreDeleteQueryHandler extends ARC2_StoreQueryHandler
         if (!$this->store->getLock()) {
             return $this->addError('Could not get lock in "cleanTableReferences"');
         }
-        $con = $this->store->getDBCon();
         $tbl_prefix = $this->store->getTablePrefix();
         $dbv = $this->store->getDBVersion();
         /* check for unconnected triples */
@@ -171,7 +166,8 @@ class ARC2_StoreDeleteQueryHandler extends ARC2_StoreQueryHandler
       SELECT T.t FROM '.$tbl_prefix.'triple T LEFT JOIN '.$tbl_prefix.'g2t G ON ( G.t = T.t )
       WHERE G.t IS NULL LIMIT 1
     ';
-        if (($rs = mysqli_query($con, $sql)) && mysqli_num_rows($rs)) {
+        $result = $this->store->a['db_object']->mysqli()->query($sql);
+        if (0 < $result->num_rows) {
             /* delete unconnected triples */
             $sql = ($dbv < '04-01') ? 'DELETE '.$tbl_prefix.'triple' : 'DELETE T';
             $sql .= '
@@ -179,24 +175,25 @@ class ARC2_StoreDeleteQueryHandler extends ARC2_StoreQueryHandler
         LEFT JOIN '.$tbl_prefix.'g2t G ON (G.t = T.t)
         WHERE G.t IS NULL
       ';
-            mysqli_query($con, $sql);
+            $result = $this->store->a['db_object']->mysqli()->query($sql);
         }
         /* check for unconnected graph refs */
         if ((1 == rand(1, 10))) {
             $sql = '
-        SELECT G.g FROM '.$tbl_prefix.'g2t G LEFT JOIN '.$tbl_prefix.'triple T ON ( T.t = G.t )
-        WHERE T.t IS NULL LIMIT 1
-      ';
-            if (($rs = mysqli_query($con, $sql)) && mysqli_num_rows($rs)) {
+                SELECT G.g FROM '.$tbl_prefix.'g2t G LEFT JOIN '.$tbl_prefix.'triple T ON ( T.t = G.t )
+                WHERE T.t IS NULL LIMIT 1
+            ';
+            $result = $this->store->a['db_object']->mysqli()->query($sql);
+            if (0 < $result->num_rows) {
                 /* delete unconnected graph refs */
                 $sql = ($dbv < '04-01') ? 'DELETE '.$tbl_prefix.'g2t' : 'DELETE G';
                 $sql .= '
-          FROM '.$tbl_prefix.'g2t G
-          LEFT JOIN '.$tbl_prefix.'triple T ON (T.t = G.t)
-          WHERE T.t IS NULL
-        ';
-                mysqli_query($con, $sql);
-            }
+                    FROM '.$tbl_prefix.'g2t G
+                    LEFT JOIN '.$tbl_prefix.'triple T ON (T.t = G.t)
+                    WHERE T.t IS NULL
+                ';
+                $this->store->a['db_object']->mysqli()->query($sql);
+             }
         }
         /* release lock */
         $this->store->releaseLock();
@@ -208,7 +205,6 @@ class ARC2_StoreDeleteQueryHandler extends ARC2_StoreQueryHandler
         if (!$this->store->getLock()) {
             return $this->addError('Could not get lock in "cleanValueTables"');
         }
-        $con = $this->store->getDBCon();
         $tbl_prefix = $this->store->getTablePrefix();
         $dbv = $this->store->getDBVersion();
         /* o2val */
@@ -218,7 +214,7 @@ class ARC2_StoreDeleteQueryHandler extends ARC2_StoreQueryHandler
       LEFT JOIN '.$tbl_prefix.'triple T ON (T.o = V.id)
       WHERE T.t IS NULL
     ';
-        mysqli_query($con, $sql);
+        $this->store->a['db_object']->mysqli()->query($sql);
         /* s2val */
         $sql = ($dbv < '04-01') ? 'DELETE '.$tbl_prefix.'s2val' : 'DELETE V';
         $sql .= '
@@ -226,7 +222,7 @@ class ARC2_StoreDeleteQueryHandler extends ARC2_StoreQueryHandler
       LEFT JOIN '.$tbl_prefix.'triple T ON (T.s = V.id)
       WHERE T.t IS NULL
     ';
-        mysqli_query($con, $sql);
+        $this->store->a['db_object']->mysqli()->query($sql);
         /* id2val */
         $sql = ($dbv < '04-01') ? 'DELETE '.$tbl_prefix.'id2val' : 'DELETE V';
         $sql .= '
@@ -236,7 +232,9 @@ class ARC2_StoreDeleteQueryHandler extends ARC2_StoreQueryHandler
       LEFT JOIN '.$tbl_prefix.'triple T2 ON (T2.o_lang_dt = V.id)
       WHERE G.g IS NULL AND T1.t IS NULL AND T2.t IS NULL
     ';
-        //mysql_query($sql, $con);
+        // TODO was commented out before. could this be a problem?
+        $this->store->a['db_object']->mysqli()->query($sql);
+
         /* release lock */
         $this->store->releaseLock();
     }

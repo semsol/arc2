@@ -28,7 +28,7 @@ class ARC2_ClassTest extends ARC2_TestCase
     {
         $result = $this->fixture->queryDB('SHOW TABLES', $this->dbConnection);
         $this->assertEquals(1, $result->field_count);
-        $this->assertEquals(6, $result->num_rows);
+        $this->assertTrue(0 < $result->num_rows);
     }
 
     public function testQueryDBInvalidQuery()
