@@ -21,7 +21,6 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler
     {/* db_con */
         parent::__init();
         $this->store = $this->caller;
-        $con = $this->store->getDBCon();
         $this->handler_type = 'select';
         $this->engine_type = $this->v('store_engine_type', 'MyISAM', $this->a);
         $this->cache_results = $this->v('store_cache_results', 0, $this->a);
@@ -29,7 +28,6 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler
 
     public function runQuery($infos)
     {
-        $con = $this->store->getDBCon();
         $rf = $this->v('result_format', '', $infos);
         $this->infos = $infos;
         $this->infos['null_vars'] = [];
@@ -53,7 +51,7 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler
         $r = $this->getFinalQueryResult($q_sql, $tmp_tbl);
         /* remove intermediate results */
         if (!$this->cache_results) {
-            $this->queryDB('DROP TABLE IF EXISTS '.$tmp_tbl, $con);
+            $this->getDBObjectFromARC2Class()->query('DROP TABLE IF EXISTS '.$tmp_tbl);
         }
 
         return $r;
@@ -121,7 +119,6 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler
 
     public function createTempTable($q_sql)
     {
-        $con = $this->store->getDBCon();
         $v = $this->store->getDBVersion();
         if ($this->cache_results) {
             $tbl = $this->store->getTablePrefix().'Q'.md5($q_sql);
@@ -134,11 +131,11 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler
         $tmp_sql = 'CREATE TEMPORARY TABLE '.$tbl.' ( '.$this->getTempTableDef($tbl, $q_sql).') ';
         $tmp_sql .= (($v < '04-01-00') && ($v >= '04-00-18')) ? 'ENGINE' : (($v >= '04-01-02') ? 'ENGINE' : 'TYPE');
         $tmp_sql .= '='.$this->engine_type; /* HEAP doesn't support AUTO_INCREMENT, and MySQL breaks on MEMORY sometimes */
-        if (!$this->store->a['db_object']->plainQuery($tmp_sql)
-            && !$this->store->a['db_object']->plainQuery(str_replace('CREATE TEMPORARY', 'CREATE', $tmp_sql))) {
+        if (!$this->store->a['db_object']->query($tmp_sql)
+            && !$this->store->a['db_object']->query(str_replace('CREATE TEMPORARY', 'CREATE', $tmp_sql))) {
             return $this->addError($this->store->a['db_object']->getErrorMessage());
         }
-        if (false == $this->store->a['db_object']->plainQuery('INSERT INTO '.$tbl.' '."\n".$q_sql)) {
+        if (false == $this->store->a['db_object']->query('INSERT INTO '.$tbl.' '."\n".$q_sql)) {
             $this->addError($this->store->a['db_object']->getErrorMessage());
         }
 

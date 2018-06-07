@@ -11,11 +11,12 @@ class ARC2_StoreTest extends ARC2_TestCase
         parent::setUp();
 
         $this->fixture = \ARC2::getStore($this->dbConfig);
+        $this->fixture->createDBCon();
 
         // remove all tables
-        $res = $this->fixture->queryDB('SHOW TABLES', $this->fixture->getDBCon());
-        while($row = mysqli_fetch_array($res)) {
-            $this->fixture->queryDB('DROP TABLE '. $row[0], $this->fixture->getDBCon());
+        $tables = $this->fixture->getDBObject()->rawQuery('SHOW TABLES');
+        foreach($tables as $table) {
+            $this->fixture->getDBObject()->query('DROP TABLE '. $table['Tables_in_'.$this->dbConfig['db_name']]);
         }
 
         // fresh setup of ARC2
@@ -111,7 +112,7 @@ class ARC2_StoreTest extends ARC2_TestCase
 
     public function testCountDBProcesses()
     {
-        $this->assertTrue(0 < $this->fixture->countDBProcesses());
+        $this->assertTrue(is_integer($this->fixture->countDBProcesses()));
     }
 
     /*

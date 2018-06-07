@@ -481,18 +481,26 @@ class ARC2_Class {
     return $this->getMicrodataAttrs($id, $type);
   }
 
-  /* central DB query hook */
+    /* central DB query hook */
+
+    public function getDBObjectFromARC2Class($con = null)
+    {
+        if (!$this->db_object) {
+            if ($con) {
+                $this->db_object = new \ARC2\Store\Adapter\MysqliDbExtended($con);
+            } elseif (null == $this->db_object) {
+                $this->db_object = new \ARC2\Store\Adapter\MysqliDbExtended($this->a['db_host'], $this->a['db_user'], $this->a['db_pwd']);
+            }
+        }
+        return $this->db_object;
+    }
 
     public function queryDB($sql, $con, $log_errors = 0)
     {
         $t1 = ARC2::mtime();
 
         // use existing connection
-        if ($con) {
-            $this->db_object = new \ARC2\Store\Adapter\MysqliDbExtended($con);
-        } elseif (null == $this->db_object) {
-            $this->db_object = new \ARC2\Store\Adapter\MysqliDbExtended($this->a['db_host'], $this->a['db_user'], $this->a['db_pwd']);
-        }
+        $this->getDBObjectFromARC2Class($con);
 
         $r = $this->db_object->plainQuery($sql);
 
@@ -512,7 +520,7 @@ class ARC2_Class {
             $this->addError($this->db_object->getErrorMessage());
         }
         return $r;
-  }
+    }
 
   /**
    * Shortcut method to create an RDF/XML backup dump from an RDF Store object.

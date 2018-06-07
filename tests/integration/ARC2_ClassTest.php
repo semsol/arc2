@@ -14,6 +14,7 @@ class ARC2_ClassTest extends ARC2_TestCase
         parent::setUp();
 
         $this->store = \ARC2::getStore($this->dbConfig);
+        $this->store->createDBCon();
         $this->store->setup();
         $this->dbConnection = $this->store->getDBCon();
 
@@ -26,6 +27,9 @@ class ARC2_ClassTest extends ARC2_TestCase
 
     public function testQueryDB()
     {
+        $this->store->createDBCon();
+        $this->store->setup();
+
         $result = $this->fixture->queryDB('SHOW TABLES', $this->dbConnection);
         $this->assertEquals(1, $result->field_count);
         $this->assertTrue(0 < $result->num_rows);

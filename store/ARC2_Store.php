@@ -62,18 +62,18 @@ class ARC2_Store extends ARC2_Class
         $this->a['db_con'] = $this->db->mysqli();
         $this->a['db_object'] = $this->db;
 
-        if (true !== $this->db->plainQuery('USE `'.$this->a['db_name'].'`')) {
+        if (true !== $this->db->query('USE `'.$this->a['db_name'].'`')) {
             $fixed = 0;
             /* try to create it */
             if ($this->a['db_name']) {
-                $this->db->plainQuery('
+                $this->db->query('
                   CREATE DATABASE IF NOT EXISTS `'.$this->a['db_name'].'`
                   DEFAULT CHARACTER SET utf8
                   DEFAULT COLLATE utf8_general_ci
                   '
                 );
-                if ($this->db->plainQuery('USE `'.$this->a['db_name'].'`')) {
-                    $this->db->plainQuery("SET NAMES 'utf8'");
+                if ($this->db->query('USE `'.$this->a['db_name'].'`')) {
+                    $this->db->query("SET NAMES 'utf8'");
                     $fixed = 1;
                 }
             }
@@ -82,12 +82,17 @@ class ARC2_Store extends ARC2_Class
             }
         }
         if (preg_match('/^utf8/', $this->getCollation())) {
-            $this->db->plainQuery("SET NAMES 'utf8'");
+            $this->db->query("SET NAMES 'utf8'");
         }
         // This is RDF, we may need many JOINs...
-        $this->db->plainQuery('SET SESSION SQL_BIG_SELECTS=1');
+        $this->db->query('SET SESSION SQL_BIG_SELECTS=1');
 
         return true;
+    }
+
+    public function getDBObject()
+    {
+        return $this->db;
     }
 
     public function getDBCon($force = 0)
@@ -204,7 +209,7 @@ class ARC2_Store extends ARC2_Class
             return 1;
         }
         $tbl = $this->getTablePrefix().'o2val';
-        $this->db->plainQuery('CREATE FULLTEXT INDEX vft ON '.$tbl.'(val(128))');
+        $this->db->query('CREATE FULLTEXT INDEX vft ON '.$tbl.'(val(128))');
     }
 
     public function disableFulltextSearch()
@@ -213,17 +218,12 @@ class ARC2_Store extends ARC2_Class
             return 1;
         }
         $tbl = $this->getTablePrefix().'o2val';
-        $this->db->plainQuery('DROP INDEX vft ON '.$tbl);
+        $this->db->query('DROP INDEX vft ON '.$tbl);
     }
 
     public function countDBProcesses()
     {
-        $result = $this->db->plainQuery('SHOW PROCESSLIST');
-        if (false !== $result) {
-            return $result->num_rows;
-        } else {
-            return 0;
-        }
+        return $this->db->getNumberOfRows('SHOW PROCESSLIST');
     }
 
     /**
@@ -260,7 +260,7 @@ class ARC2_Store extends ARC2_Class
             if (!$kill) {
                 continue;
             }
-            $this->db->plainQuery('KILL '.$row['Id']);
+            $this->db->query('KILL '.$row['Id']);
         }
     }
 
@@ -274,7 +274,7 @@ class ARC2_Store extends ARC2_Class
         if (null !== $this->db) {
             $tbl = $this->getTablePrefix().'setting';
 
-            return $this->db->plainQuery('SELECT 1 FROM '.$tbl.' LIMIT 0') ? 1 : 0;
+            return $this->db->query('SELECT 1 FROM '.$tbl.' LIMIT 0') ? 1 : 0;
         }
 
         return 0;
@@ -282,7 +282,7 @@ class ARC2_Store extends ARC2_Class
 
     public function setUp($force = 0)
     {
-        if (($force || !$this->isSetUp()) && ($con = $this->getDBCon())) {
+        if (($force || !$this->isSetUp()) && $this->getDBCon()) {
             if ($this->getDBVersion() < '04-00-04') {
                 /* UPDATE + JOINs */
                 return $this->addError('MySQL version not supported. ARC requires version 4.0.4 or higher.');
@@ -340,14 +340,14 @@ class ARC2_Store extends ARC2_Class
             $sql = 'INSERT INTO '.$tbl." (k, val) VALUES ('".md5($k)."', '".$this->db->escape(serialize($v))."')";
         }
 
-        return $this->db->plainQuery($sql);
+        return $this->db->query($sql);
     }
 
     public function removeSetting($k)
     {
         $tbl = $this->getTablePrefix().'setting';
 
-        return $this->db->plainQuery('DELETE FROM '.$tbl." WHERE k = '".md5($k)."'");
+        return $this->db->query('DELETE FROM '.$tbl." WHERE k = '".md5($k)."'");
     }
 
     public function getQueueTicket()
@@ -357,12 +357,12 @@ class ARC2_Store extends ARC2_Class
         }
         $t = 'ticket_'.substr(md5(uniqid(rand())), 0, 10);
         /* lock */
-        $this->db->plainQuery('LOCK TABLES '.$this->getTablePrefix().'setting WRITE');
+        $this->db->query('LOCK TABLES '.$this->getTablePrefix().'setting WRITE');
         /* queue */
         $queue = $this->getSetting('query_queue', []);
         $queue[] = $t;
         $this->setSetting('query_queue', $queue);
-        $this->db->plainQuery('UNLOCK TABLES');
+        $this->db->query('UNLOCK TABLES');
         /* loop */
         $lc = 0;
         $queue = $this->getSetting('query_queue', []);
@@ -386,13 +386,13 @@ class ARC2_Store extends ARC2_Class
             return 1;
         }
         /* lock */
-        $this->db->plainQuery('LOCK TABLES '.$this->getTablePrefix().'setting WRITE');
+        $this->db->query('LOCK TABLES '.$this->getTablePrefix().'setting WRITE');
         /* queue */
         $vals = $this->getSetting('query_queue', []);
         $pos = array_search($t, $vals);
         $queue = ($pos < (count($vals) - 1)) ? array_slice($vals, $pos + 1) : [];
         $this->setSetting('query_queue', $queue);
-        $this->db->plainQuery('UNLOCK TABLES');
+        $this->db->query('UNLOCK TABLES');
     }
 
     public function reset($keep_settings = 0)
@@ -403,7 +403,7 @@ class ARC2_Store extends ARC2_Class
         $ps = $this->getSetting('split_predicates', []);
         foreach ($ps as $p) {
             $tbl = 'triple_'.abs(crc32($p));
-            $this->db->plainQuery('DROP TABLE '.$prefix.$tbl);
+            $this->db->query('DROP TABLE '.$prefix.$tbl);
         }
         $this->removeSetting('split_predicates');
         /* truncate tables */
@@ -411,7 +411,7 @@ class ARC2_Store extends ARC2_Class
             if ($keep_settings && ('setting' == $tbl)) {
                 continue;
             }
-            $this->db->plainQuery('TRUNCATE '.$prefix.$tbl);
+            $this->db->query('TRUNCATE '.$prefix.$tbl);
         }
     }
 
@@ -424,7 +424,7 @@ class ARC2_Store extends ARC2_Class
         $tbls = $this->getTables();
         $prefix = $this->getTablePrefix();
         foreach ($tbls as $tbl) {
-            $this->db->plainQuery('DROP TABLE '.$prefix.$tbl);
+            $this->db->query('DROP TABLE '.$prefix.$tbl);
         }
     }
 
@@ -480,7 +480,7 @@ class ARC2_Store extends ARC2_Class
         $new_prefix .= $new_prefix ? '_' : '';
         $new_prefix .= $name.'_';
         foreach ($tbls as $tbl) {
-            $this->db->plainQuery('RENAME TABLE '.$old_prefix.$tbl.' TO '.$new_prefix.$tbl);
+            $this->db->query('RENAME TABLE '.$old_prefix.$tbl.' TO '.$new_prefix.$tbl);
             if (!empty($this->db->getErrorMessage())) {
                 return $this->addError($this->db->getErrorMessage());
             }
@@ -499,7 +499,7 @@ class ARC2_Store extends ARC2_Class
         $old_prefix = $this->getTablePrefix();
         $new_prefix = $new_store->getTablePrefix();
         foreach ($tbls as $tbl) {
-            $this->db->plainQuery('INSERT IGNORE INTO '.$new_prefix.$tbl.' SELECT * FROM '.$old_prefix.$tbl);
+            $this->db->query('INSERT IGNORE INTO '.$new_prefix.$tbl.' SELECT * FROM '.$old_prefix.$tbl);
             if (!empty($this->db->getErrorMessage())) {
                 return $this->addError($this->db->getErrorMessage());
             }
@@ -513,7 +513,6 @@ class ARC2_Store extends ARC2_Class
         if ($log_query) {
             $this->logQuery($q);
         }
-        $con = $this->getDBCon();
         if (preg_match('/^dump/i', $q)) {
             $infos = ['query' => ['type' => 'dump']];
         } else {
@@ -703,7 +702,7 @@ class ARC2_Store extends ARC2_Class
 
     public function releaseLock()
     {
-        return $this->db->plainQuery('DO RELEASE_LOCK("'.$this->a['db_name'].'.'.$this->getTablePrefix().'.write_lock")');
+        return $this->db->query('DO RELEASE_LOCK("'.$this->a['db_name'].'.'.$this->getTablePrefix().'.write_lock")');
     }
 
     public function processTables($level = 2, $operation = 'optimize')
@@ -727,7 +726,7 @@ class ARC2_Store extends ARC2_Class
             $sql .= $sql ? ', ' : strtoupper($operation).' TABLE ';
             $sql .= $pre.$tbl;
         }
-        $this->db->plainQuery($sql);
+        $this->db->query($sql);
         if (false == empty($this->db->getErrorMessage())) {
             $this->addError($this->db->getErrorMessage().' in '.$sql);
         }
@@ -760,39 +759,46 @@ class ARC2_Store extends ARC2_Class
         return $c->changeNamespaceURI($old_uri, $new_uri);
     }
 
+    /**
+     * @param string $res URI
+     * @param string $unnamed_label How to label a resource without a name?
+     *
+     * @return string
+     */
     public function getResourceLabel($res, $unnamed_label = 'An unnamed resource')
     {
+        // init local label cache, if not set
         if (!isset($this->resource_labels)) {
             $this->resource_labels = [];
         }
+        // if we already know the label for the given resource
         if (isset($this->resource_labels[$res])) {
             return $this->resource_labels[$res];
         }
+        // if no URI was given, assume its a literal and return it
         if (!preg_match('/^[a-z0-9\_]+\:[^\s]+$/si', $res)) {
             return $res;
-        } /* literal */
+        }
+
         $ps = $this->getLabelProps();
         if ($this->getSetting('store_label_properties', '-') != md5(serialize($ps))) {
             $this->inferLabelProps($ps);
         }
-        //$sub_q .= $sub_q ? ' || ' : '';
-        //$sub_q .= 'REGEX(str(?p), "(last_name|name|fn|title|label)$", "i")';
-        $q = 'SELECT ?label WHERE { <'.$res.'> ?p ?label . ?p a <http://semsol.org/ns/arc#LabelProperty> } LIMIT 3';
-        $r = '';
-        $rows = $this->query($q, 'rows');
-        foreach ($rows as $row) {
-            $r = strlen($row['label']) > strlen($r) ? $row['label'] : $r;
+
+        foreach ($ps as $labelProperty) {
+            // send a query for each label property
+            $result = $this->query('SELECT ?label WHERE { <'.$res.'> <'.$labelProperty.'> ?label }');
+            if (isset($result['result']['rows'][0])) {
+                $this->resource_labels[$res] = $result['result']['rows'][0]['label'];
+                return $result['result']['rows'][0]['label'];
+            }
         }
-        if (!$r && preg_match('/^\_\:/', $res)) {
-            return $unnamed_label;
-        }
-        $r = $r ? $r : preg_replace("/^(.*[\/\#])([^\/\#]+)$/", '\\2', str_replace('#self', '', $res));
+
+        $r = preg_replace("/^(.*[\/\#])([^\/\#]+)$/", '\\2', str_replace('#self', '', $res));
         $r = str_replace('_', ' ', $r);
         $r = preg_replace_callback('/([a-z])([A-Z])/', function ($matches) {
             return $matches[1].' '.strtolower($matches[2]);
         }, $r);
-        $this->resource_labels[$res] = $r;
-
         return $r;
     }
 

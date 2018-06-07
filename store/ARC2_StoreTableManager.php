@@ -37,7 +37,6 @@ class ARC2_StoreTableManager extends ARC2_Store
 
     public function createTables()
     {
-        $con = $this->getDBCon();
         if (!$this->createTripleTable()) {
             return $this->addError('Could not create "triple" table ('.$this->a['db_object']->getErrorMessage().').');
         }
@@ -79,7 +78,7 @@ class ARC2_StoreTableManager extends ARC2_Store
         UNIQUE KEY (t), '.$index_code.' KEY (misc)
       ) '.$this->getTableOptionsCode().'
     ';
-        return $this->a['db_object']->plainQuery($sql);
+        return $this->a['db_object']->query($sql);
     }
 
     public function extendTripleTableColumns($suffix = 'triple')
@@ -93,7 +92,7 @@ class ARC2_StoreTableManager extends ARC2_Store
       MODIFY o_lang_dt int(10) UNSIGNED NOT NULL
     ';
 
-        return $this->a['db_object']->plainQuery($sql);
+        return $this->a['db_object']->query($sql);
     }
 
     public function createG2TTable()
@@ -106,7 +105,7 @@ class ARC2_StoreTableManager extends ARC2_Store
       ) '.$this->getTableOptionsCode().'
     ';
 
-        return $this->a['db_object']->plainQuery($sql);
+        return $this->a['db_object']->query($sql);
     }
 
     public function extendG2tTableColumns($suffix = 'g2t')
@@ -117,7 +116,7 @@ class ARC2_StoreTableManager extends ARC2_Store
       MODIFY t int(10) UNSIGNED NOT NULL
     ';
 
-        return $this->a['db_object']->plainQuery($sql);
+        return $this->a['db_object']->query($sql);
     }
 
     public function createID2ValTable()
@@ -134,7 +133,7 @@ class ARC2_StoreTableManager extends ARC2_Store
       ) '.$this->getTableOptionsCode().'
     ';
 
-        return $this->a['db_object']->plainQuery($sql);
+        return $this->a['db_object']->query($sql);
     }
 
     public function extendId2valTableColumns($suffix = 'id2val')
@@ -144,7 +143,7 @@ class ARC2_StoreTableManager extends ARC2_Store
       MODIFY id int(10) UNSIGNED NOT NULL
     ';
 
-        return $this->a['db_object']->plainQuery($sql);
+        return $this->a['db_object']->query($sql);
     }
 
     public function createS2ValTable()
@@ -161,7 +160,7 @@ class ARC2_StoreTableManager extends ARC2_Store
       ) '.$this->getTableOptionsCode().'
     ';
 
-        return $this->a['db_object']->plainQuery($sql);
+        return $this->a['db_object']->query($sql);
     }
 
     public function extendS2valTableColumns($suffix = 's2val')
@@ -171,7 +170,7 @@ class ARC2_StoreTableManager extends ARC2_Store
       MODIFY id int(10) UNSIGNED NOT NULL
     ';
 
-        return $this->a['db_object']->plainQuery($sql);
+        return $this->a['db_object']->query($sql);
     }
 
     public function createO2ValTable()
@@ -191,7 +190,7 @@ class ARC2_StoreTableManager extends ARC2_Store
       ) '.$this->getTableOptionsCode().'
     ';
 
-        return $this->a['db_object']->plainQuery($sql);
+        return $this->a['db_object']->query($sql);
     }
 
     public function extendO2valTableColumns($suffix = 'o2val')
@@ -201,7 +200,7 @@ class ARC2_StoreTableManager extends ARC2_Store
       MODIFY id int(10) UNSIGNED NOT NULL
     ';
 
-        return $this->a['db_object']->plainQuery($sql);
+        return $this->a['db_object']->query($sql);
     }
 
     public function createSettingTable()
@@ -214,12 +213,11 @@ class ARC2_StoreTableManager extends ARC2_Store
       ) '.$this->getTableOptionsCode().'
     ';
 
-        return $this->a['db_object']->plainQuery($sql);
+        return $this->a['db_object']->query($sql);
     }
 
     public function extendColumns()
     {
-        $con = $this->getDBCon();
         $tbl_prefix = $this->getTablePrefix();
         $tbls = $this->getTables();
         foreach ($tbls as $suffix) {
@@ -256,13 +254,12 @@ class ARC2_StoreTableManager extends ARC2_Store
         $old_tbl = $this->getTablePrefix().$suffix;
         $new_tbl = $this->getTablePrefix().'triple';
         $p_id = $this->getTermID($p, 'p');
-        $con = $this->getDBCon();
         $sql = '
       INSERT IGNORE INTO '.$new_tbl.'
       SELECT * FROM '.$old_tbl.' WHERE '.$old_tbl.'.p = '.$p_id.'
     ';
-        if ($this->a['db_object']->plainQuery($sql)) {
-            $this->a['db_object']->plainQuery('DROP TABLE '.$old_tbl);
+        if ($this->a['db_object']->query($sql)) {
+            $this->a['db_object']->query('DROP TABLE '.$old_tbl);
 
             return 1;
         } else {
@@ -277,17 +274,16 @@ class ARC2_StoreTableManager extends ARC2_Store
         $old_tbl = $this->getTablePrefix().'triple';
         $new_tbl = $this->getTablePrefix().$suffix;
         $p_id = $this->getTermID($p, 'p');
-        $con = $this->getDBCon();
         $sql = '
       INSERT IGNORE INTO '.$new_tbl.'
       SELECT * FROM '.$old_tbl.' WHERE '.$old_tbl.'.p = '.$p_id.'
     ';
-        if ($this->a['db_object']->plainQuery($sql)) {
-            $this->a['db_object']->plainQuery('DELETE FROM '.$old_tbl.' WHERE '.$old_tbl.'.p = '.$p_id);
+        if ($this->a['db_object']->query($sql)) {
+            $this->a['db_object']->query('DELETE FROM '.$old_tbl.' WHERE '.$old_tbl.'.p = '.$p_id);
 
             return 1;
         } else {
-            $this->a['db_object']->plainQuery('DROP TABLE '.$new_tbl);
+            $this->a['db_object']->query('DROP TABLE '.$new_tbl);
 
             return 0;
         }

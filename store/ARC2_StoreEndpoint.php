@@ -397,7 +397,6 @@ class ARC2_StoreEndpoint extends ARC2_Store
 
     public function getSPARQLJSONSelectResultDoc($r)
     {
-        $con = $this->getDBCon();
         $this->setHeader('content-type', 'Content-Type: application/sparql-results+json');
         $vars = $r['result']['variables'];
         $rows = $r['result']['rows'];

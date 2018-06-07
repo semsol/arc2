@@ -155,7 +155,6 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler
 
     public function getMaxTermID()
     {
-        $con = $this->store->getDBCon();
         $sql = '';
         foreach (['id2val', 's2val', 'o2val'] as $tbl) {
             $sql .= $sql ? ' UNION ' : '';
@@ -193,7 +192,6 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler
 
     public function getStoredTermID($val, $type_id, $tbl)
     {
-        $con = $this->store->getDBCon();
         /* buffered */
         if (isset($this->term_ids[$val])) {
             if (!isset($this->term_ids[$val][$tbl])) {
@@ -226,10 +224,13 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler
                     }
                 }
             } else {
-                $sql = 'SELECT id AS `id` FROM '.$tbl_prefix.$sub_tbl." WHERE val = BINARY '".$this->store->a['db_object']->escape($val)."'";
-                $result = $this->store->a['db_object']->plainQuery($sql);
-                if (0 < $result->num_rows) {
-                    $id = $result->fetch_array()['id'];
+                $binaryValue = $this->store->a['db_object']->escape($val);
+                if (false !== empty($binaryValue)) {
+                    $sql = 'SELECT id AS `id` FROM '.$tbl_prefix.$sub_tbl." WHERE val = BINARY '".$binaryValue."'";
+                    $row = $this->store->a['db_object']->rawQueryOne($sql);
+                    if (is_array($row) && isset($row['id'])) {
+                        $id = $row['id'];
+                    }
                 }
             }
             if ($id) {
@@ -257,7 +258,6 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler
 
     public function getTripleID($t)
     {
-        $con = $this->store->getDBCon();
         $val = serialize($t);
         /* buffered */
         if (isset($this->triple_ids[$val])) {
@@ -381,7 +381,6 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler
 
     public function bufferIDSQL($tbl, $id, $val, $val_type)
     {
-        $con = $this->store->getDBCon();
         $tbl = $tbl.'2val';
         if ('id2val' == $tbl) {
             $cols = 'id, val, val_type';
@@ -405,7 +404,6 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler
 
     public function checkSQLBuffers($force_write = 0, $reset_id_buffers = 0, $refresh_lock = 0, $split_tables = 0)
     {
-        $con = $this->store->getDBCon();
         if (!$this->keep_time_limit) {
             set_time_limit($this->v('time_limit', 60, $this->a));
         }
@@ -413,10 +411,10 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler
             $buffer_size = isset($this->sql_buffers[$tbl]) ? 1 : 0;
             if ($buffer_size && $force_write) {
                 $t1 = ARC2::mtime();
-                $this->store->a['db_object']->plainQuery($this->sql_buffers[$tbl]);
+                $this->store->a['db_object']->query($this->sql_buffers[$tbl]);
                 /* table error */
                 if (!empty($this->store->a['db_object']->getErrorMessage())) {
-                    $this->autoRepairTable($er, $con, $this->sql_buffers[$tbl]);
+                    $this->autoRepairTable($er, $this->sql_buffers[$tbl]);
                 }
                 unset($this->sql_buffers[$tbl]);
                 if ($this->log_inserts) {
@@ -458,7 +456,7 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler
         return 1;
     }
 
-    public function autoRepairTable($er, $con, $sql = '')
+    public function autoRepairTable($er, $sql = '')
     {
         $this->addError('MySQL error: '.$er.' ('.$sql.')');
         if (preg_match('/Table \'[^\']+\/([a-z0-9\_\-]+)\' .*(crashed|repair)/i', $er, $m)) {
