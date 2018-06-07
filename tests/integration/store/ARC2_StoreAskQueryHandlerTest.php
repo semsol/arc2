@@ -19,6 +19,11 @@ class ARC2_StoreAskQueryHandlerTest extends ARC2_TestCase
         $this->fixture = new \ARC2_StoreAskQueryHandler($this->store->a, $this->store);
     }
 
+    public function tearDown()
+    {
+        $this->store->closeDBCon();
+    }
+
     /*
      * Tests for __init
      */

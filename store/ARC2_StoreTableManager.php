@@ -39,22 +39,22 @@ class ARC2_StoreTableManager extends ARC2_Store
     {
         $con = $this->getDBCon();
         if (!$this->createTripleTable()) {
-            return $this->addError('Could not create "triple" table ('.$this->a['db_object']->mysqli()->error.').');
+            return $this->addError('Could not create "triple" table ('.$this->a['db_object']->getErrorMessage().').');
         }
         if (!$this->createG2TTable()) {
-            return $this->addError('Could not create "g2t" table ('.$this->a['db_object']->mysqli()->error.').');
+            return $this->addError('Could not create "g2t" table ('.$this->a['db_object']->getErrorMessage().').');
         }
         if (!$this->createID2ValTable()) {
-            return $this->addError('Could not create "id2val" table ('.$this->a['db_object']->mysqli()->error.').');
+            return $this->addError('Could not create "id2val" table ('.$this->a['db_object']->getErrorMessage().').');
         }
         if (!$this->createS2ValTable()) {
-            return $this->addError('Could not create "s2val" table ('.$this->a['db_object']->mysqli()->error.').');
+            return $this->addError('Could not create "s2val" table ('.$this->a['db_object']->getErrorMessage().').');
         }
         if (!$this->createO2ValTable()) {
-            return $this->addError('Could not create "o2val" table ('.$this->a['db_object']->mysqli()->error.').');
+            return $this->addError('Could not create "o2val" table ('.$this->a['db_object']->getErrorMessage().').');
         }
         if (!$this->createSettingTable()) {
-            return $this->addError('Could not create "setting" table ('.$this->a['db_object']->mysqli()->error.').');
+            return $this->addError('Could not create "setting" table ('.$this->a['db_object']->getErrorMessage().').');
         }
 
         return 1;
@@ -79,7 +79,7 @@ class ARC2_StoreTableManager extends ARC2_Store
         UNIQUE KEY (t), '.$index_code.' KEY (misc)
       ) '.$this->getTableOptionsCode().'
     ';
-        return $this->a['db_object']->mysqli()->query($sql);
+        return $this->a['db_object']->plainQuery($sql);
     }
 
     public function extendTripleTableColumns($suffix = 'triple')
@@ -93,7 +93,7 @@ class ARC2_StoreTableManager extends ARC2_Store
       MODIFY o_lang_dt int(10) UNSIGNED NOT NULL
     ';
 
-        return $this->a['db_object']->mysqli()->query($sql);
+        return $this->a['db_object']->plainQuery($sql);
     }
 
     public function createG2TTable()
@@ -106,7 +106,7 @@ class ARC2_StoreTableManager extends ARC2_Store
       ) '.$this->getTableOptionsCode().'
     ';
 
-        return $this->a['db_object']->mysqli()->query($sql);
+        return $this->a['db_object']->plainQuery($sql);
     }
 
     public function extendG2tTableColumns($suffix = 'g2t')
@@ -117,7 +117,7 @@ class ARC2_StoreTableManager extends ARC2_Store
       MODIFY t int(10) UNSIGNED NOT NULL
     ';
 
-        return $this->a['db_object']->mysqli()->query($sql);
+        return $this->a['db_object']->plainQuery($sql);
     }
 
     public function createID2ValTable()
@@ -134,7 +134,7 @@ class ARC2_StoreTableManager extends ARC2_Store
       ) '.$this->getTableOptionsCode().'
     ';
 
-        return $this->a['db_object']->mysqli()->query($sql);
+        return $this->a['db_object']->plainQuery($sql);
     }
 
     public function extendId2valTableColumns($suffix = 'id2val')
@@ -144,7 +144,7 @@ class ARC2_StoreTableManager extends ARC2_Store
       MODIFY id int(10) UNSIGNED NOT NULL
     ';
 
-        return $this->a['db_object']->mysqli()->query($sql);
+        return $this->a['db_object']->plainQuery($sql);
     }
 
     public function createS2ValTable()
@@ -161,7 +161,7 @@ class ARC2_StoreTableManager extends ARC2_Store
       ) '.$this->getTableOptionsCode().'
     ';
 
-        return $this->a['db_object']->mysqli()->query($sql);
+        return $this->a['db_object']->plainQuery($sql);
     }
 
     public function extendS2valTableColumns($suffix = 's2val')
@@ -171,7 +171,7 @@ class ARC2_StoreTableManager extends ARC2_Store
       MODIFY id int(10) UNSIGNED NOT NULL
     ';
 
-        return $this->a['db_object']->mysqli()->query($sql);
+        return $this->a['db_object']->plainQuery($sql);
     }
 
     public function createO2ValTable()
@@ -191,7 +191,7 @@ class ARC2_StoreTableManager extends ARC2_Store
       ) '.$this->getTableOptionsCode().'
     ';
 
-        return $this->a['db_object']->mysqli()->query($sql);
+        return $this->a['db_object']->plainQuery($sql);
     }
 
     public function extendO2valTableColumns($suffix = 'o2val')
@@ -201,7 +201,7 @@ class ARC2_StoreTableManager extends ARC2_Store
       MODIFY id int(10) UNSIGNED NOT NULL
     ';
 
-        return $this->a['db_object']->mysqli()->query($sql);
+        return $this->a['db_object']->plainQuery($sql);
     }
 
     public function createSettingTable()
@@ -214,7 +214,7 @@ class ARC2_StoreTableManager extends ARC2_Store
       ) '.$this->getTableOptionsCode().'
     ';
 
-        return $this->a['db_object']->mysqli()->query($sql);
+        return $this->a['db_object']->plainQuery($sql);
     }
 
     public function extendColumns()
@@ -261,8 +261,8 @@ class ARC2_StoreTableManager extends ARC2_Store
       INSERT IGNORE INTO '.$new_tbl.'
       SELECT * FROM '.$old_tbl.' WHERE '.$old_tbl.'.p = '.$p_id.'
     ';
-        if ($this->a['db_object']->mysqli()->query($sql)) {
-            $this->a['db_object']->mysqli()->query('DROP TABLE '.$old_tbl);
+        if ($this->a['db_object']->plainQuery($sql)) {
+            $this->a['db_object']->plainQuery('DROP TABLE '.$old_tbl);
 
             return 1;
         } else {
@@ -282,12 +282,12 @@ class ARC2_StoreTableManager extends ARC2_Store
       INSERT IGNORE INTO '.$new_tbl.'
       SELECT * FROM '.$old_tbl.' WHERE '.$old_tbl.'.p = '.$p_id.'
     ';
-        if ($this->a['db_object']->mysqli()->query($sql)) {
-            $this->a['db_object']->mysqli()->query('DELETE FROM '.$old_tbl.' WHERE '.$old_tbl.'.p = '.$p_id);
+        if ($this->a['db_object']->plainQuery($sql)) {
+            $this->a['db_object']->plainQuery('DELETE FROM '.$old_tbl.' WHERE '.$old_tbl.'.p = '.$p_id);
 
             return 1;
         } else {
-            $this->a['db_object']->mysqli()->query('DROP TABLE '.$new_tbl);
+            $this->a['db_object']->plainQuery('DROP TABLE '.$new_tbl);
 
             return 0;
         }

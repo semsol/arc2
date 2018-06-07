@@ -134,12 +134,12 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler
         $tmp_sql = 'CREATE TEMPORARY TABLE '.$tbl.' ( '.$this->getTempTableDef($tbl, $q_sql).') ';
         $tmp_sql .= (($v < '04-01-00') && ($v >= '04-00-18')) ? 'ENGINE' : (($v >= '04-01-02') ? 'ENGINE' : 'TYPE');
         $tmp_sql .= '='.$this->engine_type; /* HEAP doesn't support AUTO_INCREMENT, and MySQL breaks on MEMORY sometimes */
-        if (!$this->store->a['db_object']->mysqli()->query($tmp_sql)
-            && !$this->store->a['db_object']->mysqli()->query(str_replace('CREATE TEMPORARY', 'CREATE', $tmp_sql))) {
-            return $this->addError($this->store->a['db_object']->mysqli()->error);
+        if (!$this->store->a['db_object']->plainQuery($tmp_sql)
+            && !$this->store->a['db_object']->plainQuery(str_replace('CREATE TEMPORARY', 'CREATE', $tmp_sql))) {
+            return $this->addError($this->store->a['db_object']->getErrorMessage());
         }
-        if (false == $this->store->a['db_object']->mysqli()->query('INSERT INTO '.$tbl.' '."\n".$q_sql)) {
-            $this->addError($this->store->a['db_object']->mysqli()->error);
+        if (false == $this->store->a['db_object']->plainQuery('INSERT INTO '.$tbl.' '."\n".$q_sql)) {
+            $this->addError($this->store->a['db_object']->getErrorMessage());
         }
 
         return $tbl;

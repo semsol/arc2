@@ -227,7 +227,7 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler
                 }
             } else {
                 $sql = 'SELECT id AS `id` FROM '.$tbl_prefix.$sub_tbl." WHERE val = BINARY '".$this->store->a['db_object']->escape($val)."'";
-                $result = $this->store->a['db_object']->mysqli()->query($sql);
+                $result = $this->store->a['db_object']->plainQuery($sql);
                 if (0 < $result->num_rows) {
                     $id = $result->fetch_array()['id'];
                 }
@@ -413,9 +413,9 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler
             $buffer_size = isset($this->sql_buffers[$tbl]) ? 1 : 0;
             if ($buffer_size && $force_write) {
                 $t1 = ARC2::mtime();
-                $this->store->a['db_object']->mysqli()->query($this->sql_buffers[$tbl]);
+                $this->store->a['db_object']->plainQuery($this->sql_buffers[$tbl]);
                 /* table error */
-                if (!empty($this->store->a['db_object']->mysqli()->error)) {
+                if (!empty($this->store->a['db_object']->getErrorMessage())) {
                     $this->autoRepairTable($er, $con, $this->sql_buffers[$tbl]);
                 }
                 unset($this->sql_buffers[$tbl]);
@@ -425,7 +425,7 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler
                         $tbl,
                         0,
                         $this->inserts
-                    ) + max(0, $this->store->a['db_object']->mysqli()->affected_rows);
+                    ) + max(0, $this->store->a['db_object']->getAffectedRows());
 
                     $dur = round($t2 - $t1, 4);
                     $this->insert_times[$tbl] = isset($this->insert_times[$tbl])

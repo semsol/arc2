@@ -18,6 +18,11 @@ class DeleteQueryTest extends ARC2_TestCase
         $this->fixture->setup();
     }
 
+    public function tearDown()
+    {
+        $this->fixture->closeDBCon();
+    }
+
     protected function runSPOQuery(string $g = null)
     {
         return null == $g

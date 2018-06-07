@@ -43,7 +43,12 @@
             "./ARC2_Graph.php",
             "./ARC2_Reader.php",
             "./ARC2_Resource.php"
-        ]
+        ],
+        "psr-4": {
+            "ARC2\\": [
+                "src/ARC2/"
+            ]
+        }
     },
     "autoload-dev": {
         "psr-4": {

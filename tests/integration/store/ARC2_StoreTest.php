@@ -22,6 +22,11 @@ class ARC2_StoreTest extends ARC2_TestCase
         $this->fixture->setup();
     }
 
+    public function tearDown()
+    {
+        $this->fixture->closeDBCon();
+    }
+
     /**
      * Returns a list of all available graph URIs of the store. It can also respect access control,
      * to only returned available graphs in the current context. But that depends on the implementation

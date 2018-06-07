@@ -489,12 +489,12 @@ class ARC2_Class {
 
         // use existing connection
         if ($con) {
-            $this->db_object = new \MysqliDb($con);
+            $this->db_object = new \ARC2\Store\Adapter\MysqliDbExtended($con);
         } elseif (null == $this->db_object) {
-            $this->db_object = new \MysqliDb($this->a['db_host'], $this->a['db_user'], $this->a['db_pwd']);
+            $this->db_object = new \ARC2\Store\Adapter\MysqliDbExtended($this->a['db_host'], $this->a['db_user'], $this->a['db_pwd']);
         }
 
-        $r = $this->db_object->mysqli()->query($sql);
+        $r = $this->db_object->plainQuery($sql);
 
         // TODO check if this is ever called. it seems not and therefore could be removed.
         if (0) {
@@ -508,8 +508,8 @@ class ARC2_Class {
             echo "\n" . $call_path . " needed " . $t2 . ' secs for ' . str_replace("\n" , ' ', $sql);;
         }
 
-        if ($log_errors && !empty($this->db_object->mysqli()->error)) {
-            $this->addError($this->db_object->mysqli()->error);
+        if ($log_errors && !empty($this->db_object->getErrorMessage())) {
+            $this->addError($this->db_object->getErrorMessage());
         }
         return $r;
   }

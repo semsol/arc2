@@ -18,6 +18,11 @@ class SelectQueryTest extends ARC2_TestCase
         $this->fixture->setup();
     }
 
+    public function tearDown()
+    {
+        $this->fixture->closeDBCon();
+    }
+
     public function testSelectDefaultGraph()
     {
         // test data

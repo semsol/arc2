@@ -18,6 +18,11 @@ class ErrorHandlingInQueriesTest extends ARC2_TestCase
         $this->fixture->setup();
     }
 
+    public function tearDown()
+    {
+        $this->fixture->closeDBCon();
+    }
+
     /**
      * What if a result variable is not used in query.
      */

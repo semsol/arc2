@@ -129,8 +129,8 @@ class ARC2_StoreDumper extends ARC2_Class
         }
 
         $rows = $this->store->a['db_object']->rawQuery($sql);
-        if (false == empty($this->store->a['db_object']->mysqli()->error)) {
-            return $this->addError($this->store->a['db_object']->mysqli()->error);
+        if (false == empty($this->store->a['db_object']->getErrorMessage())) {
+            return $this->addError($this->store->a['db_object']->getErrorMessage());
         }
 
         return $rows;
