@@ -411,7 +411,7 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler
             $buffer_size = isset($this->sql_buffers[$tbl]) ? 1 : 0;
             if ($buffer_size && $force_write) {
                 $t1 = ARC2::mtime();
-                $this->store->a['db_object']->query($this->sql_buffers[$tbl]);
+                $this->store->a['db_object']->simpleQuery($this->sql_buffers[$tbl]);
                 /* table error */
                 if (!empty($this->store->a['db_object']->getErrorMessage())) {
                     $this->autoRepairTable($er, $this->sql_buffers[$tbl]);

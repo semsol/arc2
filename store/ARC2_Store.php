@@ -62,18 +62,18 @@ class ARC2_Store extends ARC2_Class
         $this->a['db_con'] = $this->db->mysqli();
         $this->a['db_object'] = $this->db;
 
-        if (true !== $this->db->query('USE `'.$this->a['db_name'].'`')) {
+        if (true !== $this->db->simpleQuery('USE `'.$this->a['db_name'].'`')) {
             $fixed = 0;
             /* try to create it */
             if ($this->a['db_name']) {
-                $this->db->query('
+                $this->db->simpleQuery('
                   CREATE DATABASE IF NOT EXISTS `'.$this->a['db_name'].'`
                   DEFAULT CHARACTER SET utf8
                   DEFAULT COLLATE utf8_general_ci
                   '
                 );
-                if ($this->db->query('USE `'.$this->a['db_name'].'`')) {
-                    $this->db->query("SET NAMES 'utf8'");
+                if ($this->db->simpleQuery('USE `'.$this->a['db_name'].'`')) {
+                    $this->db->simpleQuery("SET NAMES 'utf8'");
                     $fixed = 1;
                 }
             }
@@ -82,10 +82,10 @@ class ARC2_Store extends ARC2_Class
             }
         }
         if (preg_match('/^utf8/', $this->getCollation())) {
-            $this->db->query("SET NAMES 'utf8'");
+            $this->db->simpleQuery("SET NAMES 'utf8'");
         }
         // This is RDF, we may need many JOINs...
-        $this->db->query('SET SESSION SQL_BIG_SELECTS=1');
+        $this->db->simpleQuery('SET SESSION SQL_BIG_SELECTS=1');
 
         return true;
     }
@@ -209,7 +209,7 @@ class ARC2_Store extends ARC2_Class
             return 1;
         }
         $tbl = $this->getTablePrefix().'o2val';
-        $this->db->query('CREATE FULLTEXT INDEX vft ON '.$tbl.'(val(128))');
+        $this->db->simpleQuery('CREATE FULLTEXT INDEX vft ON '.$tbl.'(val(128))');
     }
 
     public function disableFulltextSearch()
@@ -218,7 +218,7 @@ class ARC2_Store extends ARC2_Class
             return 1;
         }
         $tbl = $this->getTablePrefix().'o2val';
-        $this->db->query('DROP INDEX vft ON '.$tbl);
+        $this->db->simpleQuery('DROP INDEX vft ON '.$tbl);
     }
 
     public function countDBProcesses()
@@ -260,7 +260,7 @@ class ARC2_Store extends ARC2_Class
             if (!$kill) {
                 continue;
             }
-            $this->db->query('KILL '.$row['Id']);
+            $this->db->simpleQuery('KILL '.$row['Id']);
         }
     }
 
@@ -274,7 +274,7 @@ class ARC2_Store extends ARC2_Class
         if (null !== $this->db) {
             $tbl = $this->getTablePrefix().'setting';
 
-            return $this->db->query('SELECT 1 FROM '.$tbl.' LIMIT 0') ? 1 : 0;
+            return $this->db->simpleQuery('SELECT 1 FROM '.$tbl.' LIMIT 0') ? 1 : 0;
         }
 
         return 0;
@@ -340,14 +340,14 @@ class ARC2_Store extends ARC2_Class
             $sql = 'INSERT INTO '.$tbl." (k, val) VALUES ('".md5($k)."', '".$this->db->escape(serialize($v))."')";
         }
 
-        return $this->db->query($sql);
+        return $this->db->simpleQuery($sql);
     }
 
     public function removeSetting($k)
     {
         $tbl = $this->getTablePrefix().'setting';
 
-        return $this->db->query('DELETE FROM '.$tbl." WHERE k = '".md5($k)."'");
+        return $this->db->simpleQuery('DELETE FROM '.$tbl." WHERE k = '".md5($k)."'");
     }
 
     public function getQueueTicket()
@@ -357,12 +357,12 @@ class ARC2_Store extends ARC2_Class
         }
         $t = 'ticket_'.substr(md5(uniqid(rand())), 0, 10);
         /* lock */
-        $this->db->query('LOCK TABLES '.$this->getTablePrefix().'setting WRITE');
+        $this->db->simpleQuery('LOCK TABLES '.$this->getTablePrefix().'setting WRITE');
         /* queue */
         $queue = $this->getSetting('query_queue', []);
         $queue[] = $t;
         $this->setSetting('query_queue', $queue);
-        $this->db->query('UNLOCK TABLES');
+        $this->db->simpleQuery('UNLOCK TABLES');
         /* loop */
         $lc = 0;
         $queue = $this->getSetting('query_queue', []);
@@ -386,13 +386,13 @@ class ARC2_Store extends ARC2_Class
             return 1;
         }
         /* lock */
-        $this->db->query('LOCK TABLES '.$this->getTablePrefix().'setting WRITE');
+        $this->db->simpleQuery('LOCK TABLES '.$this->getTablePrefix().'setting WRITE');
         /* queue */
         $vals = $this->getSetting('query_queue', []);
         $pos = array_search($t, $vals);
         $queue = ($pos < (count($vals) - 1)) ? array_slice($vals, $pos + 1) : [];
         $this->setSetting('query_queue', $queue);
-        $this->db->query('UNLOCK TABLES');
+        $this->db->simpleQuery('UNLOCK TABLES');
     }
 
     public function reset($keep_settings = 0)
@@ -403,7 +403,7 @@ class ARC2_Store extends ARC2_Class
         $ps = $this->getSetting('split_predicates', []);
         foreach ($ps as $p) {
             $tbl = 'triple_'.abs(crc32($p));
-            $this->db->query('DROP TABLE '.$prefix.$tbl);
+            $this->db->simpleQuery('DROP TABLE '.$prefix.$tbl);
         }
         $this->removeSetting('split_predicates');
         /* truncate tables */
@@ -411,7 +411,7 @@ class ARC2_Store extends ARC2_Class
             if ($keep_settings && ('setting' == $tbl)) {
                 continue;
             }
-            $this->db->query('TRUNCATE '.$prefix.$tbl);
+            $this->db->simpleQuery('TRUNCATE '.$prefix.$tbl);
         }
     }
 
@@ -424,7 +424,7 @@ class ARC2_Store extends ARC2_Class
         $tbls = $this->getTables();
         $prefix = $this->getTablePrefix();
         foreach ($tbls as $tbl) {
-            $this->db->query('DROP TABLE '.$prefix.$tbl);
+            $this->db->simpleQuery('DROP TABLE '.$prefix.$tbl);
         }
     }
 
@@ -480,7 +480,7 @@ class ARC2_Store extends ARC2_Class
         $new_prefix .= $new_prefix ? '_' : '';
         $new_prefix .= $name.'_';
         foreach ($tbls as $tbl) {
-            $this->db->query('RENAME TABLE '.$old_prefix.$tbl.' TO '.$new_prefix.$tbl);
+            $this->db->simpleQuery('RENAME TABLE '.$old_prefix.$tbl.' TO '.$new_prefix.$tbl);
             if (!empty($this->db->getErrorMessage())) {
                 return $this->addError($this->db->getErrorMessage());
             }
@@ -499,7 +499,7 @@ class ARC2_Store extends ARC2_Class
         $old_prefix = $this->getTablePrefix();
         $new_prefix = $new_store->getTablePrefix();
         foreach ($tbls as $tbl) {
-            $this->db->query('INSERT IGNORE INTO '.$new_prefix.$tbl.' SELECT * FROM '.$old_prefix.$tbl);
+            $this->db->simpleQuery('INSERT IGNORE INTO '.$new_prefix.$tbl.' SELECT * FROM '.$old_prefix.$tbl);
             if (!empty($this->db->getErrorMessage())) {
                 return $this->addError($this->db->getErrorMessage());
             }
@@ -702,7 +702,7 @@ class ARC2_Store extends ARC2_Class
 
     public function releaseLock()
     {
-        return $this->db->query('DO RELEASE_LOCK("'.$this->a['db_name'].'.'.$this->getTablePrefix().'.write_lock")');
+        return $this->db->simpleQuery('DO RELEASE_LOCK("'.$this->a['db_name'].'.'.$this->getTablePrefix().'.write_lock")');
     }
 
     public function processTables($level = 2, $operation = 'optimize')
@@ -726,7 +726,7 @@ class ARC2_Store extends ARC2_Class
             $sql .= $sql ? ', ' : strtoupper($operation).' TABLE ';
             $sql .= $pre.$tbl;
         }
-        $this->db->query($sql);
+        $this->db->simpleQuery($sql);
         if (false == empty($this->db->getErrorMessage())) {
             $this->addError($this->db->getErrorMessage().' in '.$sql);
         }

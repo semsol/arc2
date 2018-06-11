@@ -502,7 +502,7 @@ class ARC2_Class {
         // use existing connection
         $this->getDBObjectFromARC2Class($con);
 
-        $r = $this->db_object->plainQuery($sql);
+        $r = $this->db_object->mysqliQuery($sql);
 
         // TODO check if this is ever called. it seems not and therefore could be removed.
         if (0) {

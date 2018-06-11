@@ -78,7 +78,7 @@ class ARC2_StoreTableManager extends ARC2_Store
         UNIQUE KEY (t), '.$index_code.' KEY (misc)
       ) '.$this->getTableOptionsCode().'
     ';
-        return $this->a['db_object']->query($sql);
+        return $this->a['db_object']->simpleQuery($sql);
     }
 
     public function extendTripleTableColumns($suffix = 'triple')
@@ -92,7 +92,7 @@ class ARC2_StoreTableManager extends ARC2_Store
       MODIFY o_lang_dt int(10) UNSIGNED NOT NULL
     ';
 
-        return $this->a['db_object']->query($sql);
+        return $this->a['db_object']->simpleQuery($sql);
     }
 
     public function createG2TTable()
@@ -105,7 +105,7 @@ class ARC2_StoreTableManager extends ARC2_Store
       ) '.$this->getTableOptionsCode().'
     ';
 
-        return $this->a['db_object']->query($sql);
+        return $this->a['db_object']->simpleQuery($sql);
     }
 
     public function extendG2tTableColumns($suffix = 'g2t')
@@ -116,7 +116,7 @@ class ARC2_StoreTableManager extends ARC2_Store
       MODIFY t int(10) UNSIGNED NOT NULL
     ';
 
-        return $this->a['db_object']->query($sql);
+        return $this->a['db_object']->simpleQuery($sql);
     }
 
     public function createID2ValTable()
@@ -133,7 +133,7 @@ class ARC2_StoreTableManager extends ARC2_Store
       ) '.$this->getTableOptionsCode().'
     ';
 
-        return $this->a['db_object']->query($sql);
+        return $this->a['db_object']->simpleQuery($sql);
     }
 
     public function extendId2valTableColumns($suffix = 'id2val')
@@ -143,7 +143,7 @@ class ARC2_StoreTableManager extends ARC2_Store
       MODIFY id int(10) UNSIGNED NOT NULL
     ';
 
-        return $this->a['db_object']->query($sql);
+        return $this->a['db_object']->simpleQuery($sql);
     }
 
     public function createS2ValTable()
@@ -160,7 +160,7 @@ class ARC2_StoreTableManager extends ARC2_Store
       ) '.$this->getTableOptionsCode().'
     ';
 
-        return $this->a['db_object']->query($sql);
+        return $this->a['db_object']->simpleQuery($sql);
     }
 
     public function extendS2valTableColumns($suffix = 's2val')
@@ -170,7 +170,7 @@ class ARC2_StoreTableManager extends ARC2_Store
       MODIFY id int(10) UNSIGNED NOT NULL
     ';
 
-        return $this->a['db_object']->query($sql);
+        return $this->a['db_object']->simpleQuery($sql);
     }
 
     public function createO2ValTable()
@@ -190,7 +190,7 @@ class ARC2_StoreTableManager extends ARC2_Store
       ) '.$this->getTableOptionsCode().'
     ';
 
-        return $this->a['db_object']->query($sql);
+        return $this->a['db_object']->simpleQuery($sql);
     }
 
     public function extendO2valTableColumns($suffix = 'o2val')
@@ -200,7 +200,7 @@ class ARC2_StoreTableManager extends ARC2_Store
       MODIFY id int(10) UNSIGNED NOT NULL
     ';
 
-        return $this->a['db_object']->query($sql);
+        return $this->a['db_object']->simpleQuery($sql);
     }
 
     public function createSettingTable()
@@ -213,7 +213,7 @@ class ARC2_StoreTableManager extends ARC2_Store
       ) '.$this->getTableOptionsCode().'
     ';
 
-        return $this->a['db_object']->query($sql);
+        return $this->a['db_object']->simpleQuery($sql);
     }
 
     public function extendColumns()
@@ -258,8 +258,8 @@ class ARC2_StoreTableManager extends ARC2_Store
       INSERT IGNORE INTO '.$new_tbl.'
       SELECT * FROM '.$old_tbl.' WHERE '.$old_tbl.'.p = '.$p_id.'
     ';
-        if ($this->a['db_object']->query($sql)) {
-            $this->a['db_object']->query('DROP TABLE '.$old_tbl);
+        if ($this->a['db_object']->simpleQuery($sql)) {
+            $this->a['db_object']->simpleQuery('DROP TABLE '.$old_tbl);
 
             return 1;
         } else {
@@ -278,12 +278,12 @@ class ARC2_StoreTableManager extends ARC2_Store
       INSERT IGNORE INTO '.$new_tbl.'
       SELECT * FROM '.$old_tbl.' WHERE '.$old_tbl.'.p = '.$p_id.'
     ';
-        if ($this->a['db_object']->query($sql)) {
-            $this->a['db_object']->query('DELETE FROM '.$old_tbl.' WHERE '.$old_tbl.'.p = '.$p_id);
+        if ($this->a['db_object']->simpleQuery($sql)) {
+            $this->a['db_object']->simpleQuery('DELETE FROM '.$old_tbl.' WHERE '.$old_tbl.'.p = '.$p_id);
 
             return 1;
         } else {
-            $this->a['db_object']->query('DROP TABLE '.$new_tbl);
+            $this->a['db_object']->simpleQuery('DROP TABLE '.$new_tbl);
 
             return 0;
         }

@@ -51,7 +51,7 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler
         $r = $this->getFinalQueryResult($q_sql, $tmp_tbl);
         /* remove intermediate results */
         if (!$this->cache_results) {
-            $this->getDBObjectFromARC2Class()->query('DROP TABLE IF EXISTS '.$tmp_tbl);
+            $this->getDBObjectFromARC2Class()->simpleQuery('DROP TABLE IF EXISTS '.$tmp_tbl);
         }
 
         return $r;
@@ -131,11 +131,11 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler
         $tmp_sql = 'CREATE TEMPORARY TABLE '.$tbl.' ( '.$this->getTempTableDef($tbl, $q_sql).') ';
         $tmp_sql .= (($v < '04-01-00') && ($v >= '04-00-18')) ? 'ENGINE' : (($v >= '04-01-02') ? 'ENGINE' : 'TYPE');
         $tmp_sql .= '='.$this->engine_type; /* HEAP doesn't support AUTO_INCREMENT, and MySQL breaks on MEMORY sometimes */
-        if (!$this->store->a['db_object']->query($tmp_sql)
-            && !$this->store->a['db_object']->query(str_replace('CREATE TEMPORARY', 'CREATE', $tmp_sql))) {
+        if (!$this->store->a['db_object']->simpleQuery($tmp_sql)
+            && !$this->store->a['db_object']->simpleQuery(str_replace('CREATE TEMPORARY', 'CREATE', $tmp_sql))) {
             return $this->addError($this->store->a['db_object']->getErrorMessage());
         }
-        if (false == $this->store->a['db_object']->query('INSERT INTO '.$tbl.' '."\n".$q_sql)) {
+        if (false == $this->store->a['db_object']->simpleQuery('INSERT INTO '.$tbl.' '."\n".$q_sql)) {
             $this->addError($this->store->a['db_object']->getErrorMessage());
         }
 
