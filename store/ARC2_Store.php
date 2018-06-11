@@ -54,38 +54,25 @@ class ARC2_Store extends ARC2_Class
 
         // connect
         try {
-            $this->db = new \ARC2\Store\Adapter\MysqliDbExtended($this->a['db_host'], $this->a['db_user'], $this->a['db_pwd']);
+            if (false === class_exists('\\ARC2\\Store\\Adapter\\AdapterFactory')) {
+                require __DIR__.'/../src/ARC2/Store/Adapter/AdapterFactory.php';
+            }
+            $factory = new \ARC2\Store\Adapter\AdapterFactory();
+            $this->db = $factory->getInstanceFor('mysqli', $this->a);
+            $err = $this->db->connect();
+            // stop here, if an error occoured
+            if (is_string($err) && false !== empty($err)) {
+                throw new \Exception($err);
+            }
         } catch (\Exception $e) {
             return $this->addError($e->getMessage());
         }
 
-        $this->a['db_con'] = $this->db->mysqli();
-        $this->a['db_object'] = $this->db;
+        if ('mysqli' == $this->db->getAdapterName()) {
+            $this->a['db_con'] = $this->db->getConnection();
+        }
 
-        if (true !== $this->db->simpleQuery('USE `'.$this->a['db_name'].'`')) {
-            $fixed = 0;
-            /* try to create it */
-            if ($this->a['db_name']) {
-                $this->db->simpleQuery('
-                  CREATE DATABASE IF NOT EXISTS `'.$this->a['db_name'].'`
-                  DEFAULT CHARACTER SET utf8
-                  DEFAULT COLLATE utf8_general_ci
-                  '
-                );
-                if ($this->db->simpleQuery('USE `'.$this->a['db_name'].'`')) {
-                    $this->db->simpleQuery("SET NAMES 'utf8'");
-                    $fixed = 1;
-                }
-            }
-            if (!$fixed) {
-                return $this->addError($this->db->getErrorMessage());
-            }
-        }
-        if (preg_match('/^utf8/', $this->getCollation())) {
-            $this->db->simpleQuery("SET NAMES 'utf8'");
-        }
-        // This is RDF, we may need many JOINs...
-        $this->db->simpleQuery('SET SESSION SQL_BIG_SELECTS=1');
+        $this->a['db_object'] = $this->db;
 
         return true;
     }
@@ -95,6 +82,12 @@ class ARC2_Store extends ARC2_Class
         return $this->db;
     }
 
+    /**
+     * @param int $force 1 if you want to force a connection.
+     *
+     * @return mysqli mysqli-connection, only if mysqli adapter was selected. null otherwise,
+     *                because direct access to DB connection is not recommended.
+     */
     public function getDBCon($force = 0)
     {
         if ($force || !isset($this->a['db_con'])) {
@@ -148,7 +141,7 @@ class ARC2_Store extends ARC2_Class
 
     public function getCollation()
     {
-        $row = $this->db->rawQueryOne('SHOW TABLE STATUS LIKE "'.$this->getTablePrefix().'setting"');
+        $row = $this->db->fetchRow('SHOW TABLE STATUS LIKE "'.$this->getTablePrefix().'setting"');
         return isset($row['Collation']) ? $row['Collation'] : '';
     }
 
@@ -157,7 +150,7 @@ class ARC2_Store extends ARC2_Class
         if (!$this->v('column_type')) {
             $tbl = $this->getTablePrefix().'g2t';
 
-            $row = $this->db->rawQueryOne('SHOW COLUMNS FROM '.$tbl.' LIKE "t"');
+            $row = $this->db->fetchRow('SHOW COLUMNS FROM '.$tbl.' LIKE "t"');
             if (null == $row) {
                 $row = ['Type' => 'mediumint'];
             }
@@ -174,7 +167,7 @@ class ARC2_Store extends ARC2_Class
         if (!isset($this->$var_name)) {
             $tbl = $this->getTablePrefix().$tbl;
 
-            $row = $this->db->rawQueryOne('SHOW COLUMNS FROM '.$tbl.' LIKE "val_hash"');
+            $row = $this->db->fetchRow('SHOW COLUMNS FROM '.$tbl.' LIKE "val_hash"');
             $this->$var_name = null !== $row;
         }
 
@@ -187,7 +180,7 @@ class ARC2_Store extends ARC2_Class
             $this->has_fulltext_index = 0;
             $tbl = $this->getTablePrefix().'o2val';
 
-            $rows = $this->db->rawQuery('SHOW INDEX FROM '.$tbl);
+            $rows = $this->db->fetchList('SHOW INDEX FROM '.$tbl);
             foreach($rows as $row) {
                 if ('val' != $row['Column_name']) {
                     continue;
@@ -239,7 +232,7 @@ class ARC2_Store extends ARC2_Class
         }
         $ref_tbl = $this->getTablePrefix().'triple';
 
-        $rows = $this->db->rawQuery('SHOW FULL PROCESSLIST');
+        $rows = $this->db->fetchList('SHOW FULL PROCESSLIST');
         foreach ($rows as $row) {
             if ($row['Time'] < $runtime) {
                 continue;
@@ -312,18 +305,15 @@ class ARC2_Store extends ARC2_Class
     {
         $tbl = $this->getTablePrefix().'setting';
 
-        $row = $this->db->rawQueryOne('SELECT val FROM '.$tbl." WHERE k = '".md5($k)."'");
-        if (null !== $row) {
-            return 1;
-        } else {
-            return 0;
-        }
+        return $this->db->fetchRow('SELECT val FROM '.$tbl." WHERE k = '".md5($k)."'")
+            ? 1
+            : 0;
     }
 
     public function getSetting($k, $default = 0)
     {
         $tbl = $this->getTablePrefix().'setting';
-        $row = $this->db->rawQueryOne('SELECT val FROM '.$tbl." WHERE k = '".md5($k)."'");
+        $row = $this->db->fetchRow('SELECT val FROM '.$tbl." WHERE k = '".md5($k)."'");
         if (isset($row['val'])) {
             return unserialize($row['val']);
         }
@@ -632,7 +622,7 @@ class ARC2_Store extends ARC2_Class
         /* via hash */
         if (preg_match('/^(s2val|o2val)$/', $tbl) && $this->hasHashColumn($tbl)) {
 
-            $rows = $this->db->rawQuery(
+            $rows = $this->db->fetchList(
                 'SELECT id, val FROM '.$this->getTablePrefix().$tbl." WHERE val_hash = '".$this->getValueHash($val)."' ORDER BY id"
             );
             if (is_array($rows) && 0 < count($rows)) {
@@ -647,7 +637,7 @@ class ARC2_Store extends ARC2_Class
         /* exact match */
         else {
             $sql = 'SELECT id FROM '.$this->getTablePrefix().$tbl." WHERE val = BINARY '".$this->db->escape($val)."' LIMIT 1";
-            $row = $this->db->rawQueryOne($sql);
+            $row = $this->db->fetchRow($sql);
 
             if (null !== $row && isset($row['id'])) {
                 $r = $row['id'];
@@ -663,7 +653,7 @@ class ARC2_Store extends ARC2_Class
     public function getIDValue($id, $term = '')
     {
         $tbl = preg_match('/^(s|o)$/', $term) ? $term.'2val' : 'id2val';
-        $row = $this->db->rawQueryOne(
+        $row = $this->db->fetchRow(
             'SELECT val FROM '.$this->getTablePrefix().$tbl.' WHERE id = '.$this->db->escape($id).' LIMIT 1'
         );
         if (isset($row['val'])) {
@@ -680,7 +670,7 @@ class ARC2_Store extends ARC2_Class
         }
 
         $l_name = $this->a['db_name'].'.'.$this->getTablePrefix().'.write_lock';
-        $row = $this->db->rawQueryOne('SELECT IS_FREE_LOCK("'.$l_name.'") AS success');
+        $row = $this->db->fetchRow('SELECT IS_FREE_LOCK("'.$l_name.'") AS success');
 
         if (is_array($row)) {
             if (!$row['success']) {
@@ -690,7 +680,7 @@ class ARC2_Store extends ARC2_Class
                     return $this->getLock($t_out - 1, $t_out_init);
                 }
             } else {
-                $row = $this->db->rawQueryOne('SELECT GET_LOCK("'.$l_name.'", '.$t_out_init.') AS success');
+                $row = $this->db->fetchRow('SELECT GET_LOCK("'.$l_name.'", '.$t_out_init.') AS success');
                 if (isset($row['success'])) {
                     return $row['success'];
                 }

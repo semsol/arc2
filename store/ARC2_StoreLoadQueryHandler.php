@@ -162,7 +162,7 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler
         }
         $r = 0;
 
-        $rows = $this->store->a['db_object']->rawQuery($sql);
+        $rows = $this->store->a['db_object']->fetchList($sql);
 
         if (is_array($rows)) {
             foreach($rows as $row) {
@@ -182,7 +182,7 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler
     {
         $sql = 'SELECT MAX(t) AS `id` FROM '.$this->store->getTablePrefix().'triple';
 
-        $row = $this->store->a['db_object']->rawQueryOne($sql);
+        $row = $this->store->a['db_object']->fetchRow($sql);
         if (isset($row['id'])) {
             return $row['id']+1;
         }
@@ -214,7 +214,7 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler
             /* via hash */
             if (preg_match('/^(s2val|o2val)$/', $sub_tbl) && $this->hasHashColumn($sub_tbl)) {
                 $sql = 'SELECT id AS `id`, val AS `val` FROM '.$tbl_prefix.$sub_tbl." WHERE val_hash = BINARY '".$this->getValueHash($val)."'";
-                $rows = $this->store->a['db_object']->rawQuery($sql);
+                $rows = $this->store->a['db_object']->fetchList($sql);
                 if (is_array($rows)) {
                     foreach($rows as $row) {
                         if ($row['val'] == $val) {
@@ -227,7 +227,7 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler
                 $binaryValue = $this->store->a['db_object']->escape($val);
                 if (false !== empty($binaryValue)) {
                     $sql = 'SELECT id AS `id` FROM '.$tbl_prefix.$sub_tbl." WHERE val = BINARY '".$binaryValue."'";
-                    $row = $this->store->a['db_object']->rawQueryOne($sql);
+                    $row = $this->store->a['db_object']->fetchRow($sql);
                     if (is_array($row) && isset($row['id'])) {
                         $id = $row['id'];
                     }
@@ -270,7 +270,7 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler
                         AND o_lang_dt = '.$t['o_lang_dt'].' AND s_type = '.$t['s_type'].'
                         AND o_type = '.$t['o_type'].'
                  LIMIT 1';
-        $row = $this->store->a['db_object']->rawQueryOne($sql);
+        $row = $this->store->a['db_object']->fetchRow($sql);
         if (isset($row['t'])) {
             $this->triple_ids[$val] = $row['t']; /* hack for "don't insert this triple" */
             return [$row['t']]; /* hack for "don't insert this triple" */
@@ -460,7 +460,7 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler
     {
         $this->addError('MySQL error: '.$er.' ('.$sql.')');
         if (preg_match('/Table \'[^\']+\/([a-z0-9\_\-]+)\' .*(crashed|repair)/i', $er, $m)) {
-            $row = $this->store->a['db_object']->rawQueryOne('REPAIR TABLE '.rawurlencode($m[1]));
+            $row = $this->store->a['db_object']->fetchRow('REPAIR TABLE '.rawurlencode($m[1]));
             $msg = is_array($row) ? $row : [];
 
             if ('error' == $this->v('Msg_type', 'error', $msg)) {

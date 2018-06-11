@@ -14,9 +14,9 @@ class ARC2_StoreTest extends ARC2_TestCase
         $this->fixture->createDBCon();
 
         // remove all tables
-        $tables = $this->fixture->getDBObject()->rawQuery('SHOW TABLES');
+        $tables = $this->fixture->getDBObject()->fetchList('SHOW TABLES');
         foreach($tables as $table) {
-            $this->fixture->getDBObject()->query('DROP TABLE '. $table['Tables_in_'.$this->dbConfig['db_name']]);
+            $this->fixture->getDBObject()->simpleQuery('DROP TABLE '. $table['Tables_in_'.$this->dbConfig['db_name']]);
         }
 
         // fresh setup of ARC2
@@ -328,6 +328,11 @@ XML;
         $this->fixture->setSetting('foo', 'bar');
 
         $this->assertEquals('bar', $this->fixture->getSetting('foo'));
+    }
+
+    public function testGetAndSetSettingUseDefault()
+    {
+        $this->assertEquals('no-entry', $this->fixture->getSetting('not-available-'.time(), 'no-entry'));
     }
 
     public function testGetAndSetSettingExistingSetting()

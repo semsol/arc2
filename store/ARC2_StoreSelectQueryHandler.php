@@ -207,7 +207,7 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler
         try {
             $entries = []; // in case an exception gets thrown
 
-            $entries = $this->store->a['db_object']->rawQuery($v_sql);
+            $entries = $this->store->a['db_object']->fetchList($v_sql);
         } catch (\Exception $e) {
             $this->addError($e->getMessage());
         }

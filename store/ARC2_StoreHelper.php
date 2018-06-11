@@ -32,7 +32,7 @@ class ARC2_StoreHelper extends ARC2_Class
             foreach (['id', 's', 'o'] as $id_col) {
                 $tbl = $this->store->getTablePrefix().$id_col.'2val';
                 $sql = 'SELECT id, val FROM '.$tbl.' WHERE val LIKE "'.$this->store->a['db_object']->escape($old_uri).'%"';
-                $rows = $this->store->a['db_object']->rawQuery($sql);
+                $rows = $this->store->a['db_object']->fetchList($sql);
 
                 if (false == is_array($rows)) {
                     continue;

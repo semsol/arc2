@@ -499,7 +499,7 @@ class ARC2_Class {
     {
         $t1 = ARC2::mtime();
 
-        // use existing connection
+        // create connection using an adapter, if not available yet
         $this->getDBObjectFromARC2Class($con);
 
         $r = $this->db_object->mysqliQuery($sql);

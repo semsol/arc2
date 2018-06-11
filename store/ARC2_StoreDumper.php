@@ -128,7 +128,7 @@ class ARC2_StoreDumper extends ARC2_Class
             $sql .= ' OFFSET '.$offset;
         }
 
-        $rows = $this->store->a['db_object']->rawQuery($sql);
+        $rows = $this->store->a['db_object']->fetchList($sql);
         if (false == empty($this->store->a['db_object']->getErrorMessage())) {
             return $this->addError($this->store->a['db_object']->getErrorMessage());
         }

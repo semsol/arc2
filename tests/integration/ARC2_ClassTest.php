@@ -18,7 +18,7 @@ class ARC2_ClassTest extends ARC2_TestCase
         $this->store->setup();
         $this->dbConnection = $this->store->getDBCon();
 
-        $this->fixture = new \ARC2_Class([], $this);
+        $this->fixture = new \ARC2_Class($this->dbConfig, $this);
     }
 
     /*

@@ -21,6 +21,17 @@ class MysqliDbExtended extends \MysqliDb
 
     /**
      * If you ran a query using MysqliDbExtended::simpleQuery and an error occoured, you can
+     * get the error code with this function.
+     *
+     * @return int Error code, if available.
+     */
+    public function getErrorCode()
+    {
+        return $this->mysqli()->errno;
+    }
+
+    /**
+     * If you ran a query using MysqliDbExtended::simpleQuery and an error occoured, you can
      * get the error message with this function.
      *
      * @return string Non-empty string, if an error occoured, empty string otherwise.

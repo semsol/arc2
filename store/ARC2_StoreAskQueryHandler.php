@@ -39,7 +39,7 @@ class ARC2_StoreAskQueryHandler extends ARC2_StoreSelectQueryHandler
 
     public function getFinalQueryResult($q_sql, $tmp_tbl)
     {
-        $row = $this->store->a['db_object']->rawQueryOne('SELECT success FROM '.$tmp_tbl);
+        $row = $this->store->a['db_object']->fetchRow('SELECT success FROM '.$tmp_tbl);
         $r = isset($row['success']) ? $row['success'] : 0;
         return $r ? true : false;
     }
