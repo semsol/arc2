@@ -19,7 +19,7 @@ class MysqliDbExtended extends \MysqliDb
     public function getNumberOfRows($sql = null)
     {
         if (null != $sql) {
-            $result = $this->query($sql);
+            $result = $this->plainQuery($sql);
             return is_object($result) ? $result->num_rows : 0;
 
         } elseif (is_object($this->last_result)) {

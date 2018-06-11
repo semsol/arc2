@@ -165,8 +165,8 @@ class ARC2_StoreDeleteQueryHandler extends ARC2_StoreQueryHandler
       SELECT T.t FROM '.$tbl_prefix.'triple T LEFT JOIN '.$tbl_prefix.'g2t G ON ( G.t = T.t )
       WHERE G.t IS NULL LIMIT 1
     ';
-        $result = $this->store->a['db_object']->plainQuery($sql);
-        if (0 < $result->num_rows) {
+        $numRows = $this->store->a['db_object']->getNumberOfRows($sql);
+        if (0 < $numRows) {
             /* delete unconnected triples */
             $sql = ($dbv < '04-01') ? 'DELETE '.$tbl_prefix.'triple' : 'DELETE T';
             $sql .= '
