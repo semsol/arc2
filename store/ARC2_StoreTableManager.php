@@ -17,19 +17,16 @@ class ARC2_StoreTableManager extends ARC2_Store
     }
 
     public function __init()
-    {/* db_con */
+    {
         parent::__init();
         $this->engine_type = $this->v('store_engine_type', 'MyISAM', $this->a);
     }
 
     public function getTableOptionsCode()
     {
-        $v = $this->getDBVersion();
-        $r = '';
-        $r .= (($v < '04-01-00') && ($v >= '04-00-18')) ? 'ENGINE' : (($v >= '04-01-02') ? 'ENGINE' : 'TYPE');
-        $r .= '='.$this->engine_type;
-        $r .= ($v >= '04-00-00') ? ' CHARACTER SET utf8' : '';
-        $r .= ($v >= '04-01-00') ? ' COLLATE utf8_unicode_ci' : '';
+        $r = 'ENGINE='.$this->engine_type;
+        $r .= ' CHARACTER SET utf8';
+        $r .= ' COLLATE utf8_unicode_ci';
         $r .= ' DELAY_KEY_WRITE = 1';
 
         return $r;

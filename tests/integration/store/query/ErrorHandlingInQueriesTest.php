@@ -49,6 +49,6 @@ class ErrorHandlingInQueriesTest extends ARC2_TestCase
             $res
         );
 
-        $this->assertEquals(2, count($this->fixture->errors));
+        $this->assertEquals(3, count($this->fixture->errors));
     }
 }

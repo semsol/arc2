@@ -9,4 +9,6 @@ return array(
     'db_user' => 'root',
     'db_pwd'  => 'Pass123',
     'db_host' => 'localhost',
+    'db_pdo_protocol' => 'mysql', // TODO integrate that
+    'db_adapter' => 'pdo',
 );

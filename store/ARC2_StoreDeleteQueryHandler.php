@@ -16,7 +16,7 @@ class ARC2_StoreDeleteQueryHandler extends ARC2_StoreQueryHandler
     }
 
     public function __init()
-    {/* db_con */
+    {
         parent::__init();
         $this->store = $this->caller;
         $this->handler_type = 'delete';
@@ -72,8 +72,7 @@ class ARC2_StoreDeleteQueryHandler extends ARC2_StoreQueryHandler
         $r = 0;
         foreach ($this->infos['query']['target_graphs'] as $g) {
             if ($g_id = $this->getTermID($g, 'g')) {
-                $this->store->a['db_object']->simpleQuery('DELETE FROM '.$tbl_prefix.'g2t WHERE g = '.$g_id);
-                $r += $this->store->a['db_object']->getAffectedRows();
+                $r += $this->store->a['db_object']->deleteQuery('DELETE FROM '.$tbl_prefix.'g2t WHERE g = '.$g_id);
             }
         }
         $this->refs_deleted = $r ? 1 : 0;
@@ -130,11 +129,10 @@ class ARC2_StoreDeleteQueryHandler extends ARC2_StoreQueryHandler
                 $sql = ($dbv < '04-01') ? 'DELETE '.$this->getTripleTable() : 'DELETE T';
                 $sql .= ' FROM '.$this->getTripleTable().' T WHERE '.$q;
             }
-            $this->store->a['db_object']->simpleQuery($sql);
+            $r += $this->store->a['db_object']->deleteQuery($sql);
             if (!empty($this->store->a['db_object']->getErrorMessage())) {
                 $this->addError($this->store->a['db_object']->getErrorMessage().' in '.$sql);
             }
-            $r += $this->store->a['db_object']->getAffectedRows();
         }
 
         return $r;

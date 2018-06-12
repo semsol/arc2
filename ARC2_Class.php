@@ -485,16 +485,35 @@ class ARC2_Class {
 
     public function getDBObjectFromARC2Class($con = null)
     {
-        if (!$this->db_object) {
+        if (null == $this->db_object) {
+            if (false === class_exists('\\ARC2\\Store\\Adapter\\AdapterFactory')) {
+                require __DIR__.'/src/ARC2/Store/Adapter/AdapterFactory.php';
+            }
+            if (false == isset($this->a['db_adapter'])) {
+                $this->a['db_adapter'] = 'mysqli';
+            }
+            $factory = new \ARC2\Store\Adapter\AdapterFactory();
+            $this->db_object = $factory->getInstanceFor($this->a['db_adapter'], $this->a);
             if ($con) {
-                $this->db_object = new \ARC2\Store\Adapter\MysqliDbExtended($con);
-            } elseif (null == $this->db_object) {
-                $this->db_object = new \ARC2\Store\Adapter\MysqliDbExtended($this->a['db_host'], $this->a['db_user'], $this->a['db_pwd']);
+                $this->db_object->connect($con);
+            } else {
+                $this->db_object->connect();
             }
         }
         return $this->db_object;
     }
 
+    /**
+     * Dont use this function to directly query the database. It currently works only with mysqli DB adapter.
+     *
+     * @param string $sql SQL query
+     * @param mysqli $con Connection
+     * @param int    $log_errors 1 if you want to log errors. Default is 0
+     *
+     * @return mysqli Result
+     *
+     * @deprecated since 2.4.0
+     */
     public function queryDB($sql, $con, $log_errors = 0)
     {
         $t1 = ARC2::mtime();

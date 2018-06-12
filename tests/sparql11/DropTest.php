@@ -26,24 +26,42 @@ class DropTest extends ComplianceTest
      */
     protected function createGraph($graphUri)
     {
-        // table names
-        $g2t = 'arc_g2t';
-        $id2val = 'arc_id2val';
+        // g2t table
+        if (isset($this->dbConfig['db_table_prefix'])) {
+            $g2t = $this->dbConfig['db_table_prefix'] . '_';
+        } else {
+            $g2t = '';
+        }
+        if (isset($this->dbConfig['store_name'])) {
+            $g2t .= $this->dbConfig['store_name'] . '_';
+        }
+        $g2t .= 'g2t';
+
+        // id2val table
+        if (isset($this->dbConfig['db_table_prefix'])) {
+            $id2val = $this->dbConfig['db_table_prefix'] . '_';
+        } else {
+            $id2val = '';
+        }
+        if (isset($this->dbConfig['store_name'])) {
+            $id2val .= $this->dbConfig['store_name'] . '_';
+        }
+        $id2val .= 'id2val';
 
         /*
          * for id2val table
          */
         $query = 'INSERT INTO '. $id2val .' (val) VALUES("'. $graphUri .'")';
-        $this->store->queryDB($query, $this->store->getDBCon());
-        $usedId = $this->store->getDBCon()->insert_id;
+        $this->store->getDBObject()->simpleQuery($query);
+        $usedId = $this->store->getDBObject()->getLastInsertId();
 
         /*
          * for g2t table
          */
         $newIdg2t = 1 + $this->getRowCount($g2t);
         $query = 'INSERT INTO '. $g2t .' (t, g) VALUES('. $newIdg2t .', '. $usedId .')';
-        $this->store->queryDB($query, $this->store->getDBCon());
-        $usedId = $this->store->getDBCon()->insert_id;
+        $this->store->getDBObject()->simpleQuery($query);
+        $usedId = $this->store->getDBObject()->getLastInsertId();
     }
 
     /**
@@ -85,13 +103,13 @@ class DropTest extends ComplianceTest
         // create graph
         $this->createGraph($graphUri);
 
-        // load test data into graph
-        $parser = \ARC2::getTurtleParser();
-        $parser->parse($this->w3cTestsFolderPath .'/drop-g1.ttl');
-        $this->store->insert($parser->getSimpleIndex(), $graphUri);
+        $this->store->query('INSERT INTO <'.$graphUri.'> {
+            <http://example.org/g1> <http://example.org/name> "G1" ;
+                                    <http://example.org/description> "Graph 1" .
+        }');
 
         // check if graph really contains data
-        $res = $this->store->query('SELECT * FROM <'. $graphUri .'> WHERE {?s ?p ?o.}');
+        $res = $this->store->query('SELECT * WHERE {?s ?p ?o.}');
         $this->assertTrue(0 < count($res['result']['rows']), 'No test data in graph found.');
 
         // run test query

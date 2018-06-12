@@ -376,9 +376,6 @@ class InsertIntoQueryTest extends ARC2_TestCase
         // but ARC2 added none.
         $res = $this->fixture->query('SELECT * FROM <http://example.com/> {?s ?p ?o.}');
         $this->assertEquals(0, \count($res['result']['rows']));
-        // no errors or warnings by ARC2
-        $this->assertTrue(0 == \count($this->fixture->warnings));
-        $this->assertTrue(0 == \count($this->fixture->errors));
 
         $this->markTestSkipped(
             'ARC2 does not check the WHERE clause when inserting data. No data added at all.'

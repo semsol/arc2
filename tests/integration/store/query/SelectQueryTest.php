@@ -1020,8 +1020,9 @@ class SelectQueryTest extends ARC2_TestCase
         ';
 
         // mark skipped, if we have a certain MySQL version running
-        $mysqlMajorVersion = substr($this->fixture->a['db_con']->server_info, 0, 3);
-        if (in_array($mysqlMajorVersion, ['5.7'])) {
+        // TODO make that more flexible, currently its tight to MySQL
+        $serverVersion = $this->fixture->a['db_object']->getServerVersion();
+        if ('05-07' == substr($serverVersion, 0, 5)) {
             $this->markTestSkipped(
                 '[mysql 5.7] Result set is empty for query: '
                 .$query

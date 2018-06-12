@@ -18,7 +18,7 @@ class ARC2_Store extends ARC2_Class
     }
 
     public function __init()
-    {/* db_con */
+    {
         parent::__init();
         $this->table_lock = 0;
         $this->triggers = $this->v('store_triggers', [], $this->a);
@@ -57,8 +57,11 @@ class ARC2_Store extends ARC2_Class
             if (false === class_exists('\\ARC2\\Store\\Adapter\\AdapterFactory')) {
                 require __DIR__.'/../src/ARC2/Store/Adapter/AdapterFactory.php';
             }
+            if (false == isset($this->a['db_adapter'])) {
+                $this->a['db_adapter'] = 'mysqli';
+            }
             $factory = new \ARC2\Store\Adapter\AdapterFactory();
-            $this->db = $factory->getInstanceFor('mysqli', $this->a);
+            $this->db = $factory->getInstanceFor($this->a['db_adapter'], $this->a);
             $err = $this->db->connect();
             // stop here, if an error occoured
             if (is_string($err) && false !== empty($err)) {
@@ -90,13 +93,19 @@ class ARC2_Store extends ARC2_Class
      */
     public function getDBCon($force = 0)
     {
-        if ($force || !isset($this->a['db_con'])) {
+        if ($force || !isset($this->a['db_object'])) {
             if (!$this->createDBCon()) {
                 return false;
             }
         }
 
-        return $this->a['db_con'];
+        if ('mysqli' == $this->a['db_adapter']) {
+            // for backward compatibility reasons only.
+            // TODO remove that in 3.x
+            return $this->a['db_con'];
+        } else {
+            return true;
+        }
     }
 
     /**
@@ -104,10 +113,11 @@ class ARC2_Store extends ARC2_Class
      */
     public function closeDBCon()
     {
-        if ($this->v('db_con', false, $this->a)) {
+        if (isset($this->a['db_object'])) {
             $this->db->disconnect();
         }
         unset($this->a['db_con']);
+        unset($this->a['db_object']);
     }
 
     public function getDBVersion()
@@ -118,12 +128,7 @@ class ARC2_Store extends ARC2_Class
                 $this->createDBCon();
             }
 
-            $res = preg_match(
-                "/^([0-9]+)\.([0-9]+)\.([0-9]+)/",
-                $this->db->getServerInfo(),
-                $m
-            );
-            $this->db_version = $res ? sprintf('%02d-%02d-%02d', $m[1], $m[2], $m[3]) : '00-00-00';
+            $this->db_version = $this->db->getServerVersion();
         }
 
         return $this->db_version;
@@ -134,9 +139,7 @@ class ARC2_Store extends ARC2_Class
      */
     public function getDBSName()
     {
-        return false !== strpos($this->a['db_con']->server_info, 'MariaDB')
-            ? 'mariadb'
-            : 'mysql';
+        return $this->db->getDBSName();
     }
 
     public function getCollation()
@@ -267,7 +270,14 @@ class ARC2_Store extends ARC2_Class
         if (null !== $this->db) {
             $tbl = $this->getTablePrefix().'setting';
 
-            return $this->db->simpleQuery('SELECT 1 FROM '.$tbl.' LIMIT 0') ? 1 : 0;
+            try {
+                // mysqli way
+                return $this->db->simpleQuery('SELECT 1 FROM '.$tbl.' LIMIT 0') ? 1 : 0;
+            } catch (\Exception $e) {
+                // when using PDO, an exception gets thrown if $tbl does not exist.
+                $this->errors[] = $e->getMessage();
+                return 0;
+            }
         }
 
         return 0;
@@ -275,11 +285,7 @@ class ARC2_Store extends ARC2_Class
 
     public function setUp($force = 0)
     {
-        if (($force || !$this->isSetUp()) && $this->getDBCon()) {
-            if ($this->getDBVersion() < '04-00-04') {
-                /* UPDATE + JOINs */
-                return $this->addError('MySQL version not supported. ARC requires version 4.0.4 or higher.');
-            }
+        if (($force || !$this->isSetUp()) && false !== $this->getDBCon()) {
             ARC2::inc('StoreTableManager');
             $mgr = new ARC2_StoreTableManager($this->a, $this);
             $mgr->createTables();
@@ -303,6 +309,10 @@ class ARC2_Store extends ARC2_Class
 
     public function hasSetting($k)
     {
+        if (null == $this->db) {
+            $this->createDBCon();
+        }
+
         $tbl = $this->getTablePrefix().'setting';
 
         return $this->db->fetchRow('SELECT val FROM '.$tbl." WHERE k = '".md5($k)."'")
@@ -312,6 +322,10 @@ class ARC2_Store extends ARC2_Class
 
     public function getSetting($k, $default = 0)
     {
+        if (null == $this->db) {
+            $this->createDBCon();
+        }
+
         $tbl = $this->getTablePrefix().'setting';
         $row = $this->db->fetchRow('SELECT val FROM '.$tbl." WHERE k = '".md5($k)."'");
         if (isset($row['val'])) {
@@ -411,10 +425,10 @@ class ARC2_Store extends ARC2_Class
             $this->createDBCon();
         }
 
-        $tbls = $this->getTables();
         $prefix = $this->getTablePrefix();
+        $tbls = $this->getTables();
         foreach ($tbls as $tbl) {
-            $this->db->simpleQuery('DROP TABLE '.$prefix.$tbl);
+            $this->db->simpleQuery('DROP TABLE IF EXISTS '.$prefix.$tbl);
         }
     }
 

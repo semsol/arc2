@@ -21,3 +21,14 @@ if (file_exists(__DIR__ .'/config.php')) {
         'db_host' => '127.0.0.1',
     );
 }
+
+// set defaults for dbConfig entries
+if (false == isset($dbConfig['store_name'])) {
+    $dbConfig['store_name'] = 'arc';
+}
+
+if (false == isset($dbConfig['db_table_prefix'])) {
+    $dbConfig['db_table_prefix'] = null;
+}
+
+// TODO make it more flexible and enable tests against ALL available DB adapters

@@ -18,7 +18,7 @@ class ARC2_StoreDumpQueryHandler extends ARC2_StoreQueryHandler
     }
 
     public function __init()
-    {/* db_con */
+    {
         parent::__init();
         $this->store = $this->caller;
     }
@@ -26,7 +26,6 @@ class ARC2_StoreDumpQueryHandler extends ARC2_StoreQueryHandler
     public function runQuery($infos, $keep_bnode_ids = 0)
     {
         $this->infos = $infos;
-        $con = $this->store->getDBCon();
         ARC2::inc('StoreDumper');
         $d = new ARC2_StoreDumper($this->a, $this->store);
         $d->dumpSPOG();

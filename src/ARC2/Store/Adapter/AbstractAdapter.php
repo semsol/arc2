@@ -15,6 +15,20 @@ abstract class AbstractAdapter
     protected $db;
 
     /**
+     * Stores errors of failed queries.
+     *
+     * @var array
+     */
+    protected $errors = array();
+
+    /**
+     * Sent queries.
+     *
+     * @var array
+     */
+    protected $queries = array();
+
+    /**
      * @param array $configuration Default is array(). Only use, if you have your own mysqli connection.
      */
     public function __construct(array $configuration = array())
@@ -38,13 +52,11 @@ abstract class AbstractAdapter
 
     abstract public function getAdapterName();
 
-    abstract public function getAffectedRows();
-
     abstract public function getCollation();
 
-    abstract public function getConnectionId();
-
     abstract public function getDBSName();
+
+    abstract public function getLastInsertId();
 
     abstract public function getServerInfo();
 
@@ -57,4 +69,6 @@ abstract class AbstractAdapter
     abstract public function getTablePrefix();
 
     abstract public function simpleQuery($sql);
+
+    abstract public function deleteQuery($sql);
 }

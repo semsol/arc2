@@ -413,8 +413,9 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler
                 $t1 = ARC2::mtime();
                 $this->store->a['db_object']->simpleQuery($this->sql_buffers[$tbl]);
                 /* table error */
-                if (!empty($this->store->a['db_object']->getErrorMessage())) {
-                    $this->autoRepairTable($er, $this->sql_buffers[$tbl]);
+                $error = $this->store->a['db_object']->getErrorMessage();
+                if (!empty($error)) {
+                    $this->autoRepairTable($error, $this->sql_buffers[$tbl]);
                 }
                 unset($this->sql_buffers[$tbl]);
                 if ($this->log_inserts) {

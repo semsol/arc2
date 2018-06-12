@@ -18,7 +18,7 @@ class ARC2_StoreQueryHandler extends ARC2_Class
     }
 
     public function __init()
-    {/* db_con */
+    {
         parent::__init();
         $this->xsd = 'http://www.w3.org/2001/XMLSchema#';
         $this->allow_extension_functions = $this->v('store_allow_extension_functions', 1, $this->a);

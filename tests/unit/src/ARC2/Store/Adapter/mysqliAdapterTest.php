@@ -3,48 +3,20 @@
 namespace Tests\unit\src\ARC2\Store\Adapter;
 
 use ARC2\Store\Adapter\mysqliAdapter;
-use Tests\ARC2_TestCase;
 
-class mysqliAdapterTest extends ARC2_TestCase
+class mysqliAdapterTest extends AbstractAdapterTest
 {
-    public function setUp()
+    protected function checkAdapterRequirements()
     {
-        parent::setUp();
-
         // stop, if mysqli is not available
         if (false == \extension_loaded('mysqli') || false == \function_exists('mysqli_connect')) {
             $this->markTestSkipped('Test skipped, because extension mysqli is not installed.');
         }
-
-        $this->fixture = new mysqliAdapter($this->dbConfig);
-        $result = $this->fixture->connect();
-
-        // remove all tables
-        $tables = $this->fixture->fetchList('SHOW TABLES');
-        foreach($tables as $table) {
-            $this->fixture->simpleQuery('DROP TABLE '. $table['Tables_in_'.$this->dbConfig['db_name']]);
-        }
     }
 
-    public function tearDown()
+    protected function getAdapterInstance($configuration)
     {
-        $this->fixture->disconnect();
-    }
-
-    /*
-     * Tests for connect
-     */
-
-    public function testConnectCreateNewConnection()
-    {
-        $this->fixture->disconnect();
-
-        // do explicit reconnect
-        $this->fixture = new mysqliAdapter($this->dbConfig);
-        $this->fixture->connect();
-
-        $result = $this->fixture->simpleQuery('SHOW TABLES');
-        $this->assertTrue($result);
+        return new mysqliAdapter($configuration);
     }
 
     public function testConnectUseGivenConnection()
@@ -72,21 +44,19 @@ class mysqliAdapterTest extends ARC2_TestCase
         $this->assertTrue($result);
     }
 
-    /*
-     * Tests for getDBSName
-     */
-
-    public function testGetDBSName()
+    public function testEscape()
     {
-        $this->assertTrue(in_array($this->fixture->getDBSName(), array('mariadb', 'mysql')));
+        $this->assertEquals('\"hallo\"', $this->fixture->escape('"hallo"'));
     }
 
-    public function testGetDBSNameNoConnection()
+    public function testGetAdapterName()
     {
-        $this->fixture->disconnect();
+        $this->assertEquals('mysqli', $this->fixture->getAdapterName());
+    }
 
-        // it will reconnect
-        $this->assertEquals('mariadb', $this->fixture->getDBSName());
+    public function testGetConnection()
+    {
+        $this->assertTrue($this->fixture->getConnection() instanceof \mysqli);
     }
 
     /*
@@ -109,21 +79,7 @@ class mysqliAdapterTest extends ARC2_TestCase
             $errorMsg
         );
 
-        $this->assertEquals(1064, $errorCode);
-    }
-
-    /*
-     * Tests for getNumberOfRows
-     */
-
-    public function testGetNumberOfRows()
-    {
-        // create test table
-        $this->fixture->simpleQuery('
-            CREATE TABLE pet (name VARCHAR(20));
-        ');
-
-        $this->assertEquals(1, $this->fixture->getNumberOfRows('SHOW TABLES'));
+        $this->assertTrue(0 < $errorCode);
     }
 
     public function testGetNumberOfRowsInvalidQuery()
@@ -132,15 +88,14 @@ class mysqliAdapterTest extends ARC2_TestCase
         $this->assertEquals(0, $this->fixture->getNumberOfRows('SHOW TABLES of x'));
     }
 
-    /*
-     * Tests for query
-     */
-
-    public function testQuery()
+    public function testMysqliQuery()
     {
-        // valid query
-        $this->assertTrue($this->fixture->simpleQuery('SHOW TABLES'));
+        $res = $this->fixture->mysqliQuery('SHOW TABLES');
+        $this->assertTrue($res instanceof \mysqli_result);
+    }
 
+    public function testQueryInvalid()
+    {
         // invalid query
         $this->assertFalse($this->fixture->simpleQuery('invalid query'));
     }

@@ -19,6 +19,10 @@ class ARC2_ClassTest extends ARC2_TestCase
         $this->dbConnection = $this->store->getDBCon();
 
         $this->fixture = new \ARC2_Class($this->dbConfig, $this);
+
+        if ('mysqli' !== $this->dbConfig['db_adapter']) {
+            $this->markTestSkipped('Db adapter is not mysqli, therefore skip tests with queryDB.');
+        }
     }
 
     /*

@@ -147,11 +147,36 @@ class mysqliAdapter extends AbstractAdapter
             : 'mysql';
     }
 
+    public function getLastInsertId()
+    {
+        if (null != $this->db) {
+            return $this->db->getLastInsertId();
+        }
+
+        return 'No database connection (mysqliAdapter).';
+    }
+
     public function getServerInfo()
     {
         $this->connect();
 
         return $this->db->mysqli()->server_info;
+    }
+
+    /**
+     * Returns the version of the database server like 05-00-12
+     */
+    public function getServerVersion()
+    {
+        $res = preg_match(
+            "/([0-9]+)\.([0-9]+)\.([0-9]+)/",
+            $this->getServerInfo(),
+            $matches
+        );
+
+        return 1 == $res
+            ? sprintf('%02d-%02d-%02d', $matches[1], $matches[2], $matches[3])
+            : '00-00-00';
     }
 
     public function getErrorMessage()
@@ -167,11 +192,6 @@ class mysqliAdapter extends AbstractAdapter
     public function getNumberOfRows($sql)
     {
         return $this->db->getNumberOfRows($sql);
-    }
-
-    public function getAffectedRows()
-    {
-        return $this->db->getAffectedRows();
     }
 
     public function getStoreName()
@@ -220,5 +240,16 @@ class mysqliAdapter extends AbstractAdapter
         }
 
         return $this->db->simpleQuery($sql);
+    }
+
+    /**
+     * @param string $sql DELETE Query
+     *
+     * @return bool True if query ran fine, false otherwise.
+     */
+    public function deleteQuery($sql)
+    {
+        $this->db->simpleQuery($sql);
+        return $this->db->getAffectedRows();
     }
 }

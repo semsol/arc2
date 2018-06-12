@@ -18,7 +18,7 @@ class ARC2_StoreHelper extends ARC2_Class
     }
 
     public function __init()
-    {/* db_con */
+    {
         parent::__init();
         $this->store = $this->caller;
     }

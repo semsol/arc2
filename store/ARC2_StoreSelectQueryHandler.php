@@ -18,7 +18,7 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler
     }
 
     public function __init()
-    {/* db_con */
+    {
         parent::__init();
         $this->store = $this->caller;
         $this->handler_type = 'select';
@@ -221,7 +221,13 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler
                 foreach ($vars as $var) {
                     if (isset($pre_row[$var])) {
                         $row[$var] = $pre_row[$var];
-                        $row[$var.' type'] = isset($pre_row[$var.' type']) ? $types[$pre_row[$var.' type']] : (in_array($var, $aggregate_vars) ? 'literal' : 'uri');
+                        $row[$var.' type'] = isset($pre_row[$var.' type'])
+                            ? $types[$pre_row[$var.' type']]
+                            : (
+                                in_array($var, $aggregate_vars)
+                                    ? 'literal'
+                                    : 'uri'
+                              );
                         if (isset($pre_row[$var.' lang_dt']) && ($lang_dt = $pre_row[$var.' lang_dt'])) {
                             if (preg_match('/^([a-z]+(\-[a-z0-9]+)*)$/i', $lang_dt)) {
                                 $row[$var.' lang'] = $lang_dt;

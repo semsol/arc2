@@ -16,7 +16,7 @@ class ARC2_StoreInsertQueryHandler extends ARC2_StoreQueryHandler
     }
 
     public function __init()
-    {/* db_con */
+    {
         parent::__init();
         $this->store = $this->caller;
     }

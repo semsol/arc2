@@ -42,6 +42,18 @@ class MysqliDbExtended extends \MysqliDb
     }
 
     /**
+     * @return int
+     */
+    public function getLastInsertId()
+    {
+        if (is_object($this->last_result)) {
+            return $this->last_result->insert_id;
+        }
+
+        return null;
+    }
+
+    /**
      * Executes a SQL statement and returns the number of rows. This function will return 0,
      * regardless of errors in the query.
      *
