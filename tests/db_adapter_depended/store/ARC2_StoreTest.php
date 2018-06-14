@@ -493,7 +493,7 @@ XML;
     /**
      * Saft frameworks ARC2 addition fails to run with ARC2 2.4.
      *
-     * https://github.com/SaftIng/Saft/blob/master/src/Saft/Addition/ARC2/Test/Store/NativeARC2ImporterTest.php#L51
+     * https://github.com/SaftIng/Saft/tree/master/src/Saft/Addition/ARC2
      */
     public function testInsertSaftRegressionTest1()
     {
@@ -510,6 +510,51 @@ XML;
 
         $res2 = $this->fixture->query('SELECT * WHERE { ?s ?p ?o. } ');
         $this->assertEquals(442, count($res2['result']['rows']));
+    }
+
+    /**
+     * Saft frameworks ARC2 addition fails to run with ARC2 2.4.
+     *
+     * https://github.com/SaftIng/Saft/tree/master/src/Saft/Addition/ARC2
+     *
+     * This tests checks gathering of freshly created resources.
+     */
+    public function testInsertSaftRegressionTest2()
+    {
+        $res = $this->fixture->query('INSERT INTO <http://localhost/Saft/TestGraph/> {<http://foo/1> <http://foo/2> <http://foo/3> . }');
+
+        $res1 = $this->fixture->query('SELECT * FROM <http://localhost/Saft/TestGraph/> WHERE {?s ?p ?o.}');
+        $this->assertEquals(1, count($res1['result']['rows']));
+
+        $res2 = $this->fixture->query('SELECT * WHERE {?s ?p ?o.}');
+        $this->assertEquals(1, count($res2['result']['rows']));
+
+        $res2 = $this->fixture->query('SELECT ?s ?p ?o WHERE {?s ?p ?o.}');
+        $this->assertEquals(1, count($res2['result']['rows']));
+    }
+
+    /**
+     * Saft frameworks ARC2 addition fails to run with ARC2 2.4.
+     *
+     * This test checks side effects of update operations on different graphs.
+     *
+     * We add 1 triple to 1 and another to another graph. Afterwards removing the first graph.
+     * In the end should the second graph still containg his triple.
+     */
+    public function testInsertSaftRegressionTest3()
+    {
+        $this->fixture->query(
+            'INSERT INTO <http://localhost/Saft/TestGraph/> {<http://localhost/Saft/TestGraph/> <http://localhost/Saft/TestGraph/> <http://localhost/Saft/TestGraph/> . }'
+        );
+        $this->fixture->query(
+            'INSERT INTO <http://second-graph/> {<http://second-graph/0> <http://second-graph/1> <http://second-graph/2> . }'
+        );
+        $this->fixture->query(
+            'DELETE FROM <http://localhost/Saft/TestGraph/>'
+        );
+
+        $res = $this->fixture->query('SELECT * FROM <http://second-graph/> WHERE {?s ?p ?o.}');
+        $this->assertEquals(1, count($res['result']['rows']));
     }
 
     /*
