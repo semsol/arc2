@@ -1,6 +1,7 @@
 # ARC2
 
 [![Build](https://travis-ci.org/semsol/arc2.svg?branch=master)](https://travis-ci.org/semsol/arc2)
+[![Coverage Status](https://coveralls.io/repos/github/semsol/arc2/badge.svg?branch=master)](https://coveralls.io/github/semsol/arc2?branch=master)
 [![Latest Stable Version](https://poser.pugx.org/semsol/arc2/v/stable.svg)](https://packagist.org/packages/semsol/arc2)
 [![Total Downloads](https://poser.pugx.org/semsol/arc2/downloads.svg)](https://packagist.org/packages/semsol/arc2)
 [![Latest Unstable Version](https://poser.pugx.org/semsol/arc2/v/unstable.svg)](https://packagist.org/packages/semsol/arc2)
@@ -42,4 +43,8 @@ composer require semsol/arc2:2.4.*
 
 ## RDF triple store
 
-Please have a look into [SPARQL-support.md](SPARQL-support.md) to see which SPARQL 1.0/1.1 features are currently supported.
+Please have a look into [SPARQL-support.md](doc/SPARQL-support.md) to see which SPARQL 1.0/1.1 features are currently supported.
+
+## Internal information for developers
+
+Please have a look [here](doc/developer.md) to find information about maintaining and extending ARC2.
