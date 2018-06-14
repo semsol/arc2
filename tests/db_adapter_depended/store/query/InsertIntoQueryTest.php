@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\integration\store\query;
+namespace Tests\db_adapter_depended\store\query;
 
 use Tests\ARC2_TestCase;
 
@@ -54,7 +54,7 @@ class InsertIntoQueryTest extends ARC2_TestCase
         // using <#foo> in query makes ARC2 using the phpunit path as prefix
         // e.g. file:///var/www/html/pier-and-peer/ARC2/vendor/phpunit/phpunit/phpunit#
         // therefore we build this prefix manually to check later
-        $filePrefix = 'file://'.str_replace('tests/integration/store/query', '', __DIR__);
+        $filePrefix = 'file://'.str_replace('tests/db_adapter_depended/store/query', '', __DIR__);
         $filePrefix .= 'vendor/phpunit/phpunit/phpunit#';
 
         $this->assertEquals(

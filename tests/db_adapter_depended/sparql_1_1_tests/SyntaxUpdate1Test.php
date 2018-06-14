@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\sparql11;
+namespace Tests\db_adapter_depended\sparql_1_1_tests;
 
 /**
  * Runs W3C tests from https://www.w3.org/2009/sparql/docs/tests/

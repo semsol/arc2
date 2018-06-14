@@ -12,6 +12,13 @@ class PDOAdapterTest extends AbstractAdapterTest
         if (false == \extension_loaded('pdo_mysql')) {
             $this->markTestSkipped('Test skipped, because extension pdo_mysql is not installed.');
         }
+
+        // stop, if pdo_db_protocol is not set in dbConfig
+        if (false == isset($this->dbConfig['pdo_db_protocol'])) {
+            $this->markTestSkipped(
+                'Test skipped, because pdo_db_protocol is not set. Its ok, if this happens in unit test environment.'
+            );
+        }
     }
 
     protected function getAdapterInstance($configuration)

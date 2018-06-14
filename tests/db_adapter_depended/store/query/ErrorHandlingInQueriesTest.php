@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\integration\store\query;
+namespace Tests\db_adapter_depended\store\query;
 
 use Tests\ARC2_TestCase;
 
@@ -49,6 +49,6 @@ class ErrorHandlingInQueriesTest extends ARC2_TestCase
             $res
         );
 
-        $this->assertEquals(3, count($this->fixture->errors));
+        $this->assertTrue(2 <= count($this->fixture->errors));
     }
 }

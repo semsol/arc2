@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\integration;
+namespace Tests\db_adapter_depended;
 
 use Tests\ARC2_TestCase;
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\sparql11;
+namespace Tests\db_adapter_depended\sparql_1_1_tests;
 
 use Tests\ARC2_TestCase;
 

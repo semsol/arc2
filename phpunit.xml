@@ -19,11 +19,8 @@
         <ini name="display_errors" value="On"/>
     </php>
     <testsuites>
-        <testsuite name="integration">
-            <directory suffix="Test.php">./tests/integration</directory>
-        </testsuite>
-        <testsuite name="sparql11">
-            <directory suffix="Test.php">./tests/sparql11</directory>
+        <testsuite name="db_adapter_depended">
+            <directory suffix="Test.php">./tests/db_adapter_depended</directory>
         </testsuite>
         <testsuite name="unit">
             <directory suffix="Test.php">./tests/unit</directory>
