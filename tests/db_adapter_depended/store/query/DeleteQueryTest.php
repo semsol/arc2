@@ -23,7 +23,7 @@ class DeleteQueryTest extends ARC2_TestCase
         $this->fixture->closeDBCon();
     }
 
-    protected function runSPOQuery(string $g = null)
+    protected function runSPOQuery($g = null)
     {
         return null == $g
             ? $this->fixture->query('SELECT * WHERE {?s ?p ?o.}')
@@ -129,7 +129,7 @@ class DeleteQueryTest extends ARC2_TestCase
             <http://s> rdf:type <http://Test> .
         }');
 
-        $this->assertEquals(5, \count($this->runSPOQuery()['result']['rows']));
+        $this->assertEquals(5, \count($this->runSPOQuery('http://example.com/1')['result']['rows']));
 
         $this->fixture->query('DELETE FROM <http://example.com/1> {
             <http://s> <http://to-delete> 1, 2 .
@@ -137,6 +137,6 @@ class DeleteQueryTest extends ARC2_TestCase
             <http://s> <http://to-check> 1, 2 .
         }');
 
-        $this->assertEquals(3, \count($this->runSPOQuery()['result']['rows']));
+        $this->assertEquals(3, \count($this->runSPOQuery('http://example.com/1')['result']['rows']));
     }
 }

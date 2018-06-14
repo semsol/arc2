@@ -1370,4 +1370,58 @@ class SelectQueryTest extends ARC2_TestCase
             $res
         );
     }
+
+    /*
+     * Tests using certain queries with SELECT FROM WHERE and not just SELECT WHERE
+     */
+
+    public function testSelectOrderByAscWithFromClause()
+    {
+        // test data
+        $this->fixture->query('INSERT INTO <http://example.com/> {
+            <http://person1> <http://id> "1" .
+            <http://person3> <http://id> "3" .
+            <http://person2> <http://id> "2" .
+        }');
+
+        $res = $this->fixture->query('
+            SELECT * FROM <http://example.com/> WHERE {
+                ?s <http://id> ?id .
+            }
+            ORDER BY ASC(?id)
+        ');
+        $this->assertEquals(
+            [
+                'query_type' => 'select',
+                'result' => [
+                    'variables' => [
+                        's',
+                        'id'
+                    ],
+                    'rows' => [
+                        [
+                            's' => 'http://person1',
+                            's type' => 'uri',
+                            'id' => '1',
+                            'id type' => 'literal',
+                        ],
+                        [
+                            's' => 'http://person2',
+                            's type' => 'uri',
+                            'id' => '2',
+                            'id type' => 'literal',
+                        ],
+                        [
+                            's' => 'http://person3',
+                            's type' => 'uri',
+                            'id' => '3',
+                            'id type' => 'literal',
+                        ],
+                    ],
+                ],
+                'query_time' => $res['query_time']
+            ],
+            $res
+        );
+    }
 }

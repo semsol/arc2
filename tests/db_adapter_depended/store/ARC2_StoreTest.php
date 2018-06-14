@@ -490,6 +490,28 @@ XML;
         $this->assertEquals(0, $res);
     }
 
+    /**
+     * Saft frameworks ARC2 addition fails to run with ARC2 2.4.
+     *
+     * https://github.com/SaftIng/Saft/blob/master/src/Saft/Addition/ARC2/Test/Store/NativeARC2ImporterTest.php#L51
+     */
+    public function testInsertSaftRegressionTest1()
+    {
+        $res = $this->fixture->query('SELECT * FROM <http://example.com/> WHERE { ?s ?p ?o. } ');
+        $this->assertEquals(0, count($res['result']['rows']));
+
+        $this->fixture->insert(
+            file_get_contents(__DIR__.'/../../data/nt/saft-arc2-addition-regression1.nt'),
+            'http://example.com/'
+        );
+
+        $res1 = $this->fixture->query('SELECT * FROM <http://example.com/> WHERE { ?s ?p ?o. } ');
+        $this->assertEquals(442, count($res1['result']['rows']));
+
+        $res2 = $this->fixture->query('SELECT * WHERE { ?s ?p ?o. } ');
+        $this->assertEquals(442, count($res2['result']['rows']));
+    }
+
     /*
      * Tests for logQuery
      */
