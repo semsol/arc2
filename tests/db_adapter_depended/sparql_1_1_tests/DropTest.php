@@ -20,51 +20,6 @@ class DropTest extends ComplianceTest
     }
 
     /**
-     * @param string $graphUri
-     * @todo Check that $graphUri is a valid URI
-     * @todo port this functionality to ARC2_Store->query
-     */
-    protected function createGraph($graphUri)
-    {
-        // g2t table
-        if (isset($this->dbConfig['db_table_prefix'])) {
-            $g2t = $this->dbConfig['db_table_prefix'] . '_';
-        } else {
-            $g2t = '';
-        }
-        if (isset($this->dbConfig['store_name'])) {
-            $g2t .= $this->dbConfig['store_name'] . '_';
-        }
-        $g2t .= 'g2t';
-
-        // id2val table
-        if (isset($this->dbConfig['db_table_prefix'])) {
-            $id2val = $this->dbConfig['db_table_prefix'] . '_';
-        } else {
-            $id2val = '';
-        }
-        if (isset($this->dbConfig['store_name'])) {
-            $id2val .= $this->dbConfig['store_name'] . '_';
-        }
-        $id2val .= 'id2val';
-
-        /*
-         * for id2val table
-         */
-        $query = 'INSERT INTO '. $id2val .' (val) VALUES("'. $graphUri .'")';
-        $this->store->getDBObject()->simpleQuery($query);
-        $usedId = $this->store->getDBObject()->getLastInsertId();
-
-        /*
-         * for g2t table
-         */
-        $newIdg2t = 1 + $this->getRowCount($g2t);
-        $query = 'INSERT INTO '. $g2t .' (t, g) VALUES('. $newIdg2t .', '. $usedId .')';
-        $this->store->getDBObject()->simpleQuery($query);
-        $usedId = $this->store->getDBObject()->getLastInsertId();
-    }
-
-    /**
      * Helper function to get test query for a given test.
      *
      * @param string $testUri
@@ -99,9 +54,6 @@ class DropTest extends ComplianceTest
     public function test_delete_graph()
     {
         $graphUri = 'http://example.org/g1';
-
-        // create graph
-        $this->createGraph($graphUri);
 
         $this->store->query('INSERT INTO <'.$graphUri.'> {
             <http://example.org/g1> <http://example.org/name> "G1" ;

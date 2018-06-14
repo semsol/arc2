@@ -557,6 +557,27 @@ XML;
         $this->assertEquals(1, count($res['result']['rows']));
     }
 
+    public function testMultipleInsertQuerysInDifferentGraphs()
+    {
+        $this->fixture->query('INSERT INTO <http://graph1/> {<http://foo/1> <http://foo/2> <http://foo/3> . }');
+        $this->fixture->query('INSERT INTO <http://graph2/> {<http://foo/4> <http://foo/5> <http://foo/6> . }');
+        $this->fixture->query('INSERT INTO <http://graph2/> {<http://foo/1> <http://foo/2> <http://foo/3> . }');
+
+        $res = $this->fixture->query('SELECT * FROM <http://graph1/> WHERE {?s ?p ?o.}');
+        $this->assertEquals(1, count($res['result']['rows']));
+
+        $res = $this->fixture->query('SELECT * FROM <http://graph2/> WHERE {?s ?p ?o.}');
+        $this->assertEquals(1, count($res['result']['rows']));
+
+        $res = $this->fixture->query('SELECT * WHERE {?s ?p ?o.}');
+        $this->assertEquals(3, count($res['result']['rows']));
+
+        $this->markTestSkipped(
+            'Adding the same triple into two graphs does not work.'
+            . PHP_EOL . 'Bug report: https://github.com/semsol/arc2/issues/114'
+        );
+    }
+
     /*
      * Tests for logQuery
      */
