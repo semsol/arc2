@@ -86,6 +86,17 @@ class PDOAdapter extends AbstractAdapter
             $stmt = $this->db->prepare('SET SESSION SQL_BIG_SELECTS=1');
             $stmt->execute();
             $stmt->closeCursor();
+
+            // with MySQL 5.6 we ran into exceptions like:
+            //      PDOException: SQLSTATE[42000]: Syntax error or access violation:
+            //      1140 In aggregated query without GROUP BY, expression #1 of SELECT list contains
+            //      nonaggregated column 'testdb.T_0_0_0.p'; this is incompatible with sql_mode=only_full_group_by
+            //
+            // the following query makes this right.
+            // FYI: https://stackoverflow.com/questions/23921117/disable-only-full-group-by
+            $stmt = $this->db->prepare("SET sql_mode = ''");
+            $stmt->execute();
+            $stmt->closeCursor();
         }
 
         return $this->db;
