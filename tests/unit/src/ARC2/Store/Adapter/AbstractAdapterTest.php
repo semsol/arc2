@@ -32,7 +32,9 @@ abstract class AbstractAdapterTest extends ARC2_TestCase
 
     public function tearDown()
     {
-        $this->fixture->disconnect();
+        if (null !== $this->fixture) {
+            $this->fixture->disconnect();
+        }
     }
 
     protected function dropAllTables()
