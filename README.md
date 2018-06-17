@@ -18,6 +18,15 @@ If you're using Composer to manage dependencies, you can use
 ```bash
 composer require semsol/arc2:2.4.*
 ```
+
+### Branches
+
+`2.3.1` was latest stable version for a long time. But recent developments lead to version `2.4`, which is the next minor version of the 2.x-branch, containing stabilizations, wider test coverage and a couple of new features (e.g. PDO adapter for RDF store). Primary focus was to keep backward compatibility, so that an upgrade doesn't mess up your application. Its not clear how long the 2.x-branch will be maintained, so please consider upgrading to 3.x.
+
+![](doc/branches.png)
+
+Version `3.x` introduces new features and develops the backend further. Unfortunately, backward compatibility can not be maintained. One of the major changes is the transition from MyISAM to InnoDB table engine (RDF store).
+
 ## Requirements
 
 #### PHP
@@ -44,6 +53,21 @@ composer require semsol/arc2:2.4.*
 ## RDF triple store
 
 Please have a look into [SPARQL-support.md](doc/SPARQL-support.md) to see which SPARQL 1.0/1.1 features are currently supported.
+
+### Known problems/restrictions with database systems
+
+In this section you find known problems with MariaDB or MySQL, regarding certain features. E.g. MySQL 5.5 doesn't allow FULLTEXT indexes in InnoDB. We try to encapsulate any differences in the DB adapters, so that you don't have to care about them. In case you run into problems, this section might be of help.
+
+#### MySQL 8.0 and mysqli
+
+Using mysqli with MySQL 8.0 as backend throws the following exception:
+
+> mysqli_connect(): The server requested authentication method unknown to the client [caching_sha2_password]
+
+Based on this [source](https://mysqlserverteam.com/upgrading-to-mysql-8-0-default-authentication-plugin-considerations/), one has to change the my.cnf, adding the following entry:
+
+> [mysqld]
+> default-authentication-plugin=mysql_native_password
 
 ## Internal information for developers
 
