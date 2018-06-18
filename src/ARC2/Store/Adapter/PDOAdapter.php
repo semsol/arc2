@@ -114,7 +114,7 @@ class PDOAdapter extends AbstractAdapter
     public function escape($value)
     {
         // quote surronds the string with ', but using trim aligns the result
-        return trim($this->db->quote($value), "'");
+        return \trim($this->db->quote($value), "'");
     }
 
     /**
@@ -159,8 +159,8 @@ class PDOAdapter extends AbstractAdapter
         $stmt = $this->db->prepare($sql);
         $stmt->execute();
         $rows = $stmt->fetchAll();
-        if (0 < count($rows)) {
-            $row = array_values($rows)[0];
+        if (0 < \count($rows)) {
+            $row = \array_values($rows)[0];
         }
         $stmt->closeCursor();
 
@@ -194,10 +194,10 @@ class PDOAdapter extends AbstractAdapter
             return null;
         }
 
-        $clientVersion = strtolower($this->db->getAttribute(\PDO::ATTR_SERVER_VERSION));
-        if (false !== strpos($clientVersion, 'mariadb')) {
+        $clientVersion = \strtolower($this->db->getAttribute(\PDO::ATTR_SERVER_VERSION));
+        if (false !== \strpos($clientVersion, 'mariadb')) {
             $return = 'mariadb';
-        } elseif (false !== strpos($clientVersion, 'mysql')) {
+        } elseif (false !== \strpos($clientVersion, 'mysql')) {
             $return = 'mysql';
         } else {
             $return = null;
@@ -208,7 +208,7 @@ class PDOAdapter extends AbstractAdapter
 
     public function getServerInfo()
     {
-        return $this->db->getAttribute(constant('PDO::ATTR_CLIENT_VERSION'));
+        return $this->db->getAttribute(\constant('PDO::ATTR_CLIENT_VERSION'));
     }
 
     /**
@@ -216,14 +216,14 @@ class PDOAdapter extends AbstractAdapter
      */
     public function getServerVersion()
     {
-        $res = preg_match(
+        $res = \preg_match(
             "/([0-9]+)\.([0-9]+)\.([0-9]+)/",
             $this->getServerInfo(),
             $matches
         );
 
         return 1 == $res
-            ? sprintf('%02d-%02d-%02d', $matches[1], $matches[2], $matches[3])
+            ? \sprintf('%02d-%02d-%02d', $matches[1], $matches[2], $matches[3])
             : '00-00-00';
     }
 
@@ -252,7 +252,7 @@ class PDOAdapter extends AbstractAdapter
 
         $stmt = $this->db->prepare($sql);
         $stmt->execute();
-        $rowCount = count($stmt->fetchAll());
+        $rowCount = \count($stmt->fetchAll());
         $stmt->closeCursor();
         return $rowCount;
     }
