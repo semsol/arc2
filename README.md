@@ -52,6 +52,8 @@ Version `3.x` introduces new features and develops the backend further. Unfortun
 
 ## RDF triple store
 
+### SPARQL support
+
 Please have a look into [SPARQL-support.md](doc/SPARQL-support.md) to see which SPARQL 1.0/1.1 features are currently supported.
 
 ### Known problems/restrictions with database systems
@@ -72,3 +74,9 @@ Based on this [source](https://mysqlserverteam.com/upgrading-to-mysql-8-0-defaul
 ## Internal information for developers
 
 Please have a look [here](doc/developer.md) to find information about maintaining and extending ARC2.
+
+### Docker setup
+
+For ARC2 developers we recommend this following [Docker setup](https://github.com/k00ni/PHP-Apache-MySQL-Docker). It provides a pre-configured set of software (for PHP, DBS etc.) and allows quick switches between different software versions.
+
+For more information have a look [here](https://github.com/k00ni/PHP-Apache-MySQL-Docker).
