@@ -14,9 +14,9 @@ class PDOAdapterTest extends AbstractAdapterTest
         }
 
         // stop, if pdo_db_protocol is not set in dbConfig
-        if (false == isset($this->dbConfig['pdo_db_protocol'])) {
+        if (false == isset($this->dbConfig['db_pdo_protocol'])) {
             $this->markTestSkipped(
-                'Test skipped, because pdo_db_protocol is not set. Its ok, if this happens in unit test environment.'
+                'Test skipped, because db_pdo_protocol is not set. Its ok, if this happens in unit test environment.'
             );
         }
     }
@@ -81,19 +81,29 @@ class PDOAdapterTest extends AbstractAdapterTest
 
     /**
      * @expectedException \Exception
-     * @expectedExceptionMessage SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'of x' at line 1
      */
     public function testGetNumberOfRowsInvalidQuery()
     {
+        $dbs = 'mysql' == $this->fixture->getDBSName() ? 'MySQL' : 'MariaDB';
+
+        $this->expectExceptionMessage(
+            "SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your $dbs server version for the right syntax to use near 'of x' at line 1"
+        );
+
         $this->fixture->getNumberOfRows('SHOW TABLES of x');
     }
 
     /**
      * @expectedException \Exception
-     * @expectedExceptionMessage SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'invalid query' at line 1
      */
     public function testQueryInvalid()
     {
+        $dbs = 'mysql' == $this->fixture->getDBSName() ? 'MySQL' : 'MariaDB';
+
+        $this->expectExceptionMessage(
+            "SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your $dbs server version for the right syntax to use near 'invalid query' at line 1"
+        );
+
         // invalid query
         $this->assertFalse($this->fixture->simpleQuery('invalid query'));
     }

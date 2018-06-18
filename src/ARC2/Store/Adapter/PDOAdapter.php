@@ -134,7 +134,6 @@ class PDOAdapter extends AbstractAdapter
             $this->connect();
         }
 
-        $row = false;
         $stmt = $this->db->prepare($sql);
         $stmt->execute();
         $rows = $stmt->fetchAll();
@@ -191,10 +190,10 @@ class PDOAdapter extends AbstractAdapter
     public function getDBSName()
     {
         if (null == $this->db) {
-            return null;
+            return;
         }
 
-        $clientVersion = \strtolower($this->db->getAttribute(\PDO::ATTR_SERVER_VERSION));
+        $clientVersion = \strtolower($this->db->getAttribute(\PDO::ATTR_CLIENT_VERSION));
         if (false !== \strpos($clientVersion, 'mariadb')) {
             $return = 'mariadb';
         } elseif (false !== \strpos($clientVersion, 'mysql')) {
@@ -313,7 +312,19 @@ class PDOAdapter extends AbstractAdapter
             'by_function' => 'deleteQuery'
         ];
 
-        $affectedRows = $this->db->exec($sql);
+        $affectedRows = $this->exec($sql);
         return $affectedRows;
+    }
+
+    /**
+     * Encapsulates internal PDO::exec call. This allows us to extend it, e.g. with caching functionality.
+     *
+     * @param string $sql
+     *
+     * @return int Number of affected rows.
+     */
+    protected function exec($sql)
+    {
+        return $this->db->exec($sql);
     }
 }

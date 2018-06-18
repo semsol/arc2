@@ -167,6 +167,8 @@ abstract class AbstractAdapterTest extends ARC2_TestCase
 
     public function testGetDBSName()
     {
+        // connect and check
+        $this->fixture->connect();
         $this->assertTrue(in_array($this->fixture->getDBSName(), array('mariadb', 'mysql')));
     }
 
