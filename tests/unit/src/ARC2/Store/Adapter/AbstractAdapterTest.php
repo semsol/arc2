@@ -194,6 +194,7 @@ abstract class AbstractAdapterTest extends ARC2_TestCase
             CREATE TABLE pet (name VARCHAR(20));
         ');
 
+        var_dump($this->fixture->getNumberOfRows('SHOW TABLES'));
         $this->assertEquals(1, $this->fixture->getNumberOfRows('SHOW TABLES'));
     }
 
@@ -206,14 +207,15 @@ abstract class AbstractAdapterTest extends ARC2_TestCase
         // valid query
         $sql = 'CREATE TABLE MyGuests (id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY)';
         $this->fixture->simpleQuery($sql);
-        $this->assertEquals(
-            [
-                [
-                    'Tables_in_testdb' => 'MyGuests',
-                ]
-            ],
-            $this->fixture->fetchList('SHOW TABLES')
-        );
+
+        $foundTable = false;
+        foreach ($this->fixture->fetchList('SHOW TABLES') as $entry) {
+            if ('MyGuests' == $entry['Tables_in_'.$this->dbConfig['db_name']]) {
+                $foundTable = true;
+                break;
+            }
+        }
+        $this->assertTrue($foundTable, 'Expected table not found.');
     }
 
     /*
