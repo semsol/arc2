@@ -194,7 +194,6 @@ abstract class AbstractAdapterTest extends ARC2_TestCase
             CREATE TABLE pet (name VARCHAR(20));
         ');
 
-        var_dump($this->fixture->getNumberOfRows('SHOW TABLES'));
         $this->assertEquals(1, $this->fixture->getNumberOfRows('SHOW TABLES'));
     }
 

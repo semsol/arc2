@@ -45,6 +45,8 @@ class CachedPDOAdapter extends PDOAdapter
                 // FYI: https://symfony.com/doc/current/components/cache/adapters/filesystem_adapter.html
                 $this->cache = new FilesystemCache('arc2', 0, null);
             }
+        } else {
+            throw new \Exception('Cache not enabled, therefore CachedPDOAdapter can not be used.');
         }
     }
 
@@ -119,7 +121,7 @@ class CachedPDOAdapter extends PDOAdapter
      */
     protected function queryChangesDb($sql)
     {
-        $sqlPart = substr($sql, 0, 4);
+        $sqlPart = substr(trim($sql), 0, 4);
         return true === in_array($sqlPart, ['CREA', 'DROP', 'DELE', 'INSE', 'RENA', 'UPDA',]);
     }
 

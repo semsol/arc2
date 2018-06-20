@@ -48,7 +48,7 @@ if ('pdo' == getenv('DB_ADAPTER')) {
  *
  * if enabled, we use an instance of ArrayCache which is very fast
  */
-if (true == getenv('CACHE_ENABLED')) {
+if (true ===\getenv('CACHE_ENABLED') || 'true' == \getenv('CACHE_ENABLED')) {
     $dbConfig['cache_enabled'] = true;
     $dbConfig['cache_instance'] = new Symfony\Component\Cache\Simple\ArrayCache();
 }
