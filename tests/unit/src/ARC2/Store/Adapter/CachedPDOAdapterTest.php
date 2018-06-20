@@ -24,4 +24,17 @@ class CachedPDOAdapterTest extends PDOAdapterTest
     {
         return new CachedPDOAdapter($configuration);
     }
+
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage Cache not enabled, therefore CachedPDOAdapter can not be used.
+     */
+    public function testExceptionIfCacheIsNotEnabled()
+    {
+        $cfg = $this->dbConfig;
+        unset($cfg['cache_enabled']);
+        unset($cfg['cache_instance']);
+
+        new CachedPDOAdapter($cfg);
+    }
 }
