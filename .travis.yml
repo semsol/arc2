@@ -207,8 +207,8 @@ git:
     depth: 1
 
 cache:
-    directories:
-        - $HOME/.composer
+  directories:
+    - $HOME/.composer/cache/files
 
 before_script:
     #
@@ -220,7 +220,7 @@ before_script:
     # setup and run tests
     #
     # Install composer packages, will also trigger dump-autoload
-    - travis_retry composer install --no-interaction
+    - travis_retry composer install --no-interaction --prefer-dist
     # Install coveralls.phar
     - wget -c -nc --retry-connrefused --tries=0 https://github.com/satooshi/php-coveralls/releases/download/v1.1.0/coveralls.phar
     - chmod +x coveralls.phar
