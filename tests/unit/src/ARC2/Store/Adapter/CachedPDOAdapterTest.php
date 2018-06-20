@@ -12,18 +12,4 @@ class CachedPDOAdapterTest extends PDOAdapterTest
 
         return new CachedPDOAdapter($configuration);
     }
-
-    public function setUp()
-    {
-        parent::setUp();
-
-        $this->fixture->clearCache();
-    }
-
-    public function tearDown()
-    {
-        $this->fixture->clearCache();
-
-        parent::tearDown();
-    }
 }
