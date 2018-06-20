@@ -243,11 +243,11 @@ class mysqliAdapter extends AbstractAdapter
     }
 
     /**
-     * @param string $sql DELETE Query
+     * @param string $sql Query with return of affected rows
      *
      * @return bool True if query ran fine, false otherwise.
      */
-    public function deleteQuery($sql)
+    public function exec($sql)
     {
         $this->db->simpleQuery($sql);
         return $this->db->getAffectedRows();

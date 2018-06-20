@@ -35,6 +35,11 @@ abstract class AbstractAdapterTest extends ARC2_TestCase
         if (null !== $this->fixture) {
             $this->fixture->disconnect();
         }
+
+        // in case we run with a cache, clear it
+        if (isset($this->dbConfig['cache_enabled']) && true == $this->dbConfig['cache_enabled']) {
+            $this->fixture->clearCache();
+        }
     }
 
     protected function dropAllTables()
@@ -63,16 +68,16 @@ abstract class AbstractAdapterTest extends ARC2_TestCase
     }
 
     /*
-     * Tests for deleteQuery
+     * Tests for exec
      */
 
-    public function testDeleteQuery()
+    public function testExec()
     {
         $this->fixture->simpleQuery('CREATE TABLE users (id INT(6), name VARCHAR(30) NOT NULL)');
         $this->fixture->simpleQuery('INSERT INTO users (id, name) VALUE (1, "foobar");');
         $this->fixture->simpleQuery('INSERT INTO users (id, name) VALUE (2, "foobar2");');
 
-        $this->assertEquals(2, $this->fixture->deleteQuery('DELETE FROM users;'));
+        $this->assertEquals(2, $this->fixture->exec('DELETE FROM users;'));
     }
 
     /*

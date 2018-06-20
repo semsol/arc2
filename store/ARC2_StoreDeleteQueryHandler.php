@@ -72,7 +72,7 @@ class ARC2_StoreDeleteQueryHandler extends ARC2_StoreQueryHandler
         $r = 0;
         foreach ($this->infos['query']['target_graphs'] as $g) {
             if ($g_id = $this->getTermID($g, 'g')) {
-                $r += $this->store->a['db_object']->deleteQuery('DELETE FROM '.$tbl_prefix.'g2t WHERE g = '.$g_id);
+                $r += $this->store->a['db_object']->exec('DELETE FROM '.$tbl_prefix.'g2t WHERE g = '.$g_id);
             }
         }
         $this->refs_deleted = $r ? 1 : 0;
@@ -129,7 +129,7 @@ class ARC2_StoreDeleteQueryHandler extends ARC2_StoreQueryHandler
                 $sql = ($dbv < '04-01') ? 'DELETE '.$this->getTripleTable() : 'DELETE T';
                 $sql .= ' FROM '.$this->getTripleTable().' T WHERE '.$q;
             }
-            $r += $this->store->a['db_object']->deleteQuery($sql);
+            $r += $this->store->a['db_object']->exec($sql);
             if (!empty($this->store->a['db_object']->getErrorMessage())) {
                 $this->addError($this->store->a['db_object']->getErrorMessage().' in '.$sql);
             }

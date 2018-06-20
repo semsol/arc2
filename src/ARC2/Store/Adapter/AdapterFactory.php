@@ -33,10 +33,19 @@ class AdapterFactory
              * PDO
              */
             } elseif ('pdo' == $adapterName) {
-                if (false == class_exists('\\ARC2\\Store\\Adapter\\PDOAdapter')) {
-                    require_once 'PDOAdapter.php';
+                // use cache?
+                if (isset($configuration['cache_enabled'])) {
+                    if (false == class_exists('\\ARC2\\Store\\Adapter\\CachedPDOAdapter')) {
+                        require_once 'CachedPDOAdapter.php';
+                    }
+                    return new CachedPDOAdapter($configuration);
+                // no cache
+                } else {
+                    if (false == class_exists('\\ARC2\\Store\\Adapter\\PDOAdapter')) {
+                        require_once 'PDOAdapter.php';
+                    }
+                    return new PDOAdapter($configuration);
                 }
-                return new PDOAdapter($configuration);
             }
         }
 

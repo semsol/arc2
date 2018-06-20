@@ -46,6 +46,8 @@ abstract class AbstractAdapter
 
     abstract public function escape($value);
 
+    abstract public function exec($sql);
+
     abstract public function fetchList($sql);
 
     abstract public function fetchRow($sql);
@@ -69,6 +71,4 @@ abstract class AbstractAdapter
     abstract public function getTablePrefix();
 
     abstract public function simpleQuery($sql);
-
-    abstract public function deleteQuery($sql);
 }

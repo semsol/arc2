@@ -300,31 +300,20 @@ class PDOAdapter extends AbstractAdapter
     }
 
     /**
-     * @param string $sql DELETE Query
-     *
-     * @return int Number of affected rows
-     */
-    public function deleteQuery($sql)
-    {
-        // save query
-        $this->queries[] = [
-            'query' => $sql,
-            'by_function' => 'deleteQuery'
-        ];
-
-        $affectedRows = $this->exec($sql);
-        return $affectedRows;
-    }
-
-    /**
      * Encapsulates internal PDO::exec call. This allows us to extend it, e.g. with caching functionality.
      *
      * @param string $sql
      *
      * @return int Number of affected rows.
      */
-    protected function exec($sql)
+    public function exec($sql)
     {
+        // save query
+        $this->queries[] = [
+            'query' => $sql,
+            'by_function' => 'exec'
+        ];
+
         return $this->db->exec($sql);
     }
 }

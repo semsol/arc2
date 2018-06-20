@@ -24,3 +24,10 @@ test:
 	@echo "##########################"
 	@echo ""
 	DB_ADAPTER=pdo DB_PDO_PROTOCOL=mysql vendor/bin/phpunit --testsuite db_adapter_depended
+	@echo ""
+	@echo ""
+	@echo "#######################################"
+	@echo "PDO adapter depended tests (with cache)"
+	@echo "#######################################"
+	@echo ""
+	DB_ADAPTER=pdo DB_PDO_PROTOCOL=mysql CACHE_ENABLED=true vendor/bin/phpunit --testsuite db_adapter_depended

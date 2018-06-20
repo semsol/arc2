@@ -40,3 +40,13 @@ if ('pdo' == getenv('DB_ADAPTER')) {
         throw new \Exception('Environment variable DB_PDO_PROTOCOL not set. Possible values are: mysql');
     }
 }
+
+/*
+ * set cache enable
+ *
+ * if enabled, we use an instance of ArrayCache which is very fast
+ */
+if (true == getenv('CACHE_ENABLED')) {
+    $dbConfig['cache_enabled'] = true;
+    $dbConfig['cache_instance'] = new Symfony\Component\Cache\Simple\ArrayCache();
+}

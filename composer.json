@@ -26,7 +26,8 @@
     ],
     "require": {
         "php": ">=5.3.0",
-        "joshcam/mysqli-database-class": "2.*"
+        "joshcam/mysqli-database-class": "2.*",
+        "symfony/cache": "3.4.*"
     },
     "require-dev": {
         "doctrine/instantiator": "1.0.*",
