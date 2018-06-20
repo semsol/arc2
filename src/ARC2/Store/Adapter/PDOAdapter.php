@@ -194,9 +194,10 @@ class PDOAdapter extends AbstractAdapter
         }
 
         $clientVersion = \strtolower($this->db->getAttribute(\PDO::ATTR_CLIENT_VERSION));
-        if (false !== \strpos($clientVersion, 'mariadb')) {
+        $serverVersion = \strtolower($this->db->getAttribute(\PDO::ATTR_SERVER_VERSION));
+        if (false !== \strpos($clientVersion, 'mariadb') || false !== \strpos($serverVersion, 'mariadb')) {
             $return = 'mariadb';
-        } elseif (false !== \strpos($clientVersion, 'mysql')) {
+        } elseif (false !== \strpos($clientVersion, 'mysql') || false !== \strpos($serverVersion, 'mysql')) {
             $return = 'mysql';
         } else {
             $return = null;
