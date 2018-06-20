@@ -46,4 +46,4 @@ No matter if one needs a MariaDB 10.3 with PHP 7.2 or a PHP 5.6 with MySQL 5.7.0
 
 We use a very wide range of software-combinations to test ARC2 ([Travis](https://travis-ci.org/semsol/arc2)). Currently, all combinations of major versions of PHP and database systems (currently MySQL and MariaDB only) are checked.
 
-Using a Docker setup for local development allows to switch the backend very easily. So, if a test with a certain DBS/PHP version combination fails on travis, its very likely that you can reproduce it locally.
+Using a Docker setup for local development allows to switch the backend very easily. So, if a test with a certain DBS/PHP version combination fails on travis, its very likely that you can reproduce it locally. Dont forget to run `composer update` after a switch to make sure appropriate software is used.
