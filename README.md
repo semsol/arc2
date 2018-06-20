@@ -25,7 +25,7 @@ composer require semsol/arc2:2.4.*
 
 ![](doc/branches.png)
 
-Version `3.x` introduces new features and develops the backend further. Unfortunately, backward compatibility can not be maintained. One of the major changes is the transition from MyISAM to InnoDB table engine (RDF store).
+Version `3.x` introduces new features and develops the backend further. Unfortunately, overall backward compatibility can not be maintained. One of the major changes is the transition from MyISAM to InnoDB table engine (RDF store).
 
 ## Requirements
 
@@ -55,6 +55,43 @@ Version `3.x` introduces new features and develops the backend further. Unfortun
 ### SPARQL support
 
 Please have a look into [SPARQL-support.md](doc/SPARQL-support.md) to see which SPARQL 1.0/1.1 features are currently supported.
+
+### Use cache
+
+The RDF store implementation provides a hash-based query cache. It works on two levels: SQL and SPARQL, which means, that it checks given SPARQL queries as well as internally generated SQL queries.
+
+To use it, just add the following to the database configuration:
+
+```php
+$store = ARC2::getStore(array(
+    'db_name' => 'testdb',
+    'db_user' => 'root',
+    'db_pwd'  => '',
+    'db_host' => '127.0.0.1',
+    // ...
+    'cache_enabled' => true // <== activates cache
+));
+```
+
+Per default it uses a file based cache, which stores items in the default temp folder of the system (in Linux its usually `/tmp`). But you can use another cache solution, such as memcached.
+
+#### PSR-16 compatibility
+
+Our cache solution is [PSR-16](https://www.php-fig.org/psr/psr-16/) compatible, which means, that you can use your own cache instance. To do that, add the following to the database configuration:
+
+```php
+$store = ARC2::getStore(array(
+    'db_name' => 'testdb',
+    'db_user' => 'root',
+    'db_pwd'  => '',
+    'db_host' => '127.0.0.1',
+    // ...
+    'cache_enabled' => true
+    'cache_instance' => new ArrayCache() // <=== example Cache instance, managed by yourself
+));
+```
+
+ARC2 uses [Symfony Cache](https://symfony.com/doc/current/components/cache.html) , which provides many connectors out of the box ([Overview](https://github.com/symfony/cache/tree/master/Simple)). This allows you to attach ARC2 to a [Redis server](https://github.com/symfony/cache/blob/master/Simple/RedisCache.php), for instance.
 
 ### Known problems/restrictions with database systems
 

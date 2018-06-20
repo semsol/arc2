@@ -10,6 +10,7 @@ ARC2::inc('Class');
 
 class ARC2_Store extends ARC2_Class
 {
+    protected $cache;
     protected $db;
 
     public function __construct($a, &$caller)
@@ -26,6 +27,27 @@ class ARC2_Store extends ARC2_Class
         $this->is_win = ('win' == strtolower(substr(PHP_OS, 0, 3))) ? true : false;
         $this->max_split_tables = $this->v('store_max_split_tables', 10, $this->a);
         $this->split_predicates = $this->v('store_split_predicates', [], $this->a);
+
+        /*
+         * setup cache instance, if required by the user.
+         */
+        if (isset($this->a['cache_enabled']) && true === $this->a['cache_enabled']) {
+            // reuse existing cache instance, if it implements Psr\SimpleCache\CacheInterface
+            if (isset($this->a['cache_instance'])
+                && $this->a['cache_instance'] instanceof \Psr\SimpleCache\CacheInterface) {
+                $this->cache = $this->a['cache_instance'];
+
+            // create new cache instance
+            } else {
+                // FYI: https://symfony.com/doc/current/components/cache/adapters/filesystem_adapter.html
+                $this->cache = new \Symfony\Component\Cache\Simple\FilesystemCache('arc2', 0, null);
+            }
+        }
+    }
+
+    public function cacheEnabled()
+    {
+        return isset($this->a['cache_enabled']) && true === $this->a['cache_enabled'];
     }
 
     public function getName()
@@ -512,6 +534,17 @@ class ARC2_Store extends ARC2_Class
         return $new_store->query('SELECT COUNT(*) AS t_count WHERE { ?s ?p ?o}', 'row');
     }
 
+    /**
+     * Executes a SPARQL query.
+     *
+     * @param string $q             SPARQL query
+     * @param string $result_format Possible values: infos, raw, rows, row
+     * @param string $src
+     * @param int $keep_bnode_ids   Keep blank node IDs? Default is 0
+     * @param int $log_query        Log executed queries? Default is 0
+     *
+     * @return array|int Array if query returned a result, 0 otherwise.
+     */
     public function query($q, $result_format = '', $src = '', $keep_bnode_ids = 0, $log_query = 0)
     {
         if ($log_query) {
@@ -520,24 +553,57 @@ class ARC2_Store extends ARC2_Class
         if (preg_match('/^dump/i', $q)) {
             $infos = ['query' => ['type' => 'dump']];
         } else {
-            ARC2::inc('SPARQLPlusParser');
-            $p = new ARC2_SPARQLPlusParser($this->a, $this);
-            $p->parse($q, $src);
-            $infos = $p->getQueryInfos();
+            // check cache
+            $key = \hash('sha1', $q);
+            if ($this->cacheEnabled() && $this->cache->has($key.'_infos')) {
+                $infos = $this->cache->get($key.'_infos');
+                $errors = $this->cache->get($key.'_errors');
+            // no entry found
+            } else {
+                ARC2::inc('SPARQLPlusParser');
+                $p = new ARC2_SPARQLPlusParser($this->a, $this);
+                $p->parse($q, $src);
+                $infos = $p->getQueryInfos();
+                $errors = $p->getErrors();
+
+                // store result in cache
+                if ($this->cacheEnabled()) {
+                    $this->cache->set($key.'_infos', $infos);
+                    $this->cache->set($key.'_errors', $errors);
+                }
+            }
         }
+
         if ('infos' == $result_format) {
             return $infos;
         }
+
         $infos['result_format'] = $result_format;
-        if (!isset($p) || !$p->getErrors()) {
+
+        if (!isset($p) || 0 == count($errors)) {
             $qt = $infos['query']['type'];
             if (!in_array($qt, ['select', 'ask', 'describe', 'construct', 'load', 'insert', 'delete', 'dump'])) {
                 return $this->addError('Unsupported query type "'.$qt.'"');
             }
             $t1 = ARC2::mtime();
-            $r = ['query_type' => $qt, 'result' => $this->runQuery($infos, $qt, $keep_bnode_ids, $q)];
-            $t2 = ARC2::mtime();
-            $r['query_time'] = $t2 - $t1;
+
+            // if cache is enabled, get/store result
+            $key = \hash('sha1', $q);
+            if ($this->cacheEnabled() && $this->cache->has($key)) {
+                $result = $this->cache->get($key);
+
+            } else {
+                $result = $this->runQuery($infos, $qt, $keep_bnode_ids, $q);
+
+                // store in cache, if enabled
+                if ($this->cacheEnabled()) {
+                    $this->cache->set($key, $result);
+                }
+            }
+
+            $r = ['query_type' => $qt, 'result' => $result];
+            $r['query_time'] = ARC2::mtime() - $t1;
+
             /* query result */
             if ('raw' == $result_format) {
                 return $r['result'];
@@ -555,8 +621,16 @@ class ARC2_Store extends ARC2_Class
         return 0;
     }
 
+    /**
+     * Runs a SPARQL query. Dont use this function directly, use query instead.
+     */
     public function runQuery($infos, $type, $keep_bnode_ids = 0, $q = '')
     {
+        // invalidate cache, if enabled and a query is executed, which changes the store
+        if ($this->cacheEnabled() && in_array($type, ['load', 'insert', 'delete'])) {
+            $this->cache->clear();
+        }
+
         ARC2::inc('Store'.ucfirst($type).'QueryHandler');
         $cls = 'ARC2_Store'.ucfirst($type).'QueryHandler';
         $h = new $cls($this->a, $this);

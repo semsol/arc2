@@ -35,11 +35,6 @@ abstract class AbstractAdapterTest extends ARC2_TestCase
         if (null !== $this->fixture) {
             $this->fixture->disconnect();
         }
-
-        // in case we run with a cache, clear it
-        if (isset($this->dbConfig['cache_enabled']) && true == $this->dbConfig['cache_enabled']) {
-            $this->fixture->clearCache();
-        }
     }
 
     protected function dropAllTables()

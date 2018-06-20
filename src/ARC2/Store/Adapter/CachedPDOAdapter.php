@@ -64,11 +64,11 @@ class CachedPDOAdapter extends PDOAdapter
 
         // sql query is known
         if ($this->cache->has($key)) {
-            return json_decode($this->cache->get($key), true);
+            return $this->cache->get($key);
 
         } else {
             $result = parent::fetchList($sql);
-            $this->cache->set($key, json_encode($result));
+            $this->cache->set($key, $result);
             return $result;
         }
     }
@@ -84,11 +84,11 @@ class CachedPDOAdapter extends PDOAdapter
 
         // sql query is known
         if ($this->cache->has($key)) {
-            return json_decode($this->cache->get($key), true);
+            return $this->cache->get($key);
 
         } else {
             $result = parent::fetchRow($sql);
-            $this->cache->set($key, json_encode($result));
+            $this->cache->set($key, $result);
             return $result;
         }
     }
@@ -104,11 +104,11 @@ class CachedPDOAdapter extends PDOAdapter
 
         // sql query is known
         if ($this->cache->has($key)) {
-            return json_decode($this->cache->get($key), true);
+            return $this->cache->get($key);
 
         } else {
             $result = parent::getNumberOfRows($sql);
-            $this->cache->set($key, json_encode($result));
+            $this->cache->set($key, $result);
             return $result;
         }
     }
