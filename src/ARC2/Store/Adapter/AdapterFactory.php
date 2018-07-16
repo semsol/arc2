@@ -34,7 +34,7 @@ class AdapterFactory
              */
             } elseif ('pdo' == $adapterName) {
                 // use cache?
-                if (isset($configuration['cache_enabled'])) {
+                if (isset($configuration['cache_enabled']) && true === $configuration['cache_enabled']) {
                     if (false == class_exists('\\ARC2\\Store\\Adapter\\CachedPDOAdapter')) {
                         require_once 'CachedPDOAdapter.php';
                     }
