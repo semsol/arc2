@@ -14,6 +14,9 @@ return PhpCsFixer\Config::create()
     ->setFinder(
         PhpCsFixer\Finder::create()
         ->files()
+        ->in(__DIR__ . '/parsers')
+        ->in(__DIR__ . '/serializers')
+        ->in(__DIR__ . '/src')
         ->in(__DIR__ . '/store')
         ->name('*.php')
     );

@@ -18,7 +18,7 @@ class ARC2_StoreQueryHandler extends ARC2_Class
     }
 
     public function __init()
-    {/* db_con */
+    {
         parent::__init();
         $this->xsd = 'http://www.w3.org/2001/XMLSchema#';
         $this->allow_extension_functions = $this->v('store_allow_extension_functions', 1, $this->a);
@@ -55,8 +55,7 @@ class ARC2_StoreQueryHandler extends ARC2_Class
             return 1;
         }
         $this->mrg_table_id = 'MRG_'.$this->store->getTablePrefix().crc32(uniqid(rand()));
-        $con = $this->store->getDBCon();
-        $this->queryDB('FLUSH TABLES', $con);
+        $this->getDBObject()->query('FLUSH TABLES');
         $indexes = $this->v('store_indexes', ['sp (s,p)', 'os (o,s)', 'po (p,o)'], $this->a);
         $index_code = $indexes ? 'KEY '.implode(', KEY ', $indexes).', ' : '';
         $prefix = $this->store->getTablePrefix();
@@ -72,7 +71,7 @@ class ARC2_StoreQueryHandler extends ARC2_Class
         o_type tinyint(1) NOT NULL default 0,       /* uri/bnode/literal => 0/1/2 */
         misc tinyint(1) NOT NULL default 0,         /* temporary flags */
         UNIQUE KEY (t), '.$index_code.' KEY (misc)
-      ) 
+      )
     ';
         $v = $this->store->getDBVersion();
         $sql .= (($v < '04-01-00') && ($v >= '04-00-18')) ? 'ENGINE' : (($v >= '04-01-02') ? 'ENGINE' : 'TYPE');
@@ -81,17 +80,19 @@ class ARC2_StoreQueryHandler extends ARC2_Class
             $sql .= ','.$prefix.'triple_'.abs(crc32($p));
         }
         $sql .= ')';
+        // TODO whats about that?
         //$sql .= ($v >= '04-00-00') ? " CHARACTER SET utf8" : "";
         //$sql .= ($v >= '04-01-00') ? " COLLATE utf8_unicode_ci" : "";
         //echo $sql;
-        return $this->queryDB($sql, $con);
+        return $this->getDBObject()->query($sql);
     }
 
     public function dropMergeTable()
     {
         return 1;
+        // TODO triple_all table seems not used anymore, therefore this function can be removed?
         $sql = 'DROP TABLE IF EXISTS '.$this->store->getTablePrefix().'triple_all';
         //echo $sql;
-        return $this->queryDB($sql, $this->store->getDBCon());
+        //return $this->queryDB($sql, $this->store->getDBCon());
     }
 }

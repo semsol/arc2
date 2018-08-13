@@ -155,15 +155,17 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler
 
     public function getMaxTermID()
     {
-        $con = $this->store->getDBCon();
         $sql = '';
         foreach (['id2val', 's2val', 'o2val'] as $tbl) {
             $sql .= $sql ? ' UNION ' : '';
             $sql .= '(SELECT MAX(id) as `id` FROM '.$this->store->getTablePrefix().$tbl.')';
         }
         $r = 0;
-        if (($rs = $this->queryDB($sql, $con)) && mysqli_num_rows($rs)) {
-            while ($row = mysqli_fetch_array($rs)) {
+
+        $rows = $this->store->a['db_object']->fetchList($sql);
+
+        if (is_array($rows)) {
+            foreach($rows as $row) {
                 $r = ($r < $row['id']) ? $row['id'] : $r;
             }
         }
@@ -171,12 +173,18 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler
         return $r + 1;
     }
 
+    /**
+     * @todo change DB schema and avoid using this function because it does not protect against race conditions
+     *
+     * @return int
+     */
     public function getMaxTripleID()
     {
-        $con = $this->store->getDBCon();
         $sql = 'SELECT MAX(t) AS `id` FROM '.$this->store->getTablePrefix().'triple';
-        if (($rs = $this->queryDB($sql, $con)) && mysqli_num_rows($rs) && ($row = mysqli_fetch_array($rs))) {
-            return $row['id'] + 1;
+
+        $row = $this->store->a['db_object']->fetchRow($sql);
+        if (isset($row['id'])) {
+            return $row['id']+1;
         }
 
         return 1;
@@ -184,7 +192,6 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler
 
     public function getStoredTermID($val, $type_id, $tbl)
     {
-        $con = $this->store->getDBCon();
         /* buffered */
         if (isset($this->term_ids[$val])) {
             if (!isset($this->term_ids[$val][$tbl])) {
@@ -204,12 +211,12 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler
         $sub_tbls = ('id' == $tbl) ? ['id2val', 's2val', 'o2val'] : ('s' == $tbl ? ['s2val', 'id2val', 'o2val'] : ['o2val', 'id2val', 's2val']);
         foreach ($sub_tbls as $sub_tbl) {
             $id = 0;
-            //$sql = "SELECT id AS `id`, '" . $sub_tbl . "' AS `tbl` FROM " . $tbl_prefix . $sub_tbl . " WHERE val = BINARY '" . mysql_real_escape_string($val, $con) . "'";
             /* via hash */
             if (preg_match('/^(s2val|o2val)$/', $sub_tbl) && $this->hasHashColumn($sub_tbl)) {
                 $sql = 'SELECT id AS `id`, val AS `val` FROM '.$tbl_prefix.$sub_tbl." WHERE val_hash = BINARY '".$this->getValueHash($val)."'";
-                if (($rs = $this->queryDB($sql, $con)) && mysqli_num_rows($rs)) {
-                    while ($row = mysqli_fetch_array($rs)) {
+                $rows = $this->store->a['db_object']->fetchList($sql);
+                if (is_array($rows)) {
+                    foreach($rows as $row) {
                         if ($row['val'] == $val) {
                             $id = $row['id'];
                             break;
@@ -217,10 +224,13 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler
                     }
                 }
             } else {
-                $sql = 'SELECT id AS `id` FROM '.$tbl_prefix.$sub_tbl." WHERE val = BINARY '".mysqli_real_escape_string($con, $val)."'";
-                if (($rs = $this->queryDB($sql.' LIMIT 1', $con)) && mysqli_num_rows($rs)) {
-                    $row = mysqli_fetch_array($rs);
-                    $id = $row['id'];
+                $binaryValue = $this->store->a['db_object']->escape($val);
+                if (false !== empty($binaryValue)) {
+                    $sql = 'SELECT id AS `id` FROM '.$tbl_prefix.$sub_tbl." WHERE val = BINARY '".$binaryValue."'";
+                    $row = $this->store->a['db_object']->fetchRow($sql);
+                    if (is_array($row) && isset($row['id'])) {
+                        $id = $row['id'];
+                    }
                 }
             }
             if ($id) {
@@ -248,23 +258,25 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler
 
     public function getTripleID($t)
     {
-        $con = $this->store->getDBCon();
         $val = serialize($t);
         /* buffered */
         if (isset($this->triple_ids[$val])) {
             return [$this->triple_ids[$val]]; /* hack for "don't insert this triple" */
         }
         /* db */
-        $sql = 'SELECT t FROM '.$this->store->getTablePrefix().'triple WHERE
-      s = '.$t['s'].' AND p = '.$t['p'].' AND o = '.$t['o'].' AND o_lang_dt = '.$t['o_lang_dt'].' AND s_type = '.$t['s_type'].' AND o_type = '.$t['o_type'].'
-      LIMIT 1
-    ';
-        if (($rs = $this->queryDB($sql, $con)) && mysqli_num_rows($rs) && ($row = mysqli_fetch_array($rs))) {
+        $sql = 'SELECT t
+                  FROM '.$this->store->getTablePrefix().'triple
+                 WHERE s = '.$t['s'].' AND p = '.$t['p'].' AND o = '.$t['o'].'
+                        AND o_lang_dt = '.$t['o_lang_dt'].' AND s_type = '.$t['s_type'].'
+                        AND o_type = '.$t['o_type'].'
+                 LIMIT 1';
+        $row = $this->store->a['db_object']->fetchRow($sql);
+        if (isset($row['t'])) {
             $this->triple_ids[$val] = $row['t']; /* hack for "don't insert this triple" */
             return [$row['t']]; /* hack for "don't insert this triple" */
-        }
+
         /* new */
-        else {
+        } else {
             $this->triple_ids[$val] = $this->max_triple_id;
             ++$this->max_triple_id;
             /* split tables ? */
@@ -300,7 +312,9 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler
                 if (isset($m[3]) && ('Z' != $m[3])) {
                     $uts = strtotime(str_replace('T', ' ', $val));
                     if (preg_match('/([\+\-])([0-9]{2})\:?([0-9]{2})$/', $m[3], $sub_m)) {
-                        $diff_mins = (3600 * ltrim($sub_m[2], '0')) + ltrim($sub_m[3], '0');
+                        // without the explicit (int) casting, you will get the following error with PHP 7.1+
+                        // A non-numeric value encountered
+                        $diff_mins = (3600 * (int)ltrim($sub_m[2], '0')) + (int)ltrim($sub_m[3], '0');
                         $uts = ('-' == $sub_m[1]) ? $uts + $diff_mins : $uts - $diff_mins;
                         $val = date('Y-m-d\TH:i:s\Z', $uts);
                     }
@@ -345,14 +359,13 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler
 
     public function bufferTripleSQL($t)
     {
-        $con = $this->store->getDBCon();
         $tbl = 'triple';
         $sql = ', ';
         if (!isset($this->sql_buffers[$tbl])) {
             $this->sql_buffers[$tbl] = 'INSERT IGNORE INTO '.$this->store->getTablePrefix().$tbl.' (t, s, p, o, o_lang_dt, o_comp, s_type, o_type) VALUES';
             $sql = ' ';
         }
-        $this->sql_buffers[$tbl] .= $sql.'('.$t['t'].', '.$t['s'].', '.$t['p'].', '.$t['o'].', '.$t['o_lang_dt'].", '".mysqli_real_escape_string($con, $t['o_comp'])."', ".$t['s_type'].', '.$t['o_type'].')';
+        $this->sql_buffers[$tbl] .= $sql.'('.$t['t'].', '.$t['s'].', '.$t['p'].', '.$t['o'].', '.$t['o_lang_dt'].", '".$this->store->a['db_object']->escape($t['o_comp'])."', ".$t['s_type'].', '.$t['o_type'].')';
     }
 
     public function bufferGraphSQL($g2t)
@@ -368,17 +381,16 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler
 
     public function bufferIDSQL($tbl, $id, $val, $val_type)
     {
-        $con = $this->store->getDBCon();
         $tbl = $tbl.'2val';
         if ('id2val' == $tbl) {
             $cols = 'id, val, val_type';
-            $vals = '('.$id.", '".mysqli_real_escape_string($con, $val)."', ".$val_type.')';
+            $vals = '('.$id.", '".$this->store->a['db_object']->escape($val)."', ".$val_type.')';
         } elseif (preg_match('/^(s2val|o2val)$/', $tbl) && $this->hasHashColumn($tbl)) {
             $cols = 'id, val_hash, val';
-            $vals = '('.$id.", '".$this->getValueHash($val)."', '".mysqli_real_escape_string($con, $val)."')";
+            $vals = '('.$id.", '".$this->getValueHash($val)."', '".$this->store->a['db_object']->escape($val)."')";
         } else {
             $cols = 'id, val';
-            $vals = '('.$id.", '".mysqli_real_escape_string($con, $val)."')";
+            $vals = '('.$id.", '".$this->store->a['db_object']->escape($val)."')";
         }
         if (!isset($this->sql_buffers[$tbl])) {
             $this->sql_buffers[$tbl] = '';
@@ -392,7 +404,6 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler
 
     public function checkSQLBuffers($force_write = 0, $reset_id_buffers = 0, $refresh_lock = 0, $split_tables = 0)
     {
-        $con = $this->store->getDBCon();
         if (!$this->keep_time_limit) {
             set_time_limit($this->v('time_limit', 60, $this->a));
         }
@@ -400,19 +411,30 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler
             $buffer_size = isset($this->sql_buffers[$tbl]) ? 1 : 0;
             if ($buffer_size && $force_write) {
                 $t1 = ARC2::mtime();
-                $this->queryDB($this->sql_buffers[$tbl], $con);
+                $this->store->a['db_object']->simpleQuery($this->sql_buffers[$tbl]);
                 /* table error */
-                $er = mysqli_error($con);
-                if (!empty($er)) {
-                    $this->autoRepairTable($er, $con, $this->sql_buffers[$tbl]);
+                $error = $this->store->a['db_object']->getErrorMessage();
+                if (!empty($error)) {
+                    $this->autoRepairTable($error, $this->sql_buffers[$tbl]);
                 }
                 unset($this->sql_buffers[$tbl]);
                 if ($this->log_inserts) {
                     $t2 = ARC2::mtime();
-                    $this->inserts[$tbl] = $this->v($tbl, 0, $this->inserts) + max(0, mysqli_affected_rows($con));
+                    $this->inserts[$tbl] = $this->v(
+                        $tbl,
+                        0,
+                        $this->inserts
+                    ) + max(0, $this->store->a['db_object']->getAffectedRows());
+
                     $dur = round($t2 - $t1, 4);
-                    $this->insert_times[$tbl] = isset($this->insert_times[$tbl]) ? $this->insert_times[$tbl] : ['min' => $dur, 'max' => $dur, 'sum' => $dur];
-                    $this->insert_times[$tbl] = ['min' => min($dur, $this->insert_times[$tbl]['min']), 'max' => max($dur, $this->insert_times[$tbl]['max']), 'sum' => $dur + $this->insert_times[$tbl]['sum']];
+                    $this->insert_times[$tbl] = isset($this->insert_times[$tbl])
+                        ? $this->insert_times[$tbl]
+                        : ['min' => $dur, 'max' => $dur, 'sum' => $dur];
+                    $this->insert_times[$tbl] = [
+                        'min' => min($dur, $this->insert_times[$tbl]['min']),
+                        'max' => max($dur, $this->insert_times[$tbl]['max']),
+                        'sum' => $dur + $this->insert_times[$tbl]['sum']
+                    ];
                 }
                 /* reset term id buffers */
                 if ($reset_id_buffers) {
@@ -435,12 +457,13 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler
         return 1;
     }
 
-    public function autoRepairTable($er, $con, $sql = '')
+    public function autoRepairTable($er, $sql = '')
     {
         $this->addError('MySQL error: '.$er.' ('.$sql.')');
         if (preg_match('/Table \'[^\']+\/([a-z0-9\_\-]+)\' .*(crashed|repair)/i', $er, $m)) {
-            $rs = $this->queryDB('REPAIR TABLE '.rawurlencode($m[1]), $con);
-            $msg = $rs ? mysqli_fetch_array($rs) : [];
+            $row = $this->store->a['db_object']->fetchRow('REPAIR TABLE '.rawurlencode($m[1]));
+            $msg = is_array($row) ? $row : [];
+
             if ('error' == $this->v('Msg_type', 'error', $msg)) {
                 /* auto-reset */
                 if ($this->v('store_reset_on_table_crash', 0, $this->a)) {
@@ -450,7 +473,6 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler
                     $er = $this->v('Msg_text', 'unknown error', $msg);
                     $this->addError('Auto-repair failed on '.rawurlencode($m[1]).': '.$er);
                 }
-                //die("Fatal errors: \n" . print_r($this->getErrors(), 1));
             }
         }
     }

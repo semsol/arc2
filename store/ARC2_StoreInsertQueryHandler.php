@@ -16,7 +16,7 @@ class ARC2_StoreInsertQueryHandler extends ARC2_StoreQueryHandler
     }
 
     public function __init()
-    {/* db_con */
+    {
         parent::__init();
         $this->store = $this->caller;
     }
@@ -24,7 +24,6 @@ class ARC2_StoreInsertQueryHandler extends ARC2_StoreQueryHandler
     public function runQuery($infos, $keep_bnode_ids = 0)
     {
         $this->infos = $infos;
-        $con = $this->store->getDBCon();
         /* insert */
         if (!$this->v('pattern', [], $this->infos['query'])) {
             $triples = $this->infos['query']['construct_triples'];

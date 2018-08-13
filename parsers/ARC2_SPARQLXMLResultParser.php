@@ -10,103 +10,102 @@ version:  2010-11-16
 
 ARC2::inc('LegacyXMLParser');
 
-class ARC2_SPARQLXMLResultParser extends ARC2_LegacyXMLParser {
-
-  function __construct($a, &$caller) {
-    parent::__construct($a, $caller);
-  }
-  
-  function __init() {/* reader */
-    parent::__init();
-    $this->srx = 'http://www.w3.org/2005/sparql-results#';
-    $this->nsp[$this->srx] = 'srx';
-    $this->allowCDataNodes = 0;
-  }
-  
-  /*  */
-  
-  function done() {
-  }
-  
-  /*  */
-  
-  function getVariables() {
-    $r = array();
-    foreach ($this->nodes as $node) {
-      if ($node['tag'] == $this->srx . 'variable') {
-        $r[] = $node['a']['name'];
-      }
+class ARC2_SPARQLXMLResultParser extends ARC2_LegacyXMLParser
+{
+    public function __construct($a, &$caller)
+    {
+        parent::__construct($a, $caller);
     }
-    return $r;
-  }
-  
-  function getRows() {
-    $r = array();
-    $index = $this->getNodeIndex();
-    foreach ($this->nodes as $node) {
-      if ($node['tag'] == $this->srx . 'result') {
-        $row = array();
-        $row_id = $node['id'];
-        $bindings = isset($index[$row_id])? $index[$row_id] : array();
-        foreach ($bindings as $binding) {
-          $row = array_merge($row, $this->getBinding($binding));
+
+    public function __init()
+    {/* reader */
+        parent::__init();
+        $this->srx = 'http://www.w3.org/2005/sparql-results#';
+        $this->nsp[$this->srx] = 'srx';
+        $this->allowCDataNodes = 0;
+    }
+
+    public function done()
+    {
+    }
+
+    public function getVariables()
+    {
+        $r = [];
+        foreach ($this->nodes as $node) {
+            if ($node['tag'] == $this->srx.'variable') {
+                $r[] = $node['a']['name'];
+            }
         }
-        if ($row) {
-          $r[] = $row;
+
+        return $r;
+    }
+
+    public function getRows()
+    {
+        $r = [];
+        $index = $this->getNodeIndex();
+        foreach ($this->nodes as $node) {
+            if ($node['tag'] == $this->srx.'result') {
+                $row = [];
+                $row_id = $node['id'];
+                $bindings = isset($index[$row_id]) ? $index[$row_id] : [];
+                foreach ($bindings as $binding) {
+                    $row = array_merge($row, $this->getBinding($binding));
+                }
+                if ($row) {
+                    $r[] = $row;
+                }
+            }
         }
-      }
-    }
-    return $r;
-  }
 
-  function getBinding($node) {
-    $r = array();
-    $index = $this->getNodeIndex();
-    $var = $node['a']['name'];
-    $term = $index[$node['id']][0];
-    $r[$var . ' type'] = preg_replace('/^uri$/', 'uri', substr($term['tag'], strlen($this->srx)));
-    $r[$var] = ($r[$var . ' type'] == 'bnode') ? '_:' . $term['cdata'] : $term['cdata'];
-    if (isset($term['a']['datatype'])) {
-      $r[$var . ' datatype'] = $term['a']['datatype'];
+        return $r;
     }
-    elseif (isset($term['a'][$this->xml . 'lang'])) {
-      $r[$var . ' lang'] = $term['a'][$this->xml . 'lang'];
-    }
-    return $r;
-  }
 
-  function getBooleanInsertedDeleted() {
-    foreach ($this->nodes as $node) {
-      if ($node['tag'] == $this->srx . 'boolean') {
-        return ($node['cdata'] == 'true') ? array('boolean' => true) : array('boolean' => false);
-      }
-      elseif ($node['tag'] == $this->srx . 'inserted') {
-        return array('inserted' => $node['cdata']);
-      }
-      elseif ($node['tag'] == $this->srx . 'deleted') {
-        return array('deleted' => $node['cdata']);
-      }
-      elseif ($node['tag'] == $this->srx . 'results') {
+    public function getBinding($node)
+    {
+        $r = [];
+        $index = $this->getNodeIndex();
+        $var = $node['a']['name'];
+        $term = $index[$node['id']][0];
+        $r[$var.' type'] = preg_replace('/^uri$/', 'uri', substr($term['tag'], strlen($this->srx)));
+        $r[$var] = ('bnode' == $r[$var.' type']) ? '_:'.$term['cdata'] : $term['cdata'];
+        if (isset($term['a']['datatype'])) {
+            $r[$var.' datatype'] = $term['a']['datatype'];
+        } elseif (isset($term['a'][$this->xml.'lang'])) {
+            $r[$var.' lang'] = $term['a'][$this->xml.'lang'];
+        }
+
+        return $r;
+    }
+
+    public function getBooleanInsertedDeleted()
+    {
+        foreach ($this->nodes as $node) {
+            if ($node['tag'] == $this->srx.'boolean') {
+                return ('true' == $node['cdata']) ? ['boolean' => true] : ['boolean' => false];
+            } elseif ($node['tag'] == $this->srx.'inserted') {
+                return ['inserted' => $node['cdata']];
+            } elseif ($node['tag'] == $this->srx.'deleted') {
+                return ['deleted' => $node['cdata']];
+            } elseif ($node['tag'] == $this->srx.'results') {
+                return '';
+            }
+        }
+
         return '';
-      }
     }
-    return '';
-  }
 
-  /*  */
-  
-  function getStructure() {
-    $r = array('variables' => $this->getVariables(), 'rows' => $this->getRows());
-    /* boolean|inserted|deleted */
-    if ($sub_r = $this->getBooleanInsertedDeleted()) {
-      foreach ($sub_r as $k => $v) {
-        $r[$k] = $v;
-      }
+    public function getStructure()
+    {
+        $r = ['variables' => $this->getVariables(), 'rows' => $this->getRows()];
+        /* boolean|inserted|deleted */
+        if ($sub_r = $this->getBooleanInsertedDeleted()) {
+            foreach ($sub_r as $k => $v) {
+                $r[$k] = $v;
+            }
+        }
+
+        return $r;
     }
-    return $r;
-  }
-
-  /*  */
-
-  
 }

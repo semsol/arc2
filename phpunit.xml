@@ -19,11 +19,8 @@
         <ini name="display_errors" value="On"/>
     </php>
     <testsuites>
-        <testsuite name="integration">
-            <directory suffix="Test.php">./tests/integration</directory>
-        </testsuite>
-        <testsuite name="sparql11">
-            <directory suffix="Test.php">./tests/sparql11</directory>
+        <testsuite name="db_adapter_depended">
+            <directory suffix="Test.php">./tests/db_adapter_depended</directory>
         </testsuite>
         <testsuite name="unit">
             <directory suffix="Test.php">./tests/unit</directory>
@@ -34,6 +31,11 @@
     </logging>
     <filter>
         <whitelist processUncoveredFilesFromWhitelist="true">
+            <directory suffix=".php">./extractors</directory>
+            <directory suffix=".php">./parsers</directory>
+            <directory suffix=".php">./serializers</directory>
+            <directory suffix=".php">./sparqlscript</directory>
+            <directory suffix=".php">./src</directory>
             <directory suffix=".php">./store</directory>
         </whitelist>
     </filter>

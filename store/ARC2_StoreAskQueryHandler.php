@@ -18,7 +18,7 @@ class ARC2_StoreAskQueryHandler extends ARC2_StoreSelectQueryHandler
     }
 
     public function __init()
-    {/* db_con */
+    {
         parent::__init();
         $this->store = $this->caller;
     }
@@ -39,10 +39,8 @@ class ARC2_StoreAskQueryHandler extends ARC2_StoreSelectQueryHandler
 
     public function getFinalQueryResult($q_sql, $tmp_tbl)
     {
-        $con = $this->store->getDBCon();
-        $rs = mysqli_query($con, 'SELECT success FROM '.$tmp_tbl);
-        $r = ($row = mysqli_fetch_array($rs)) ? $row['success'] : 0;
-
+        $row = $this->store->a['db_object']->fetchRow('SELECT success FROM '.$tmp_tbl);
+        $r = isset($row['success']) ? $row['success'] : 0;
         return $r ? true : false;
     }
 }
