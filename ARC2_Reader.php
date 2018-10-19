@@ -211,10 +211,15 @@ class ARC2_Reader extends ARC2_Class {
   
   function getHTTPSocket($url, $redirs = 0, $prev_parts = '') {
     $parts = parse_url($url);
+
     /* relative redirect */
+    if (!isset($parts['port']) && $prev_parts && (!isset($parts['scheme']) || $parts['scheme'] == $prev_parts['scheme'])) {
+      /* only set the port if the scheme has not changed. If the scheme changes to https assuming the port will stay as port 80 is a bad idea */
+      $parts['port'] = $prev_parts['port'];
+    }
     if (!isset($parts['scheme']) && $prev_parts) $parts['scheme'] = $prev_parts['scheme'];
     if (!isset($parts['host']) && $prev_parts) $parts['host'] = $prev_parts['host'];
-    if (!isset($parts['port']) && $prev_parts) $parts['port'] = $prev_parts['port'];
+
     /* no scheme */
     if (!$this->v('scheme', '', $parts)) return $this->addError('Socket error: Missing URI scheme.');
     /* port tweaks */
