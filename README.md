@@ -16,7 +16,7 @@ Package available on [Composer](https://packagist.org/packages/semsol/arc2).
 If you're using Composer to manage dependencies, you can use
 
 ```bash
-composer require semsol/arc2:2.4.*
+composer require semsol/arc2:^2
 ```
 
 ### Branches
