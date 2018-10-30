@@ -208,17 +208,14 @@ class ARC2_Reader extends ARC2_Class {
     }
     return array('type' => 'socket', 'socket' =>& $s, 'headers' => array(), 'pos' => 0, 'size' => filesize($parts['path']), 'buffer' => '');
   }
-  
+ 
   function getHTTPSocket($url, $redirs = 0, $prev_parts = '') {
-    $parts = parse_url($url);
-    /* relative redirect */
-    if (!isset($parts['scheme']) && $prev_parts) $parts['scheme'] = $prev_parts['scheme'];
-    if (!isset($parts['host']) && $prev_parts) $parts['host'] = $prev_parts['host'];
-    if (!isset($parts['port']) && $prev_parts) $parts['port'] = $prev_parts['port'];
-    /* no scheme */
-    if (!$this->v('scheme', '', $parts)) return $this->addError('Socket error: Missing URI scheme.');
-    /* port tweaks */
-    $parts['port'] = ($parts['scheme'] == 'https') ? $this->v1('port', 443, $parts) : $this->v1('port', 80, $parts);
+    $parts = $this->getURIPartsFromURIAndPreviousURIParts($url, $prev_parts);
+
+    if(!is_array($parts)) {
+      return false;
+    }
+
     $nl = "\r\n";
     $http_mthd = strtoupper($this->http_method);
     if ($this->v1('user', 0, $parts) || $this->useProxy($url)) {
@@ -332,6 +329,25 @@ class ARC2_Reader extends ARC2_Class {
       stream_set_blocking($s, true);
     }
     return array('type' => 'socket', 'url' => $url, 'socket' =>& $s, 'headers' => $h, 'pos' => 0, 'size' => $this->v('content-length', 0, $h), 'buffer' => '');
+  }
+
+  function getURIPartsFromURIAndPreviousURIParts($uri, $previous_uri_parts) {
+    $parts = parse_url($uri);
+
+    /* relative redirect */
+    if (!isset($parts['port']) && $previous_uri_parts && (!isset($parts['scheme']) || $parts['scheme'] == $previous_uri_parts['scheme'])) {
+      /* only set the port if the scheme has not changed. If the scheme changes to https assuming the port will stay as port 80 is a bad idea */
+      $parts['port'] = $previous_uri_parts['port'];
+    }
+    if (!isset($parts['scheme']) && $previous_uri_parts) $parts['scheme'] = $previous_uri_parts['scheme'];
+    if (!isset($parts['host']) && $previous_uri_parts) $parts['host'] = $previous_uri_parts['host'];
+
+    /* no scheme */
+    if (!$this->v('scheme', '', $parts)) return $this->addError('Socket error: Missing URI scheme.');
+    /* port tweaks */
+    $parts['port'] = ($parts['scheme'] == 'https') ? $this->v1('port', 443, $parts) : $this->v1('port', 80, $parts);
+
+    return $parts;
   }
 
   function readStream($buffer_xml = true, $d_size = 1024) {
