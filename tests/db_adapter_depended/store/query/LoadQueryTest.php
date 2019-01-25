@@ -40,7 +40,7 @@ class LoadQueryTest extends ARC2_TestCase
                     .'master/tests/data/turtle/manifest.ttl>
             WHERE {?s ?p ?o.}
         ');
-        $this->assertEquals(106, count($res['result']['rows']));
+        $this->assertEquals(1860, count($res['result']['rows']));
     }
 
     public function testLoadInto()
@@ -55,6 +55,6 @@ class LoadQueryTest extends ARC2_TestCase
 
         // check that triples were inserted
         $res = $this->fixture->query('SELECT * FROM <http://load-example> WHERE {?s ?p ?o.}');
-        $this->assertEquals(106, count($res['result']['rows']));
+        $this->assertEquals(1860, count($res['result']['rows']));
     }
 }
