@@ -30,17 +30,17 @@ class LoadQueryTest extends ARC2_TestCase
         $this->assertEquals(0, count($res['result']['rows']));
 
         $filepath = 'https://raw.githubusercontent.com/semsol/arc2/'
-            .'master/tests/data/turtle/manifest.ttl';
+            .'master/tests/db_adapter_depended/sparql_1_1_tests/w3c-tests/move/manifest.ttl';
         $this->fixture->query('LOAD <'.$filepath.'>');
 
         // check that triples were inserted
         $res = $this->fixture->query('
             SELECT *
             FROM <https://raw.githubusercontent.com/semsol/arc2/'
-                    .'master/tests/data/turtle/manifest.ttl>
+              .'master/tests/db_adapter_depended/sparql_1_1_tests/w3c-tests/move/manifest.ttl>
             WHERE {?s ?p ?o.}
         ');
-        $this->assertEquals(1860, count($res['result']['rows']));
+        $this->assertEquals(106, count($res['result']['rows']));
     }
 
     public function testLoadInto()
@@ -50,11 +50,11 @@ class LoadQueryTest extends ARC2_TestCase
         $this->assertEquals(0, count($res['result']['rows']));
 
         $filepath = 'https://raw.githubusercontent.com/semsol/arc2/'
-            .'master/tests/data/turtle/manifest.ttl';
+            .'master/tests/db_adapter_depended/sparql_1_1_tests/w3c-tests/move/manifest.ttl';
         $this->fixture->query('LOAD <'.$filepath.'> INTO <http://load-example>');
 
         // check that triples were inserted
         $res = $this->fixture->query('SELECT * FROM <http://load-example> WHERE {?s ?p ?o.}');
-        $this->assertEquals(1860, count($res['result']['rows']));
+        $this->assertEquals(106, count($res['result']['rows']));
     }
 }
