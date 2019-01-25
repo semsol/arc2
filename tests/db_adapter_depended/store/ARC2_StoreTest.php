@@ -599,7 +599,7 @@ XML;
         $this->assertEquals(1, count($res['result']['rows']));
 
         $res = $this->fixture->query('SELECT * FROM <http://graph2/> WHERE {?s ?p ?o.}');
-        $this->assertEquals(1, count($res['result']['rows']));
+        $this->assertEquals(2, count($res['result']['rows']));
 
         $res = $this->fixture->query('SELECT * WHERE {?s ?p ?o.}');
         $this->assertEquals(3, count($res['result']['rows']));
