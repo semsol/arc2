@@ -51,6 +51,14 @@ matrix:
           env: DB=mysql:5.6 DB_ADAPTER=mysqli
         - php: 7.2
           env: DB=mysql:5.6 DB_ADAPTER=pdo DB_PDO_PROTOCOL=mysql
+        - php: 7.3
+          env: DB=mysql:5.6 DB_ADAPTER=mysqli
+        - php: 7.3
+          env: DB=mysql:5.6 DB_ADAPTER=pdo DB_PDO_PROTOCOL=mysql
+        - php: 7.4
+          env: DB=mysql:5.6 DB_ADAPTER=mysqli
+        - php: 7.4
+          env: DB=mysql:5.6 DB_ADAPTER=pdo DB_PDO_PROTOCOL=mysql
         #
         # mysql 5.7
         #
@@ -78,6 +86,14 @@ matrix:
           env: DB=mysql:5.7 DB_ADAPTER=pdo DB_PDO_PROTOCOL=mysql
         - php: 7.2
           env: DB=mysql:5.7 DB_ADAPTER=pdo DB_PDO_PROTOCOL=mysql CACHE_ENABLED=true
+        - php: 7.3
+          env: DB=mysql:5.7 DB_ADAPTER=pdo DB_PDO_PROTOCOL=mysql
+        - php: 7.3
+          env: DB=mysql:5.7 DB_ADAPTER=pdo DB_PDO_PROTOCOL=mysql CACHE_ENABLED=true
+        - php: 7.4
+          env: DB=mysql:5.7 DB_ADAPTER=pdo DB_PDO_PROTOCOL=mysql
+        - php: 7.4
+          env: DB=mysql:5.7 DB_ADAPTER=pdo DB_PDO_PROTOCOL=mysql CACHE_ENABLED=true
         #
         # mariadb 10
         #
@@ -96,6 +112,14 @@ matrix:
         - php: 7.2
           env: DB=mariadb:10.0 DB_ADAPTER=mysqli
         - php: 7.2
+          env: DB=mariadb:10.0 DB_ADAPTER=pdo DB_PDO_PROTOCOL=mysql
+        - php: 7.3
+          env: DB=mariadb:10.0 DB_ADAPTER=mysqli
+        - php: 7.3
+          env: DB=mariadb:10.0 DB_ADAPTER=pdo DB_PDO_PROTOCOL=mysql
+        - php: 7.4
+          env: DB=mariadb:10.0 DB_ADAPTER=mysqli
+        - php: 7.4
           env: DB=mariadb:10.0 DB_ADAPTER=pdo DB_PDO_PROTOCOL=mysql
         #
         # mariadb 10.1
@@ -116,6 +140,14 @@ matrix:
           env: DB=mariadb:10.1 DB_ADAPTER=mysqli
         - php: 7.2
           env: DB=mariadb:10.1 DB_ADAPTER=pdo DB_PDO_PROTOCOL=mysql
+        - php: 7.3
+          env: DB=mariadb:10.1 DB_ADAPTER=mysqli
+        - php: 7.3
+          env: DB=mariadb:10.1 DB_ADAPTER=pdo DB_PDO_PROTOCOL=mysql
+        - php: 7.4
+          env: DB=mariadb:10.1 DB_ADAPTER=mysqli
+        - php: 7.4
+          env: DB=mariadb:10.1 DB_ADAPTER=pdo DB_PDO_PROTOCOL=mysql
         #
         # mariadb 10.2
         #
@@ -134,6 +166,14 @@ matrix:
         - php: 7.2
           env: DB=mariadb:10.2 DB_ADAPTER=mysqli
         - php: 7.2
+          env: DB=mariadb:10.2 DB_ADAPTER=pdo DB_PDO_PROTOCOL=mysql
+        - php: 7.3
+          env: DB=mariadb:10.2 DB_ADAPTER=mysqli
+        - php: 7.3
+          env: DB=mariadb:10.2 DB_ADAPTER=pdo DB_PDO_PROTOCOL=mysql
+        - php: 7.4
+          env: DB=mariadb:10.2 DB_ADAPTER=mysqli
+        - php: 7.4
           env: DB=mariadb:10.2 DB_ADAPTER=pdo DB_PDO_PROTOCOL=mysql
         #
         # mariadb 10.3
@@ -162,7 +202,96 @@ matrix:
           env: DB=mariadb:10.3 DB_ADAPTER=pdo DB_PDO_PROTOCOL=mysql
         - php: 7.2
           env: DB=mariadb:10.3 DB_ADAPTER=pdo DB_PDO_PROTOCOL=mysql CACHE_ENABLED=true
-
+        - php: 7.3
+          env: DB=mariadb:10.3 DB_ADAPTER=mysqli
+        - php: 7.3
+          env: DB=mariadb:10.3 DB_ADAPTER=pdo DB_PDO_PROTOCOL=mysql
+        - php: 7.3
+          env: DB=mariadb:10.3 DB_ADAPTER=pdo DB_PDO_PROTOCOL=mysql CACHE_ENABLED=true
+        - php: 7.4
+          env: DB=mariadb:10.3 DB_ADAPTER=mysqli
+        - php: 7.4
+          env: DB=mariadb:10.3 DB_ADAPTER=pdo DB_PDO_PROTOCOL=mysql
+        - php: 7.4
+          env: DB=mariadb:10.3 DB_ADAPTER=pdo DB_PDO_PROTOCOL=mysql CACHE_ENABLED=true
+        #
+        # mariadb 10.4
+        #
+        - php: 5.6
+          env: DB=mariadb:10.4 DB_ADAPTER=mysqli
+        - php: 5.6
+          env: DB=mariadb:10.4 DB_ADAPTER=pdo DB_PDO_PROTOCOL=mysql
+        - php: 5.6
+          env: DB=mariadb:10.4 DB_ADAPTER=pdo DB_PDO_PROTOCOL=mysql CACHE_ENABLED=true
+        - php: 7.0
+          env: DB=mariadb:10.4 DB_ADAPTER=mysqli
+        - php: 7.0
+          env: DB=mariadb:10.4 DB_ADAPTER=pdo DB_PDO_PROTOCOL=mysql
+        - php: 7.0
+          env: DB=mariadb:10.4 DB_ADAPTER=pdo DB_PDO_PROTOCOL=mysql CACHE_ENABLED=true
+        - php: 7.1
+          env: DB=mariadb:10.4 DB_ADAPTER=mysqli
+        - php: 7.1
+          env: DB=mariadb:10.4 DB_ADAPTER=pdo DB_PDO_PROTOCOL=mysql
+        - php: 7.1
+          env: DB=mariadb:10.4 DB_ADAPTER=pdo DB_PDO_PROTOCOL=mysql CACHE_ENABLED=true
+        - php: 7.2
+          env: DB=mariadb:10.4 DB_ADAPTER=mysqli
+        - php: 7.2
+          env: DB=mariadb:10.4 DB_ADAPTER=pdo DB_PDO_PROTOCOL=mysql
+        - php: 7.2
+          env: DB=mariadb:10.4 DB_ADAPTER=pdo DB_PDO_PROTOCOL=mysql CACHE_ENABLED=true
+        - php: 7.3
+          env: DB=mariadb:10.4 DB_ADAPTER=mysqli
+        - php: 7.3
+          env: DB=mariadb:10.4 DB_ADAPTER=pdo DB_PDO_PROTOCOL=mysql
+        - php: 7.3
+          env: DB=mariadb:10.4 DB_ADAPTER=pdo DB_PDO_PROTOCOL=mysql CACHE_ENABLED=true
+        - php: 7.4
+          env: DB=mariadb:10.4 DB_ADAPTER=mysqli
+        - php: 7.4
+          env: DB=mariadb:10.4 DB_ADAPTER=pdo DB_PDO_PROTOCOL=mysql
+        - php: 7.4
+          env: DB=mariadb:10.4 DB_ADAPTER=pdo DB_PDO_PROTOCOL=mysql CACHE_ENABLED=true
+        #
+        # mariadb 10.5
+        #
+        - php: 5.6
+          env: DB=mariadb:10.5 DB_ADAPTER=mysqli
+        - php: 5.6
+          env: DB=mariadb:10.5 DB_ADAPTER=pdo DB_PDO_PROTOCOL=mysql
+        - php: 5.6
+          env: DB=mariadb:10.5 DB_ADAPTER=pdo DB_PDO_PROTOCOL=mysql CACHE_ENABLED=true
+        - php: 7.0
+          env: DB=mariadb:10.5 DB_ADAPTER=mysqli
+        - php: 7.0
+          env: DB=mariadb:10.5 DB_ADAPTER=pdo DB_PDO_PROTOCOL=mysql
+        - php: 7.0
+          env: DB=mariadb:10.5 DB_ADAPTER=pdo DB_PDO_PROTOCOL=mysql CACHE_ENABLED=true
+        - php: 7.1
+          env: DB=mariadb:10.5 DB_ADAPTER=mysqli
+        - php: 7.1
+          env: DB=mariadb:10.5 DB_ADAPTER=pdo DB_PDO_PROTOCOL=mysql
+        - php: 7.1
+          env: DB=mariadb:10.5 DB_ADAPTER=pdo DB_PDO_PROTOCOL=mysql CACHE_ENABLED=true
+        - php: 7.2
+          env: DB=mariadb:10.5 DB_ADAPTER=mysqli
+        - php: 7.2
+          env: DB=mariadb:10.5 DB_ADAPTER=pdo DB_PDO_PROTOCOL=mysql
+        - php: 7.2
+          env: DB=mariadb:10.5 DB_ADAPTER=pdo DB_PDO_PROTOCOL=mysql CACHE_ENABLED=true
+        - php: 7.3
+          env: DB=mariadb:10.5 DB_ADAPTER=mysqli
+        - php: 7.3
+          env: DB=mariadb:10.5 DB_ADAPTER=pdo DB_PDO_PROTOCOL=mysql
+        - php: 7.3
+          env: DB=mariadb:10.5 DB_ADAPTER=pdo DB_PDO_PROTOCOL=mysql CACHE_ENABLED=true
+        - php: 7.4
+          env: DB=mariadb:10.5 DB_ADAPTER=mysqli
+        - php: 7.4
+          env: DB=mariadb:10.5 DB_ADAPTER=pdo DB_PDO_PROTOCOL=mysql
+        - php: 7.4
+          env: DB=mariadb:10.5 DB_ADAPTER=pdo DB_PDO_PROTOCOL=mysql CACHE_ENABLED=true
 git:
     depth: 1
 
