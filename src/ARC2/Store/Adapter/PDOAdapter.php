@@ -113,8 +113,20 @@ class PDOAdapter extends AbstractAdapter
 
     public function escape($value)
     {
-        // quote surronds the string with ', but using trim aligns the result
-        return \trim($this->db->quote($value), "'");
+        $quoted = $this->db->quote($value);
+
+        /*
+         * fixes the case, that we have double quoted strings like:
+         *      ''x1''
+         *
+         * remember, this value will be surrounded by quotes later on!
+         * so we don't send it back with quotes around.
+         */
+        if ("'" == \substr($quoted, 0, 1)) {
+            $quoted = \substr($quoted, 1, \strlen($quoted)-2);
+        }
+
+        return $quoted;
     }
 
     /**
