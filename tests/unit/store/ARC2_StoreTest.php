@@ -30,7 +30,9 @@ class ARC2_StoreTest extends ARC2_TestCase
 
     public function testCacheEnabled()
     {
-        $cacheEnabled = isset($this->dbConfig['cache_enabled']) && $this->dbConfig['cache_enabled'];
+        $cacheEnabled = isset($this->dbConfig['cache_enabled'])
+            && $this->dbConfig['cache_enabled']
+            && 'pdo' == $this->dbConfig['db_adapter'];
         $this->assertEquals($cacheEnabled, $this->fixture->cacheEnabled());
     }
 }
