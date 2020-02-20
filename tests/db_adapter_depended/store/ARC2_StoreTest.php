@@ -6,7 +6,7 @@ use Tests\ARC2_TestCase;
 
 class ARC2_StoreTest extends ARC2_TestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -23,7 +23,7 @@ class ARC2_StoreTest extends ARC2_TestCase
         $this->fixture->setup();
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         $this->fixture->closeDBCon();
     }
@@ -78,6 +78,9 @@ class ARC2_StoreTest extends ARC2_TestCase
         return $graphs;
     }
 
+    /**
+     * @doesNotPerformAssertions
+     */
     public function testSetup()
     {
         $this->fixture->reset();

@@ -8,7 +8,7 @@ class ARC2_StoreAskQueryHandlerTest extends ARC2_TestCase
 {
     protected $store;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -19,7 +19,7 @@ class ARC2_StoreAskQueryHandlerTest extends ARC2_TestCase
         $this->fixture = new \ARC2_StoreAskQueryHandler($this->store->a, $this->store);
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         $this->store->closeDBCon();
     }
@@ -28,9 +28,6 @@ class ARC2_StoreAskQueryHandlerTest extends ARC2_TestCase
      * Tests for __init
      */
 
-    /**
-     * @doesNotPerformAssertions
-     */
     public function test__init()
     {
         $this->fixture = new \ARC2_StoreAskQueryHandler($this->store->a, $this->store);

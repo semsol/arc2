@@ -11,7 +11,7 @@ namespace Tests\db_adapter_depended\sparql_1_1_tests;
  */
 class ConstructTest extends ComplianceTest
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -93,6 +93,8 @@ class ConstructTest extends ComplianceTest
             // get actual result for given test query
             $actualResult = $this->store->query($testQuery);
         }
+
+        return true;
     }
 
     /*
@@ -101,26 +103,26 @@ class ConstructTest extends ComplianceTest
 
     public function test_constructwhere02()
     {
-        $this->runTestFor('constructwhere02');
+        $this->assertTrue($this->runTestFor('constructwhere02'));
     }
 
     public function test_constructwhere03()
     {
-        $this->runTestFor('constructwhere03');
+        $this->assertTrue($this->runTestFor('constructwhere03'));
     }
 
     public function test_constructwhere04()
     {
-        $this->runTestFor('constructwhere04');
+        $this->assertTrue($this->runTestFor('constructwhere04'));
     }
 
     public function test_constructwhere05()
     {
-        $this->runTestFor('constructwhere05');
+        $this->assertTrue($this->runTestFor('constructwhere05'));
     }
 
     public function test_constructwhere06()
     {
-        $this->runTestFor('constructwhere06');
+        $this->assertTrue($this->runTestFor('constructwhere06'));
     }
 }

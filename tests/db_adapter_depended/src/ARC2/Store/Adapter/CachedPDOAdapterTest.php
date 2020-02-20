@@ -7,7 +7,7 @@ use Tests\ARC2_TestCase;
 
 class CachedPDOAdapterTest extends ARC2_TestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         // stop, if pdo_mysql is not available
         if (false == \extension_loaded('pdo_mysql')) {

@@ -9,7 +9,7 @@ class ARC2_ClassTest extends ARC2_TestCase
     protected $dbConnection;
     protected $store;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

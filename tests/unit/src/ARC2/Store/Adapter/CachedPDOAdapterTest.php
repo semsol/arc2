@@ -6,7 +6,7 @@ use ARC2\Store\Adapter\CachedPDOAdapter;
 
 class CachedPDOAdapterTest extends PDOAdapterTest
 {
-    public function setUp()
+    public function setUp(): void
     {
         global $dbConfig;
 
@@ -25,12 +25,11 @@ class CachedPDOAdapterTest extends PDOAdapterTest
         return new CachedPDOAdapter($configuration);
     }
 
-    /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage Cache not enabled, therefore CachedPDOAdapter can not be used.
-     */
     public function testExceptionIfCacheIsNotEnabled()
     {
+        $this->expectException('Exception');
+        $this->expectExceptionMessage('Cache not enabled, therefore CachedPDOAdapter can not be used.');
+
         $cfg = $this->dbConfig;
         unset($cfg['cache_enabled']);
         unset($cfg['cache_instance']);

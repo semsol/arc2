@@ -14,7 +14,7 @@ abstract class AbstractAdapterTest extends ARC2_TestCase
     abstract public function testGetConnection();
     abstract public function testGetNumberOfRowsInvalidQuery();
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -30,7 +30,7 @@ abstract class AbstractAdapterTest extends ARC2_TestCase
         }
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         if (null !== $this->fixture) {
             $this->fixture->disconnect();

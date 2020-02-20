@@ -6,7 +6,7 @@ use Tests\ARC2_TestCase;
 
 class ARC2_getPreferredFormatTest extends ARC2_TestCase {
 
-	public function setUp()
+	public function setUp(): void
 	{
         // fix warning about unset SCRIPT_NAME index in PHPUnit
         // Notice: Undefined index: SCRIPT_NAME in /var/www/html/ARC2/vendor/phpunit/phpunit/src/Util/Filter.php on line 27

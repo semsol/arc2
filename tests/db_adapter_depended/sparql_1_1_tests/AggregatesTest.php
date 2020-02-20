@@ -11,7 +11,7 @@ namespace Tests\db_adapter_depended\sparql_1_1_tests;
  */
 class AggregatesTest extends ComplianceTest
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -58,7 +58,7 @@ class AggregatesTest extends ComplianceTest
 
     public function test_agg_empty_group()
     {
-        $this->runTestFor('agg-empty-group');
+        $this->assertTrue($this->runTestFor('agg-empty-group'));
     }
 
     public function test_agg_min_01()
@@ -68,46 +68,46 @@ class AggregatesTest extends ComplianceTest
 
     public function test_agg01()
     {
-        $this->runTestFor('agg01');
+        $this->assertTrue($this->runTestFor('agg01'));
     }
 
     public function test_agg02()
     {
-        $this->runTestFor('agg02');
+        $this->assertTrue($this->runTestFor('agg02'));
     }
 
     public function test_agg04()
     {
-        $this->runTestFor('agg04');
+        $this->assertTrue($this->runTestFor('agg04'));
     }
 
     public function test_agg05()
     {
-        $this->runTestFor('agg05');
+        $this->assertTrue($this->runTestFor('agg05'));
     }
 
     public function test_agg08()
     {
-        $this->runTestFor('agg08');
+        $this->assertTrue($this->runTestFor('agg08'));
     }
 
     public function test_agg09()
     {
-        $this->runTestFor('agg09');
+        $this->assertTrue($this->runTestFor('agg09'));
     }
 
     public function test_agg10()
     {
-        $this->runTestFor('agg10');
+        $this->assertTrue($this->runTestFor('agg10'));
     }
 
     public function test_agg11()
     {
-        $this->runTestFor('agg11');
+        $this->assertTrue($this->runTestFor('agg11'));
     }
 
     public function test_agg12()
     {
-        $this->runTestFor('agg12');
+        $this->assertTrue($this->runTestFor('agg12'));
     }
 }

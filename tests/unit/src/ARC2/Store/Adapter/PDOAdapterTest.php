@@ -79,11 +79,10 @@ class PDOAdapterTest extends AbstractAdapterTest
         $this->assertTrue($this->fixture->getConnection() instanceof \PDO);
     }
 
-    /**
-     * @expectedException \Exception
-     */
     public function testGetNumberOfRowsInvalidQuery()
     {
+        $this->expectException('Exception');
+
         $dbs = 'mysql' == $this->fixture->getDBSName() ? 'MySQL' : 'MariaDB';
 
         $this->expectExceptionMessage(
@@ -93,11 +92,10 @@ class PDOAdapterTest extends AbstractAdapterTest
         $this->fixture->getNumberOfRows('SHOW TABLES of x');
     }
 
-    /**
-     * @expectedException \Exception
-     */
     public function testQueryInvalid()
     {
+        $this->expectException('Exception');
+
         $dbs = 'mysql' == $this->fixture->getDBSName() ? 'MySQL' : 'MariaDB';
 
         $this->expectExceptionMessage(

@@ -6,7 +6,7 @@ use Tests\ARC2_TestCase;
 
 class ARC2_GraphTest extends ARC2_TestCase {
 
-	public function setUp()
+	public function setUp(): void
 	{
 		parent::setUp();
 
@@ -192,22 +192,22 @@ class ARC2_GraphTest extends ARC2_TestCase {
 
 	public function testGetNtriples() {
 		$actual = $this->obj->setIndex($this->res3)->getNTriples();
-		$this->assertContains('<http://example.com/s1> <http://example.com/p3> "o3"', $actual);
+		$this->assertStringContainsString('<http://example.com/s1> <http://example.com/p3> "o3"', $actual);
 	}
 
 	public function testGetTurtle() {
 		$actual = $this->obj->setIndex($this->res3)->setPrefix('ex', 'http://example.com/')->getTurtle();
-		$this->assertContains('<http://example.com/s1> ex:p3 "o3"', $actual);
+		$this->assertStringContainsString('<http://example.com/s1> ex:p3 "o3"', $actual);
 	}
 
 	public function testGetRDFXML() {
 		$actual = $this->obj->setIndex($this->res3)->getRDFXML();
-		$this->assertContains('<rdf:Description rdf:about="http://example.com/s1">', $actual);
+		$this->assertStringContainsString('<rdf:Description rdf:about="http://example.com/s1">', $actual);
 	}
 
 	public function testGetJSON() {
 		$actual = $this->obj->setIndex($this->res3)->getJSON();
-		$this->assertContains('{"http:\/\/example.com\/s1":', $actual);
+		$this->assertStringContainsString('{"http:\/\/example.com\/s1":', $actual);
 	}
 
 }
