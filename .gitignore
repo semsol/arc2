@@ -6,3 +6,4 @@ tests/coverage/*
 vendor/
 tests/config.php
 /.php_cs.cache
+docker/docker-compose.yml
