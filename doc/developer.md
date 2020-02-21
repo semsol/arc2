@@ -42,6 +42,10 @@ For ARC2 developers we recommend using our docker setup (see folder `docker`). I
 
 No matter if one needs a MariaDB 10.3 with PHP 7.2 or a PHP 5.6 with MySQL 5.7.0. If there is a docker container, it runs.
 
+### Start
+
+In your terminal go to `docker` folder and run `make`. It will build and start the docker environment as well as log you in.
+
 ### Docker and Travis
 
 We use a very wide range of software-combinations to test ARC2 ([Travis](https://travis-ci.org/semsol/arc2)). Currently, all combinations of supported versions of PHP and database systems (currently MySQL and MariaDB only) are checked.
