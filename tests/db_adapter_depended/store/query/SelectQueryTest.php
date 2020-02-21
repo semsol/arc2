@@ -167,7 +167,7 @@ class SelectQueryTest extends ARC2_TestCase
                 ],
                 'query_time' => $res['query_time']
             ],
-            $res,
+            $res
         );
     }
 
