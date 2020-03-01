@@ -225,7 +225,7 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler
                 }
             } else {
                 $binaryValue = $this->store->a['db_object']->escape($val);
-                if (false == empty($binaryValue)) {
+                if (false !== empty($binaryValue)) {
                     $sql = 'SELECT id AS `id` FROM '.$tbl_prefix.$sub_tbl." WHERE val = BINARY '".$binaryValue."'";
                     $row = $this->store->a['db_object']->fetchRow($sql);
                     if (is_array($row) && isset($row['id'])) {
@@ -301,34 +301,12 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler
         if (preg_match('/^[0-9]{1,2}\s+[a-z]+\s+[0-9]{4}/i', $val) && ($uts = strtotime($val)) && ($uts !== -1)) {
             return date("Y-m-d\TH:i:s", $uts);
         }
-        /* xsd date (e.g. 2009-05-28T18:03:38+09:00 2009-05-28T18:03:38GMT) */
-        if (preg_match('/^([0-9]{4}\-[0-9]{2}\-[0-9]{2}\T)([0-9\:]+)?([0-9\+\-\:\Z]+)?(\s*[a-z]{2,3})?$/si', $val, $m)) {
-            /* yyyy-mm-dd */
-            $val = $m[1];
-            /* hh:ss */
-            if ($m[2]) {
-                $val .= $m[2];
-                /* timezone offset */
-                if (isset($m[3]) && ('Z' != $m[3])) {
-                    $uts = strtotime(str_replace('T', ' ', $val));
-                    if (preg_match('/([\+\-])([0-9]{2})\:?([0-9]{2})$/', $m[3], $sub_m)) {
-                        // without the explicit (int) casting, you will get the following error with PHP 7.1+
-                        // A non-numeric value encountered
-                        $diff_mins = (3600 * (int)ltrim($sub_m[2], '0')) + (int)ltrim($sub_m[3], '0');
-                        $uts = ('-' == $sub_m[1]) ? $uts + $diff_mins : $uts - $diff_mins;
-                        $val = date('Y-m-d\TH:i:s\Z', $uts);
-                    }
-                } else {
-                    $val .= 'Z';
-                }
-            }
 
-            return $val;
+        /* xsd date (e.g. 2009-05-28T18:03:38+09:00 2009-05-28T18:03:38GMT) */
+        if (true === (bool) \strtotime($val)) {
+            return \date('Y-m-d\TH:i:s\Z', \strtotime($val));
         }
-        /* fallback & backup w/o UTC calculation, to be removed in later revision */
-        if (preg_match('/^[0-9]{4}[0-9\-\:\T\Z\+]+([a-z]{2,3})?$/i', $val)) {
-            return $val;
-        }
+
         if (is_numeric($val)) {
             $val = sprintf('%f', $val);
             if (preg_match("/([\-\+])([0-9]*)\.([0-9]*)/", $val, $m)) {
@@ -340,6 +318,7 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler
 
             return $val;
         }
+
         /* any other string: remove tags, linebreaks etc., but keep MB-chars  */
         //$val = substr(trim(preg_replace('/[\W\s]+/is', '-', strip_tags($val))), 0, 35);
         // [\PL\s]+ ( = non-Letters) kills digits

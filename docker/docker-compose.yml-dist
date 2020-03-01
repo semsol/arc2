@@ -1,0 +1,52 @@
+version: '2'
+services:
+    # for development, acting like a real one
+    db:
+      image: mysql:5.7
+      environment:
+          MYSQL_DATABASE: arc2
+          MYSQL_ROOT_PASSWORD: Pass123
+      volumes:
+          - /path/to/your/html:/var/lib/mysql
+
+    # for tests
+    dbtest:
+        image: mysql:5.7
+        environment:
+            MYSQL_DATABASE: arc2
+            MYSQL_ROOT_PASSWORD: Pass123
+        volumes:
+            - data:/var/cache
+            - data:/var/lib/mysql
+
+    phpmyadmin:
+        image: phpmyadmin/phpmyadmin
+        links:
+            - db:mysql
+        ports:
+            - 8022:80
+        environment:
+            MYSQL_USERNAME: root
+            MYSQL_ROOT_PASSWORD: Pass123
+            PMA_HOST: db
+        volumes:
+            # custom php.ini settings (change upload restrictions)
+            - ./Docker/arc2/custom.ini:/usr/local/etc/php/conf.d/custom.ini
+
+    arc2:
+        build:
+            ./Docker/arc2
+        volumes:
+            - /path/to/your/html:/var/www/html
+            # custom php.ini settings (change error reporting etc.)
+            - ./Docker/arc2/custom.ini:/usr/local/etc/php/conf.d/custom.ini
+        ports:
+            - 8023:80
+        links:
+            - db:mysql
+
+volumes:
+    data:
+        driver_opts:
+            type: tmpfs
+            device: tmpfs

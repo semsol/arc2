@@ -20,7 +20,7 @@ class ARC2_TestCase extends \PHPUnit\Framework\TestCase
      */
     protected $fixture;
 
-    public function setUp()
+    public function setUp(): void
     {
         global $dbConfig;
 
@@ -32,7 +32,7 @@ class ARC2_TestCase extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         // in case we run with a cache, clear it
         if (isset($this->dbConfig['cache_instance']) && $this->dbConfig['cache_instance'] instanceof CacheInterface) {

@@ -2,7 +2,7 @@
 
 class ARC2_ClassTest extends PHPUnit\Framework\TestCase {
 
-    public function setUp() {
+    public function setUp(): void {
         $array = array();
         $stdClass = new stdClass;
         $this->arc2 = new ARC2_Class($array, $stdClass);

@@ -7,7 +7,8 @@
 [![Latest Unstable Version](https://poser.pugx.org/semsol/arc2/v/unstable.svg)](https://packagist.org/packages/semsol/arc2)
 [![License](https://poser.pugx.org/semsol/arc2/license.svg)](https://packagist.org/packages/semsol/arc2)
 
-ARC2 is a PHP 5.6+ library for working with RDF. It also provides a MySQL-based triplestore with SPARQL support.
+ARC2 is a PHP 7.2 library for working with RDF. It also provides a MySQL-based triplestore with SPARQL support.
+Older versions of PHP may work, but are not longer tested.
 
 ## Installation
 
@@ -19,35 +20,31 @@ If you're using Composer to manage dependencies, you can use
 composer require semsol/arc2:^2
 ```
 
-### Branches
-
-`2.3.1` was latest stable version for a long time. But recent developments lead to version `2.4`, which is the next minor version of the 2.x-branch, containing stabilizations, wider test coverage and a couple of new features (e.g. PDO adapter for RDF store). Primary focus was to keep backward compatibility, so that an upgrade doesn't mess up your application. Its not clear how long the 2.x-branch will be maintained, so please consider upgrading to 3.x.
-
-![](doc/branches.png)
-
-Version `3.x` introduces new features and develops the backend further. Unfortunately, overall backward compatibility can not be maintained. One of the major changes is the transition from MyISAM to InnoDB table engine (RDF store).
+Further information about composer usage can be found [here](https://getcomposer.org/doc/01-basic-usage.md#autoloading), for instance about autoloading ARC2 classes.
 
 ## Requirements
 
 #### PHP
 
-|          5.6          |        7.0         |        7.1         |        7.2         |
-|:---------------------:|:------------------:|:------------------:|:------------------:|
-| :heavy_check_mark:(1) | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |
+|   5.6   | 7.0  | 7.1  | 7.2  | 7.3  | 7.4  |
+|:-------:|:----:|:----:|:----:|:----:|:----:|
+| :+1:(1) | :+1:(1) | :+1:(1) | :+1: | :+1: | :+1: |
 
 (1) It is compatible with PHP 5.3+ but old versions are no longer tested.
 
 #### Database systems
 
-|           |        5.5         |        5.6         |        5.7         |       8.0       |
-|:---------:|:------------------:|:------------------:|:------------------:|:---------------:|
-| **MySQL** | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :collision: (1) |
+|           | 5.5  | 5.6  | 5.7  |       8.0       |
+|:---------:|:----:|:----:|:----:|:---------------:|
+| **MySQL** | :+1: | :+1: | :+1: | :collision: (1) |
 
-|             |        10.0        |        10.1        |        10.2        |        10.3        |
-|:-----------:|:------------------:|:------------------:|:------------------:|:------------------:|
-| **MariaDB** | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |
+|             |     10.0      | 10.1 | 10.2 | 10.3 | 10.4 | 10.5 |
+|:-----------:|:-------------:|:----:|:----:|:----:|:----:|:----:|
+| **MariaDB** | :question:(2) | :+1: | :+1: | :+1: | :+1: | :+1: |
 
 (1) As long as ARC2 uses mysqli, a connection to MySQL Server 8.0 is not possible. For more information, please look [here](https://github.com/semsol/arc2/commit/0ad48d61753b15ae02ff19f615b14aa52b6557f1). But its planned to switch to PDO ([issue](https://github.com/semsol/arc2/issues/109))
+
+(2) Not tested anymore, because outdated version.
 
 
 ## RDF triple store
@@ -91,7 +88,7 @@ $store = ARC2::getStore(array(
 ));
 ```
 
-ARC2 uses [Symfony Cache](https://symfony.com/doc/current/components/cache.html) , which provides many connectors out of the box ([Overview](https://github.com/symfony/cache/tree/master/Simple)). This allows you to attach ARC2 to a [Redis server](https://github.com/symfony/cache/blob/master/Simple/RedisCache.php), for instance.
+ARC2 uses [Symfony Cache](https://symfony.com/doc/4.1/components/cache.html) , which provides many connectors out of the box ([Overview](https://github.com/symfony/cache/tree/master/Simple)).
 
 ### Known problems/restrictions with database systems
 
@@ -110,10 +107,4 @@ Based on this [source](https://mysqlserverteam.com/upgrading-to-mysql-8-0-defaul
 
 ## Internal information for developers
 
-Please have a look [here](doc/developer.md) to find information about maintaining and extending ARC2.
-
-### Docker setup
-
-For ARC2 developers we recommend this following [Docker setup](https://github.com/k00ni/PHP-Apache-MySQL-Docker). It provides a pre-configured set of software (for PHP, DBS etc.) and allows quick switches between different software versions.
-
-For more information have a look [here](https://github.com/k00ni/PHP-Apache-MySQL-Docker).
+Please have a look [here](doc/developer.md) to find information about maintaining and extending ARC2 as well as our docker setup for local development.

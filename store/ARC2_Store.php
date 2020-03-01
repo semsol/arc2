@@ -31,7 +31,7 @@ class ARC2_Store extends ARC2_Class
         /*
          * setup cache instance, if required by the user.
          */
-        if (isset($this->a['cache_enabled']) && true === $this->a['cache_enabled']) {
+        if ($this->cacheEnabled()) {
             // reuse existing cache instance, if it implements Psr\SimpleCache\CacheInterface
             if (isset($this->a['cache_instance'])
                 && $this->a['cache_instance'] instanceof \Psr\SimpleCache\CacheInterface) {
@@ -47,7 +47,9 @@ class ARC2_Store extends ARC2_Class
 
     public function cacheEnabled()
     {
-        return isset($this->a['cache_enabled']) && true === $this->a['cache_enabled'];
+        return isset($this->a['cache_enabled'])
+            && true === $this->a['cache_enabled']
+            && 'pdo' == $this->a['db_adapter'];
     }
 
     public function getName()

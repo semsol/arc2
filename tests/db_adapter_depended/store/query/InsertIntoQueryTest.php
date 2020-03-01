@@ -9,7 +9,7 @@ use Tests\ARC2_TestCase;
  */
 class InsertIntoQueryTest extends ARC2_TestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -18,7 +18,7 @@ class InsertIntoQueryTest extends ARC2_TestCase
         $this->fixture->setup();
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         $this->fixture->closeDBCon();
     }

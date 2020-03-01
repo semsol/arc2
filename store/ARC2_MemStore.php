@@ -28,7 +28,7 @@ class ARC2_MemStore extends ARC2_Class
         return 1;
     }
 
-    public function setUp()
+    public function setUp(): void
     {
     }
 

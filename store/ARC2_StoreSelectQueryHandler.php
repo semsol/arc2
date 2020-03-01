@@ -1388,7 +1388,13 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler
     {
         $var = $pattern['value'];
         $info = $this->getVarTableInfos($var);
-        if (!$tbl = $info['table']) {
+
+        $tbl = false;
+        if (isset($info['table'])) {
+            $tbl = $info['table'];
+        }
+
+        if (!$tbl) {
             /* might be an aggregate var */
             $vars = $this->infos['query']['result_vars'];
             foreach ($vars as $test_var) {

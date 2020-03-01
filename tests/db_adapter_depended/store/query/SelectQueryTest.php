@@ -9,7 +9,7 @@ use Tests\ARC2_TestCase;
  */
 class SelectQueryTest extends ARC2_TestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -18,7 +18,7 @@ class SelectQueryTest extends ARC2_TestCase
         $this->fixture->setup();
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         $this->fixture->closeDBCon();
     }
@@ -167,11 +167,7 @@ class SelectQueryTest extends ARC2_TestCase
                 ],
                 'query_time' => $res['query_time']
             ],
-            $res,
-            '',
-            0,
-            10,
-            true
+            $res
         );
     }
 

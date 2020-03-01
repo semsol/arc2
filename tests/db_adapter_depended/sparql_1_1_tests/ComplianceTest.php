@@ -38,7 +38,7 @@ abstract class ComplianceTest extends ARC2_TestCase
      */
     protected $w3cTestsFolderPath;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -56,7 +56,7 @@ abstract class ComplianceTest extends ARC2_TestCase
     /**
      *
      */
-    public function tearDown()
+    public function tearDown(): void
     {
         $this->store->reset();
         $this->store->closeDBCon();
@@ -380,5 +380,7 @@ abstract class ComplianceTest extends ARC2_TestCase
 
             $this->assertEquals($expectedResult, $actualResultAsXml);
         }
+
+        return true;
     }
 }

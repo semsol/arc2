@@ -11,7 +11,7 @@ namespace Tests\db_adapter_depended\sparql_1_1_tests;
  */
 class DropTest extends ComplianceTest
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

@@ -8,7 +8,7 @@ use Tests\ARC2_TestCase;
 
 class AdapterFactoryTest extends ARC2_TestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -24,12 +24,11 @@ class AdapterFactoryTest extends ARC2_TestCase
         $this->assertTrue($this->fixture->getInstanceFor('mysqli') instanceof AbstractAdapter);
     }
 
-    /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage Unknown adapter name given. Currently supported are: mysqli, pdo
-     */
     public function testGetInstanceForInvalidAdapterName()
     {
+        $this->expectException('Exception');
+        $this->expectExceptionMessage('Unknown adapter name given. Currently supported are: mysqli, pdo');
+
         $this->fixture->getInstanceFor('invalid');
     }
 

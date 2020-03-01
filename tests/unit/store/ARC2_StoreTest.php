@@ -6,7 +6,7 @@ use Tests\ARC2_TestCase;
 
 class ARC2_StoreTest extends ARC2_TestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -23,14 +23,16 @@ class ARC2_StoreTest extends ARC2_TestCase
         $this->fixture->setup();
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         $this->fixture->closeDBCon();
     }
 
     public function testCacheEnabled()
     {
-        $cacheEnabled = isset($this->dbConfig['cache_enabled']) && $this->dbConfig['cache_enabled'];
+        $cacheEnabled = isset($this->dbConfig['cache_enabled'])
+            && $this->dbConfig['cache_enabled']
+            && 'pdo' == $this->dbConfig['db_adapter'];
         $this->assertEquals($cacheEnabled, $this->fixture->cacheEnabled());
     }
 }

@@ -6,7 +6,7 @@ use Tests\ARC2_TestCase;
 
 class ARC2_ReaderTest extends ARC2_TestCase {
 
-	public function setUp()
+	public function setUp(): void
 	{
 		parent::setUp();
 
@@ -37,7 +37,7 @@ class ARC2_ReaderTest extends ARC2_TestCase {
 	}
 
 	public function testWhenTheSchemeChangesButPortIsNotExplicitThePortIsInferredFromTheSchemeNotThePreviousParts() {
-		
+
 		$parts_of_previous_uri = array("port" => 8081, "scheme" => "https", "host" => "foo.bar", "path"=>"/baz");
 		$uri_parts = $this->reader->getURIPartsFromURIAndPreviousURIParts("http://bbc.co.uk/news", $parts_of_previous_uri);
 
