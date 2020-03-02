@@ -195,7 +195,12 @@ class ARC2_Store extends ARC2_Class
             $tbl = $this->getTablePrefix().$tbl;
 
             $row = $this->db->fetchRow('SHOW COLUMNS FROM '.$tbl.' LIKE "val_hash"');
-            $this->$var_name = null !== $row;
+            
+            // fix: $row doesn't return 'null'
+            $this->$var_name = null;
+            if ($row) {
+                $this->$var_name = true;
+            }
         }
 
         return $this->$var_name;
