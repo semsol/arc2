@@ -61,7 +61,7 @@ class ARC2_StoreEndpointTest extends ARC2_TestCase
         $this->assertArrayHasKey('results', $res);
         $this->assertEquals($res['head']['vars'][0], 'a');
         $this->assertEquals($res['results']['bindings'][0]['a']['value'], 'http://de.dbpedia.org/resource/Johann_von_Pont');
-        $this->assertEquals($res['results']['bindings'][1]['c']['type'], 'typed-literal');
+        $this->assertEquals($res['results']['bindings'][1]['c']['type'], 'literal');
         $this->assertEquals($res['results']['bindings'][2]['c']['type'], 'literal');
     }
 }
