@@ -16,7 +16,7 @@ if [ ! -z "${DB}" ]; then
 
     docker pull ${DB}
     docker run -it --name=mysqld -d -e MYSQL_ALLOW_EMPTY_PASSWORD=yes -p 3306:3306 ${DB}
-    sleep 10
+    sleep 20
 
     mysql() {
         docker exec mysqld mysql "${@}"
