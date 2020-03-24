@@ -429,13 +429,13 @@ class ARC2_StoreEndpoint extends ARC2_Store
                     $r .= '        "'.$var.'": {';
                     if ('uri' == $row[$var.' type']) {
                         $r .= $nl.'          "type": "uri",';
-                        $r .= $nl.'          "value": "'.$this->store->a['db_object']->escape($row[$var]).'"';
+                        $r .= $nl.'          "value": "'.$this->a['db_object']->escape($row[$var]).'"';
                     } elseif ('bnode' == $row[$var.' type']) {
                         $r .= $nl.'          "type": "bnode",';
                         $r .= $nl.'          "value": "'.substr($row[$var], 2).'"';
                     } else {
-                        $dt = isset($row[$var.' datatype']) ? ','.$nl.'          "datatype": "'.$this->store->a['db_object']->escape($row[$var.' datatype']).'"' : '';
-                        $lang = isset($row[$var.' lang']) ? ','.$nl.'          "xml:lang": "'.$this->store->a['db_object']->escape($row[$var.' lang']).'"' : '';
+                        $dt = isset($row[$var.' datatype']) ? ','.$nl.'          "datatype": "'.$this->a['db_object']->escape($row[$var.' datatype']).'"' : '';
+                        $lang = isset($row[$var.' lang']) ? ','.$nl.'          "xml:lang": "'.$this->a['db_object']->escape($row[$var.' lang']).'"' : '';
                         $type = $dt ? 'typed-literal' : 'literal';
                         $r .= $nl.'          "type": "'.$type.'",';
                         $r .= $nl.'          "value": "'.$this->jsonEscape($row[$var]).'"';
