@@ -142,6 +142,11 @@ jobs:
         - php: 7.4
           env: DB=mariadb:10.5 DB_ADAPTER=pdo DB_PDO_PROTOCOL=mysql CACHE_ENABLED=true
         #
+        # COVERAGE
+        #
+        - php: 7.4
+          env: COVERAGE_RUN=run
+        #
         # PHP nightly (8.x) with mysqli and PDO for MySQL only
         #
         - php: nightly
@@ -161,19 +166,10 @@ before_script:
     #
     - ./.travis/install-and-init-db.sh
 
-    #
-    # setup and run tests
-    #
-    # Install composer packages, will also trigger dump-autoload
-    - travis_retry composer install --no-interaction --prefer-dist
-    # Install coveralls.phar
-    - travis_retry wget -c -nc --retry-connrefused --tries=0 https://github.com/satooshi/php-coveralls/releases/download/v1.1.0/coveralls.phar
-    - chmod +x coveralls.phar
-    - php coveralls.phar --version
-
 script:
-    - vendor/bin/phpunit --coverage-clover gen/coverage/clover.xml
+    - if [ "$COVERAGE_RUN" = "run" ]; then composer phpunit-with-coverage ; fi;
+    - if [ "$COVERAGE_RUN" != "run" ]; then composer phpunit ; fi;
 
 after_success:
     # Submit coverage report to Coveralls servers, see .coveralls.yml
-    - travis_retry php coveralls.phar -v
+    - if [ "$COVERAGE_RUN" = "run" ]; then travis_retry php vendor/bin/php-coveralls -v ; fi;
