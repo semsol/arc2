@@ -139,6 +139,13 @@ matrix:
           env: DB=mariadb:10.5 DB_ADAPTER=pdo DB_PDO_PROTOCOL=mysql
         - php: 7.4
           env: DB=mariadb:10.5 DB_ADAPTER=pdo DB_PDO_PROTOCOL=mysql CACHE_ENABLED=true
+        #
+        # PHP nightly (8.x) with mysqli and PDO for MySQL only
+        #
+        - php: nightly
+          env: DB=mysql:5.7 DB_ADAPTER=mysqli
+        - php: nightly
+          env: DB=mysql:5.7 DB_ADAPTER=pdo DB_PDO_PROTOCOL=mysql
 git:
     depth: 1
 
