@@ -9,6 +9,8 @@ services:
 
 jobs:
     fast_finish: true
+    allow_failures:
+        - php: nightly
     include:
         #
         # Define versions of MySQL and MariaDB to test against.
