@@ -167,6 +167,8 @@ before_script:
     # install and init database (see matrix => include => env)
     #
     - ./.travis/install-and-init-db.sh
+    # composer
+    - travis_retry composer update --no-interaction --prefer-dist
 
 script:
     - if [ "$COVERAGE_RUN" = "run" ]; then composer phpunit-with-coverage ; fi;
