@@ -147,7 +147,9 @@ jobs:
         # COVERAGE
         #
         - php: 7.4
-          env: COVERAGE_RUN=run
+          env: COVERAGE_RUN=run DB=mysql:5.7 DB_ADAPTER=mysqli
+        - php: 7.4
+          env: COVERAGE_RUN=run DB=mysql:5.7 DB_ADAPTER=pdo DB_PDO_PROTOCOL=mysql
         #
         # PHP nightly (8.x) with mysqli and PDO for MySQL only
         #
