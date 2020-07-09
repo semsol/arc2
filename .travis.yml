@@ -1,11 +1,13 @@
-sudo: required
+dist: xenial
+
+os: linux
 
 language: php
 
 services:
   - docker
 
-matrix:
+jobs:
     fast_finish: true
     include:
         #
