@@ -15,7 +15,7 @@ if (file_exists(__DIR__ .'/config.php')) {
 } else {
     // standard DB credentials (ready to use in Travis)
     $dbConfig = array(
-        'db_name' => 'testdb',
+        'db_name' => 'arc2_test',
         'db_user' => 'root',
         'db_pwd'  => '',
         'db_host' => '127.0.0.1',

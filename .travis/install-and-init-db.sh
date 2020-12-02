@@ -46,10 +46,10 @@ if [ ! -z "${DB}" ]; then
         WITH_PLUGIN=''
     fi
 
-    mysql -uroot -e 'create database testdb DEFAULT CHARACTER SET utf8mb4'
+    mysql -uroot -e 'create database arc2_test DEFAULT CHARACTER SET utf8mb4'
 else
     cat ~/.my.cnf
 
     mysql -e 'select VERSION()'
-    mysql -e 'create database testdb DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;'
+    mysql -e 'create database arc2_test DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;'
 fi
