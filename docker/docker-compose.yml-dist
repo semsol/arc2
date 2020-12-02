@@ -3,7 +3,7 @@ services:
     db:
         image: mysql:5.7
         environment:
-            MYSQL_DATABASE: root
+            MYSQL_DATABASE: arc2
             MYSQL_ROOT_PASSWORD: Pass123
         volumes:
             # server is empty at the start because it uses RAM to store data
