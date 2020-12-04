@@ -13,12 +13,12 @@ if (file_exists(__DIR__ .'/config.php')) {
     $dbConfig = require 'config.php';
 
 } else {
-    // standard DB credentials (ready to use in Travis)
+    // standard DB credentials (ready to use in Github Actions)
     $dbConfig = array(
         'db_name' => 'arc2_test',
         'db_user' => 'root',
-        'db_pwd'  => '',
-        'db_host' => '127.0.0.1',
+        'db_pwd'  => 'Pass123',
+        'db_host' => DB_PORT ?? 3306,
     );
 }
 

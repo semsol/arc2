@@ -1,10 +1,10 @@
-name: Test
+name: MySQL 5.7 Tests
 
 on: push
 
 jobs:
     test:
-        name: Backbone on PHP ${{ matrix.php-versions }} ${{ matrix.COVERAGE_FLAGS }}
+        name: MySQL 5.7 Tests - PHP ${{ matrix.php-versions }} ${{ matrix.COVERAGE_FLAGS }}
         runs-on: ubuntu-latest
 
         strategy:
@@ -13,10 +13,27 @@ jobs:
             matrix:
                 include:
                     -   php-versions: 7.2
-                        DB: mysql:5.7
                         DB_ADAPTER: mysqli
+                    -   php-versions: 7.2
+                        DB_ADAPTER: pdo
+                        DB_PDO_PROTOCOL: mysql
+                    -   php-versions: 7.2
+                        DB_ADAPTER: pdo
+                        DB_PDO_PROTOCOL: mysql
+                        CACHE_ENABLED: true
                     -   php-versions: 7.4
                         COVERAGE_FLAGS: --coverage-text
+
+        services:
+            testdb:
+                image: mysql:5.7
+                env:
+                    MYSQL_ROOT_PASSWORD: Pass123
+                    MYSQL_ALLOW_EMPTY_PASSWORD: false
+                    MYSQL_DATABASE: arc2_test
+                ports:
+                    - 3306
+                options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=2s --health-retries=3
 
         steps:
             -   name: Checkout
@@ -30,12 +47,11 @@ jobs:
                     coverage: xdebug
                     ini-values: memory_limit=1G
 
-            -   name: Install and setup Database
-                run: ./tests/install-and-init-db.sh
-
             -   name: Install Composer dependencies
                 run: composer install --no-progress --no-suggest --prefer-dist --optimize-autoloader
 
             -   name: Tests
                 run: |
                     vendor/bin/phpunit ${{ matrix.COVERAGE_FLAGS }}
+                env:
+                    DB_PORT: ${{ job.services.testdb.ports[3306] }}
