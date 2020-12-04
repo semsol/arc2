@@ -1,0 +1,38 @@
+name: Test
+
+on: push
+
+jobs:
+    test:
+        name: Backbone on PHP ${{ matrix.php-versions }} ${{ matrix.COVERAGE_FLAGS }}
+        runs-on: ubuntu-latest
+
+        strategy:
+            # if one of the matrix-entries break, all entries getting canceled.
+            fail-fast: true
+            matrix:
+                include:
+                    -   php-versions: 7.2
+                        DB: mysql:5.7
+                        DB_ADAPTER: mysqli
+                    -   php-versions: 7.4
+                        COVERAGE_FLAGS: --coverage-text
+
+        steps:
+            -   name: Checkout
+                uses: actions/checkout@v2
+
+            -   name: Install PHP
+                uses: shivammathur/setup-php@v2
+                with:
+                    php-version: ${{ matrix.php-versions }}
+                    extensions: iconv
+                    coverage: xdebug
+                    ini-values: memory_limit=1G
+
+            -   name: Install Composer dependencies
+                run: composer install --no-progress --no-suggest --prefer-dist --optimize-autoloader
+
+            -   name: Tests
+                run: |
+                    php bin/phpunit ${{ matrix.COVERAGE_FLAGS }}
