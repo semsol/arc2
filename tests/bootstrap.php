@@ -23,10 +23,6 @@ if (file_exists(__DIR__ .'/config.php')) {
     );
 }
 
-var_dump($_ENV);
-var_dump($_SERVER);
-var_dump($dbConfig);
-
 // set defaults for dbConfig entries
 if (false == isset($dbConfig['store_name'])) {
     $dbConfig['store_name'] = 'arc';
