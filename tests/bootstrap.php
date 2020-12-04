@@ -23,6 +23,7 @@ if (file_exists(__DIR__ .'/config.php')) {
     );
 }
 
+var_dump($_ENV);
 var_dump($dbConfig);
 
 // set defaults for dbConfig entries
