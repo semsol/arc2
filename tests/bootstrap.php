@@ -18,7 +18,8 @@ if (file_exists(__DIR__ .'/config.php')) {
         'db_name' => 'arc2_test',
         'db_user' => 'root',
         'db_pwd'  => 'Pass123',
-        'db_host' => DB_PORT ?? 3306,
+        'db_host' => '127.0.0.1',
+        'db_port' => defined('DB_PORT') ? constant('DB_PORT') : 3306,
     );
 }
 

@@ -4,7 +4,10 @@ on: push
 
 jobs:
     test:
-        name: MySQL 5.7 Tests - PHP ${{ matrix.php-versions }} ${{ matrix.COVERAGE_FLAGS }}
+        name: |
+            MySQL 5.7 Tests - PHP ${{ matrix.php-versions }}
+            ${{ matrix.DB_ADAPTER }}
+            ${{ matrix.DB_PDO_PROTOCOL }}
         runs-on: ubuntu-latest
 
         strategy:
@@ -22,15 +25,22 @@ jobs:
                         DB_PDO_PROTOCOL: mysql
                         CACHE_ENABLED: true
                     -   php-versions: 7.4
+                        DB_ADAPTER: pdo
+                        DB_PDO_PROTOCOL: mysql
+                        CACHE_ENABLED: true
                         COVERAGE_FLAGS: --coverage-text
+                    -   php-versions: 8.0
+                        DB_ADAPTER: pdo
+                        DB_PDO_PROTOCOL: mysql
+                        CACHE_ENABLED: true
 
         services:
             testdb:
                 image: mysql:5.7
                 env:
                     MYSQL_ROOT_PASSWORD: Pass123
-                    MYSQL_ALLOW_EMPTY_PASSWORD: false
                     MYSQL_DATABASE: arc2_test
+                    MYSQL_ALLOW_EMPTY_PASSWORD: false
                 ports:
                     - 3306
                 options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=2s --health-retries=3
@@ -43,7 +53,6 @@ jobs:
                 uses: shivammathur/setup-php@v2
                 with:
                     php-version: ${{ matrix.php-versions }}
-                    extensions: iconv
                     coverage: xdebug
                     ini-values: memory_limit=1G
 

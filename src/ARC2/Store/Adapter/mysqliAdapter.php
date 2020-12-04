@@ -49,7 +49,9 @@ class mysqliAdapter extends AbstractAdapter
                 $this->db = new MysqliDbExtended(
                     $this->configuration['db_host'],
                     $this->configuration['db_user'],
-                    $this->configuration['db_pwd']
+                    $this->configuration['db_pwd'],
+                    null,
+                    $this->configuration['db_port'] ?? 3306
                 );
             } catch (\Exception $e) {
                 return $e->getMessage();
