@@ -30,7 +30,7 @@ services:
         build:
             ./ARC2
         volumes:
-            - /home/kabicht/Dokumente/arc2:/var/www/html
+            - /path/to/arc2:/var/www/html
         links:
             - db:mysql
         command: tail -f /dev/null
