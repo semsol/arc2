@@ -19,7 +19,7 @@ if (file_exists(__DIR__ .'/config.php')) {
         'db_user' => 'root',
         'db_pwd'  => 'Pass123',
         'db_host' => '127.0.0.1',
-        'db_port' => isset($_ENV['DB_PORT']) ? $_ENV['DB_PORT'] : 3306,
+        'db_port' => isset($_SERVER['DB_PORT']) ? $_SERVER['DB_PORT'] : 3306,
     );
 }
 
