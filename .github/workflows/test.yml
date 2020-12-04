@@ -31,7 +31,7 @@ jobs:
                     ini-values: memory_limit=1G
 
             -   name: Install and setup Database
-                run: ./.tests/install-and-init-db.sh
+                run: ./tests/install-and-init-db.sh
 
             -   name: Install Composer dependencies
                 run: composer install --no-progress --no-suggest --prefer-dist --optimize-autoloader
