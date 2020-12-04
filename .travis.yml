@@ -9,8 +9,6 @@ services:
 
 jobs:
     fast_finish: true
-    allow_failures:
-        - php: nightly
     include:
         #
         # Define versions of MySQL and MariaDB to test against.
@@ -153,7 +151,7 @@ jobs:
         - php: 7.4
           env: COVERAGE_RUN=run DB=mysql:5.7 DB_ADAPTER=pdo DB_PDO_PROTOCOL=mysql CACHE_ENABLED=true
         #
-        # PHP nightly (8.x) with mysqli and PDO for MySQL only
+        # PHP nightly (8.0.x) with mysqli and PDO for MySQL only
         #
         - php: nightly
           env: DB=mysql:5.7 DB_ADAPTER=mysqli
