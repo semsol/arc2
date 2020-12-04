@@ -15,8 +15,46 @@ jobs:
             fail-fast: true
             matrix:
                 include:
+                    # PHP 7.2
                     -   php-versions: 7.2
                         DB_ADAPTER: mysqli
+                    -   php-versions: 7.2
+                        DB_ADAPTER: pdo
+                        DB_PDO_PROTOCOL: mysql
+                    -   php-versions: 7.2
+                        DB_ADAPTER: pdo
+                        DB_PDO_PROTOCOL: mysql
+                        CACHE_ENABLED: true
+                    # PHP 7.3
+                    -   php-versions: 7.3
+                        DB_ADAPTER: mysqli
+                    -   php-versions: 7.3
+                        DB_ADAPTER: pdo
+                        DB_PDO_PROTOCOL: mysql
+                    -   php-versions: 7.3
+                        DB_ADAPTER: pdo
+                        DB_PDO_PROTOCOL: mysql
+                        CACHE_ENABLED: true
+                    # PHP 7.4
+                    -   php-versions: 7.4
+                        DB_ADAPTER: mysqli
+                    -   php-versions: 7.4
+                        DB_ADAPTER: pdo
+                        DB_PDO_PROTOCOL: mysql
+                    -   php-versions: 7.4
+                        DB_ADAPTER: pdo
+                        DB_PDO_PROTOCOL: mysql
+                        CACHE_ENABLED: true
+                    # PHP 8.0
+                    -   php-versions: 8.0
+                        DB_ADAPTER: mysqli
+                    -   php-versions: 8.0
+                        DB_ADAPTER: pdo
+                        DB_PDO_PROTOCOL: mysql
+                    -   php-versions: 8.0
+                        DB_ADAPTER: pdo
+                        DB_PDO_PROTOCOL: mysql
+                        CACHE_ENABLED: true
 
         services:
             testdb:
