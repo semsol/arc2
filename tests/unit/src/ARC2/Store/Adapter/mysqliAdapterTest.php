@@ -28,7 +28,8 @@ class mysqliAdapterTest extends AbstractAdapterTest
             $this->dbConfig['db_host'],
             $this->dbConfig['db_user'],
             $this->dbConfig['db_pwd'],
-            $this->dbConfig['db_name']
+            $this->dbConfig['db_name'],
+            $this->dbConfig['db_port']
         );
 
         $this->fixture = new mysqliAdapter();

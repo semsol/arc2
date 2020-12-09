@@ -5,8 +5,9 @@
  */
 
 return array(
-    'db_name' => 'testdb',
+    'db_name' => 'arc2_test',
     'db_user' => 'root',
     'db_pwd'  => 'Pass123',
-    'db_host' => 'localhost',
+    'db_host' => '127.0.0.1',
+    'db_port' => 3306,
 );

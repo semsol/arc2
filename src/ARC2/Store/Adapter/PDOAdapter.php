@@ -57,6 +57,10 @@ class PDOAdapter extends AbstractAdapter
                 $dsn .= ';dbname='.$this->configuration['db_name'];
             }
 
+            // port
+            $dsn .= ';port=';
+            $dsn .= isset($this->configuration['db_port']) ? $this->configuration['db_port'] : 3306;
+
             // set charset
             $dsn .= ';charset=utf8mb4';
 

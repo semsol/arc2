@@ -1,0 +1,88 @@
+name: MariaDB 10.2 Tests
+
+on: push
+
+jobs:
+    test:
+        name: |
+            MariaDB 10.2 Tests - PHP ${{ matrix.php-versions }}
+            ${{ matrix.DB_ADAPTER }}
+            ${{ matrix.DB_PDO_PROTOCOL }}
+        runs-on: ubuntu-latest
+
+        strategy:
+            # if one of the matrix-entries break, all entries getting canceled.
+            fail-fast: true
+            matrix:
+                include:
+                    # PHP 7.2
+                    -   php-versions: 7.2
+                        DB_ADAPTER: mysqli
+                    -   php-versions: 7.2
+                        DB_ADAPTER: pdo
+                        DB_PDO_PROTOCOL: mysql
+                    -   php-versions: 7.2
+                        DB_ADAPTER: pdo
+                        DB_PDO_PROTOCOL: mysql
+                        CACHE_ENABLED: true
+                    # PHP 7.3
+                    -   php-versions: 7.3
+                        DB_ADAPTER: mysqli
+                    -   php-versions: 7.3
+                        DB_ADAPTER: pdo
+                        DB_PDO_PROTOCOL: mysql
+                    -   php-versions: 7.3
+                        DB_ADAPTER: pdo
+                        DB_PDO_PROTOCOL: mysql
+                        CACHE_ENABLED: true
+                    # PHP 7.4
+                    -   php-versions: 7.4
+                        DB_ADAPTER: mysqli
+                    -   php-versions: 7.4
+                        DB_ADAPTER: pdo
+                        DB_PDO_PROTOCOL: mysql
+                    -   php-versions: 7.4
+                        DB_ADAPTER: pdo
+                        DB_PDO_PROTOCOL: mysql
+                        CACHE_ENABLED: true
+                    # PHP 8.0
+                    -   php-versions: 8.0
+                        DB_ADAPTER: mysqli
+                    -   php-versions: 8.0
+                        DB_ADAPTER: pdo
+                        DB_PDO_PROTOCOL: mysql
+                    -   php-versions: 8.0
+                        DB_ADAPTER: pdo
+                        DB_PDO_PROTOCOL: mysql
+                        CACHE_ENABLED: true
+
+        services:
+            testdb:
+                image: mariadb:10.2
+                env:
+                    MYSQL_ROOT_PASSWORD: Pass123
+                    MYSQL_DATABASE: arc2_test
+                    MYSQL_ALLOW_EMPTY_PASSWORD: false
+                ports:
+                    - 3306
+                options: --health-cmd="mysqladmin ping" --health-interval=15s --health-timeout=3s --health-retries=4
+
+        steps:
+            -   name: Checkout
+                uses: actions/checkout@v2
+
+            -   name: Install PHP
+                uses: shivammathur/setup-php@v2
+                with:
+                    php-version: ${{ matrix.php-versions }}
+                    coverage: xdebug
+                    ini-values: memory_limit=1G
+
+            -   name: Install Composer dependencies
+                run: composer install --no-progress --no-suggest --prefer-dist --optimize-autoloader
+
+            -   name: Tests
+                run: |
+                    vendor/bin/phpunit ${{ matrix.COVERAGE_FLAGS }}
+                env:
+                    DB_PORT: ${{ job.services.testdb.ports[3306] }}

@@ -1,23 +1,16 @@
 version: '2'
 services:
-    # for development, acting like a real one
     db:
-      image: mysql:5.7
-      environment:
-          MYSQL_DATABASE: arc2
-          MYSQL_ROOT_PASSWORD: Pass123
-      volumes:
-          - /path/to/your/html:/var/lib/mysql
-
-    # for tests
-    dbtest:
         image: mysql:5.7
         environment:
             MYSQL_DATABASE: arc2
             MYSQL_ROOT_PASSWORD: Pass123
         volumes:
+            # server is empty at the start because it uses RAM to store data
             - data:/var/cache
             - data:/var/lib/mysql
+            # for SQL commands to be run after the server starts
+            - ./sql:/docker-entrypoint-initdb.d
 
     phpmyadmin:
         image: phpmyadmin/phpmyadmin
@@ -31,19 +24,16 @@ services:
             PMA_HOST: db
         volumes:
             # custom php.ini settings (change upload restrictions)
-            - ./Docker/arc2/custom.ini:/usr/local/etc/php/conf.d/custom.ini
+            - ./ARC2/custom.ini:/usr/local/etc/php/conf.d/custom.ini
 
     arc2:
         build:
-            ./Docker/arc2
+            ./ARC2
         volumes:
-            - /path/to/your/html:/var/www/html
-            # custom php.ini settings (change error reporting etc.)
-            - ./Docker/arc2/custom.ini:/usr/local/etc/php/conf.d/custom.ini
-        ports:
-            - 8023:80
+            - /path/to/arc2:/var/www/html
         links:
             - db:mysql
+        command: tail -f /dev/null
 
 volumes:
     data:
