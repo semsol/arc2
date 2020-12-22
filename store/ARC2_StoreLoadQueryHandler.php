@@ -15,6 +15,11 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler
         parent::__construct($a, $caller);
     }
 
+    public function setStore(ARC2_Store $store): void
+    {
+        $this->store = $store;
+    }
+
     public function __init()
     {/* db_con, store_log_inserts */
         parent::__init();
@@ -246,7 +251,11 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler
             $this->term_ids[$val] = [$tbl => $this->max_term_id];
             $this->bufferIDSQL($tbl, $this->max_term_id, $val, $type_id);
             ++$this->max_term_id;
-            /* upgrade tables ? */
+            /*
+             * upgrade tables ?
+             *
+             * TODO: on next major release, remove that and find a way to use bigger version automatically.
+             */
             if (('mediumint' == $this->column_type) && ($this->max_term_id >= 16750000)) {
                 $this->store->extendColumns();
                 $this->column_type = 'int';

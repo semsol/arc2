@@ -9,6 +9,9 @@
  */
 ARC2::inc('Store');
 
+/**
+ * @todo move its functionality to a class in src/ARC2/Store/TableManager
+ */
 class ARC2_StoreTableManager extends ARC2_Store
 {
     public function __construct($a, &$caller)
@@ -216,7 +219,6 @@ class ARC2_StoreTableManager extends ARC2_Store
 
     public function extendColumns()
     {
-        $tbl_prefix = $this->getTablePrefix();
         $tbls = $this->getTables();
         foreach ($tbls as $suffix) {
             if (preg_match('/^(triple|g2t|id2val|s2val|o2val)/', $suffix, $m)) {

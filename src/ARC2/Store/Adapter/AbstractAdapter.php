@@ -38,6 +38,11 @@ abstract class AbstractAdapter
         $this->checkRequirements();
     }
 
+    public function getConfiguration(): array
+    {
+        return $this->configuration;
+    }
+
     abstract public function checkRequirements();
 
     abstract public function connect($existingConnection = null);

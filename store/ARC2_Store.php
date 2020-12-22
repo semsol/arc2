@@ -6,6 +6,11 @@
  * @license W3C Software License and GPL
  * @homepage <https://github.com/semsol/arc2>
  */
+
+use ARC2\Store\Adapter\AbstractAdapter;
+use ARC2\Store\Adapter\AdapterFactory;
+use ARC2\Store\TableManager\SQLite;
+
 ARC2::inc('Class');
 
 class ARC2_Store extends ARC2_Class
@@ -78,20 +83,20 @@ class ARC2_Store extends ARC2_Class
 
         // connect
         try {
-            if (false === class_exists('\\ARC2\\Store\\Adapter\\AdapterFactory')) {
+            if (false === class_exists(AdapterFactory::class)) {
                 require __DIR__.'/../src/ARC2/Store/Adapter/AdapterFactory.php';
             }
             if (false == isset($this->a['db_adapter'])) {
                 $this->a['db_adapter'] = 'mysqli';
             }
-            $factory = new \ARC2\Store\Adapter\AdapterFactory();
+            $factory = new AdapterFactory();
             $this->db = $factory->getInstanceFor($this->a['db_adapter'], $this->a);
             $err = $this->db->connect();
             // stop here, if an error occoured
             if (is_string($err) && false !== empty($err)) {
-                throw new \Exception($err);
+                throw new Exception($err);
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return $this->addError($e->getMessage());
         }
 
@@ -104,7 +109,7 @@ class ARC2_Store extends ARC2_Class
         return true;
     }
 
-    public function getDBObject()
+    public function getDBObject(): ?AbstractAdapter
     {
         return $this->db;
     }
@@ -312,9 +317,21 @@ class ARC2_Store extends ARC2_Class
     public function setUp($force = 0)
     {
         if (($force || !$this->isSetUp()) && false !== $this->getDBCon()) {
-            ARC2::inc('StoreTableManager');
-            $mgr = new ARC2_StoreTableManager($this->a, $this);
-            $mgr->createTables();
+            $db = $this->getDBObject();
+
+            // PDO with SQLite
+            if (
+                null !== $db
+                && $db->getConfiguration()
+                && 'pdo' == $db->getAdapterName()
+                && 'sqlite' == $db->getConfiguration()['db_pdo_protocol']
+            ) {
+                (new SQLite($this->a, $this))->createTables();
+            } else {
+                // default way
+                ARC2::inc('StoreTableManager');
+                (new ARC2_StoreTableManager($this->a, $this))->createTables();
+            }
         }
     }
 

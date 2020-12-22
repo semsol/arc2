@@ -1,25 +1,28 @@
 <?php
 
-namespace Tests\db_adapter_depended\store;
+namespace Tests\integration\store;
 
+use ARC2\Store\Adapter\PDOSQLite;
 use Tests\ARC2_TestCase;
 
-class ARC2_StoreTest extends ARC2_TestCase
+/**
+ * Tests store functionality when using SQLite with :memory:.
+ */
+class ARC2_StoreSQLiteMemoryTest extends ARC2_TestCase
 {
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->fixture = \ARC2::getStore($this->dbConfig);
+        $this->fixture = \ARC2::getStore([
+            // this config must lead to sqlite::memory: being used as DSN
+            'db_adapter' => 'pdo',
+            'db_pdo_protocol' => 'sqlite',
+        ]);
         $this->fixture->createDBCon();
 
-        // remove all tables
-        $tables = $this->fixture->getDBObject()->fetchList('SHOW TABLES');
-        foreach ($tables as $table) {
-            $this->fixture->getDBObject()->simpleQuery(
-                'DROP TABLE '.$table['Tables_in_'.$this->dbConfig['db_name']]
-            );
-        }
+        // make sure we use PDOSQLite adapter
+        $this->assertTrue($this->fixture->getDBObject() instanceof PDOSQLite);
 
         // fresh setup of ARC2
         $this->fixture->setup();
@@ -739,9 +742,7 @@ XML;
     public function testReplicateTo()
     {
         if ('05-06' == substr($this->fixture->getDBVersion(), 0, 5)) {
-            $this->markTestSkipped(
-                'With MySQL 5.6 ARC2_Store::replicateTo does not work. Tables keep their names.'
-            );
+            $this->markTestSkipped('With MySQL 5.6 ARC2_Store::replicateTo does not work. Tables keep their names.');
         }
 
         // test data

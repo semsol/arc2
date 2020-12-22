@@ -45,6 +45,11 @@ class AdapterFactory
                     }
 
                     return new CachedPDOAdapter($configuration);
+                } elseif (
+                    isset($configuration['db_pdo_protocol'])
+                    && 'sqlite' == $configuration['db_pdo_protocol']
+                ) {
+                    return new PDOSQLite($configuration);
                 } else {
                     // no cache
                     if (false == class_exists(PDOAdapter::class)) {
@@ -56,9 +61,7 @@ class AdapterFactory
             }
         }
 
-        throw new Exception(
-            'Unknown adapter name given. Currently supported are: '.implode(', ', $this->getSupportedAdapters())
-        );
+        throw new Exception('Unknown adapter name given. Currently supported are: '.implode(', ', $this->getSupportedAdapters()));
     }
 
     /**

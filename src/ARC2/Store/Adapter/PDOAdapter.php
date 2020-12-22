@@ -11,15 +11,23 @@
 
 namespace ARC2\Store\Adapter;
 
+use Exception;
+
 /**
  * PDO Adapter - Handles database operations using PDO.
+ *
+ * This adapter doesn't support SQLite, please use PDOSQLite instead.
  */
 class PDOAdapter extends AbstractAdapter
 {
     public function checkRequirements()
     {
         if (false == \extension_loaded('pdo_mysql')) {
-            throw new \Exception('Extension pdo_mysql is not loaded.');
+            throw new Exception('Extension pdo_mysql is not loaded.');
+        }
+
+        if ('mysql' != $this->configuration['db_pdo_protocol']) {
+            throw new Exception('Only "mysql" protocol is supported at the moment.');
         }
     }
 
@@ -83,19 +91,21 @@ class PDOAdapter extends AbstractAdapter
             // the buffered versions of the MySQL API. But we wont rely on that, setting it false.
             $this->db->setAttribute(\PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, false);
 
-            // This is RDF, we may need many JOINs...
-            // TODO find an equivalent in other DBS
+            // in MySQL, this setting allows bigger JOINs
             $stmt = $this->db->prepare('SET SESSION SQL_BIG_SELECTS=1');
             $stmt->execute();
             $stmt->closeCursor();
 
-            // with MySQL 5.6 we ran into exceptions like:
-            //      PDOException: SQLSTATE[42000]: Syntax error or access violation:
-            //      1140 In aggregated query without GROUP BY, expression #1 of SELECT list contains
-            //      nonaggregated column 'testdb.T_0_0_0.p'; this is incompatible with sql_mode=only_full_group_by
-            //
-            // the following query makes this right.
-            // FYI: https://stackoverflow.com/questions/23921117/disable-only-full-group-by
+            /*
+             * with MySQL 5.6 we ran into exceptions like:
+             *      PDOException: SQLSTATE[42000]: Syntax error or access violation:
+             *      1140 In aggregated query without GROUP BY, expression #1 of SELECT list contains
+             *      nonaggregated column 'testdb.T_0_0_0.p'; this is incompatible with
+             *      sql_mode=only_full_group_by
+             *
+             * the following query makes this right.
+             * FYI: https://stackoverflow.com/questions/23921117/disable-only-full-group-by
+             */
             $stmt = $this->db->prepare("SET sql_mode = ''");
             $stmt->execute();
             $stmt->closeCursor();

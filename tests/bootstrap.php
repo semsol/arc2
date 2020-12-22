@@ -31,7 +31,7 @@ if (false == isset($dbConfig['db_table_prefix'])) {
     $dbConfig['db_table_prefix'] = null;
 }
 
-// set DB adapter (see related phpunit-xx.xml file), possible values: mysqli, pdo
+// set DB adapter (possible values: mysqli, pdo)
 if ('pdo' == getenv('DB_ADAPTER')) {
     if (!empty(getenv('DB_PDO_PROTOCOL'))) {
         $dbConfig['db_adapter'] = 'pdo';
@@ -39,7 +39,7 @@ if ('pdo' == getenv('DB_ADAPTER')) {
     } else {
         throw new \Exception('Environment variable DB_PDO_PROTOCOL not set. Possible values are: mysql');
     }
-} else {
+} elseif (!isset($dbConfig['db_adapter'])) {
     $dbConfig['db_adapter'] = 'mysqli';
 }
 

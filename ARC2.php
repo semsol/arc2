@@ -11,6 +11,9 @@ if (function_exists('date_default_timezone_get')) {
     date_default_timezone_set(date_default_timezone_get());
 }
 
+/**
+ * @deprecated dont rely on this class, because it gets removed in the future
+ */
 class ARC2
 {
     public static function getVersion()
@@ -83,20 +86,13 @@ class ARC2
         $path = $inc_path.$prefix.'_'.urlencode($f).'.php';
         if (file_exists($path)) {
             return include_once $path;
-        }
-        /* safe-mode hack */
-        if (@include_once ($path)) {
-            return 1;
-        }
-        /* try other path */
-        if ('ARC2' != $prefix) {
+        } elseif ('ARC2' != $prefix) {
+            /* try other path */
             $path = $inc_path.strtolower($prefix).'/'.$prefix.'_'.urlencode($f).'.php';
             if (file_exists($path)) {
                 return include_once $path;
-            }
-            /* safe-mode hack */
-            if (@include_once ($path)) {
-                return 1;
+            } else {
+                return 0;
             }
         }
 

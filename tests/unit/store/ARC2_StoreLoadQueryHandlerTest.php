@@ -18,12 +18,6 @@ class ARC2_StoreLoadQueryHandlerTest extends ARC2_TestCase
 
         $this->fixture = new ARC2_StoreLoadQueryHandler($this->store, $this);
 
-        // remove all tables
-        $tables = $this->store->getDBObject()->fetchList('SHOW TABLES');
-        foreach ($tables as $table) {
-            $this->store->getDBObject()->simpleQuery('DROP TABLE '.$table['Tables_in_'.$this->dbConfig['db_name']]);
-        }
-
         // fresh setup of ARC2
         $this->store->setup();
     }
