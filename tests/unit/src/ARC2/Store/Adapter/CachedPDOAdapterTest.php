@@ -6,7 +6,7 @@ use ARC2\Store\Adapter\CachedPDOAdapter;
 
 class CachedPDOAdapterTest extends PDOAdapterTest
 {
-    public function setUp(): void
+    protected function setUp(): void
     {
         global $dbConfig;
 

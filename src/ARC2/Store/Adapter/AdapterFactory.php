@@ -9,6 +9,8 @@
 
 namespace ARC2\Store\Adapter;
 
+use Exception;
+
 /**
  * It provides an adapter instance for requested adapter name.
  */
@@ -17,6 +19,8 @@ class AdapterFactory
     /**
      * @param string $adapterName
      * @param array  $configuration Default is array()
+     *
+     * @throws Exception if unknown adapter name was given
      */
     public function getInstanceFor($adapterName, $configuration = [])
     {
@@ -25,7 +29,7 @@ class AdapterFactory
              * mysqli
              */
             if ('mysqli' == $adapterName) {
-                if (false == class_exists('\\ARC2\\Store\\Adapter\\mysqliAdapter')) {
+                if (false == class_exists(mysqliAdapter::class)) {
                     require_once 'mysqliAdapter.php';
                 }
 
@@ -34,16 +38,16 @@ class AdapterFactory
              * PDO
              */
             } elseif ('pdo' == $adapterName) {
-                // use cache?
                 if (isset($configuration['cache_enabled']) && true === $configuration['cache_enabled']) {
-                    if (false == class_exists('\\ARC2\\Store\\Adapter\\CachedPDOAdapter')) {
+                    // use cache?
+                    if (false == class_exists(CachedPDOAdapter::class)) {
                         require_once 'CachedPDOAdapter.php';
                     }
 
                     return new CachedPDOAdapter($configuration);
-                // no cache
                 } else {
-                    if (false == class_exists('\\ARC2\\Store\\Adapter\\PDOAdapter')) {
+                    // no cache
+                    if (false == class_exists(PDOAdapter::class)) {
                         require_once 'PDOAdapter.php';
                     }
 
@@ -52,7 +56,9 @@ class AdapterFactory
             }
         }
 
-        throw new \Exception('Unknown adapter name given. Currently supported are: '.implode(', ', $this->getSupportedAdapters()));
+        throw new Exception(
+            'Unknown adapter name given. Currently supported are: '.implode(', ', $this->getSupportedAdapters())
+        );
     }
 
     /**

@@ -31,7 +31,7 @@ class PDOAdapterTest extends AbstractAdapterTest
         $this->fixture->disconnect();
 
         // create connection outside of the instance
-        $dsn = $this->dbConfig['db_pdo_protocol'].':host='. $this->dbConfig['db_host'];
+        $dsn = $this->dbConfig['db_pdo_protocol'].':host='.$this->dbConfig['db_host'];
         $dsn .= ';dbname='.$this->dbConfig['db_name'];
         $dsn .= ';charset=utf8mb4';
         $connection = new \PDO(
@@ -61,7 +61,7 @@ class PDOAdapterTest extends AbstractAdapterTest
         $this->fixture->simpleQuery($sql);
 
         $tables = $this->fixture->fetchList('SHOW TABLES');
-        $this->assertTrue(is_array($tables) && 0 < count($tables));
+        $this->assertTrue(\is_array($tables) && 0 < \count($tables));
     }
 
     public function testEscape()

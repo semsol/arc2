@@ -3,7 +3,7 @@
 namespace Tests\db_adapter_depended\sparql_1_1_tests;
 
 /**
- * Runs tests which are based on W3C tests from https://www.w3.org/2009/sparql/docs/tests/
+ * Runs tests which are based on W3C tests from https://www.w3.org/2009/sparql/docs/tests/.
  *
  * Version: 2012-10-23 20:52 (sparql11-test-suite-20121023.tar.gz)
  *
@@ -11,7 +11,7 @@ namespace Tests\db_adapter_depended\sparql_1_1_tests;
  */
 class DropTest extends ComplianceTest
 {
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -23,7 +23,8 @@ class DropTest extends ComplianceTest
      * Helper function to get test query for a given test.
      *
      * @param string $testUri
-     * @return string Query to test.
+     *
+     * @return string query to test
      */
     protected function getTestQuery($testUri)
     {
@@ -37,8 +38,8 @@ class DropTest extends ComplianceTest
         $query = $this->store->query('
             PREFIX mf: <http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#> .
             PREFIX ut: <http://www.w3.org/2009/sparql/tests/test-update#> .
-            SELECT * FROM <'. $this->manifestGraphUri .'> WHERE {
-                <'. $testUri .'> mf:action [ ut:request ?queryFile ] .
+            SELECT * FROM <'.$this->manifestGraphUri.'> WHERE {
+                <'.$testUri.'> mf:action [ ut:request ?queryFile ] .
             }
         ');
 
@@ -51,7 +52,7 @@ class DropTest extends ComplianceTest
 
     // this test is not part of the W3C test collection
     // it tests DELETE FROM <...> command which is the ARC2 equivalent to DROP GRAPH <...>
-    public function test_delete_graph()
+    public function testDeleteGraph()
     {
         $graphUri = 'http://example.org/g1';
 
@@ -62,13 +63,13 @@ class DropTest extends ComplianceTest
 
         // check if graph really contains data
         $res = $this->store->query('SELECT * WHERE {?s ?p ?o.}');
-        $this->assertTrue(0 < count($res['result']['rows']), 'No test data in graph found.');
+        $this->assertTrue(0 < \count($res['result']['rows']), 'No test data in graph found.');
 
         // run test query
-        $res = $this->store->query('DELETE FROM <'. $graphUri .'>');
+        $res = $this->store->query('DELETE FROM <'.$graphUri.'>');
 
         // check if test data are still available
-        $res = $this->store->query('SELECT * FROM <'. $graphUri .'> WHERE {?s ?p ?o.}');
-        $this->assertTrue(0 == count($res['result']['rows']));
+        $res = $this->store->query('SELECT * FROM <'.$graphUri.'> WHERE {?s ?p ?o.}');
+        $this->assertTrue(0 == \count($res['result']['rows']));
     }
 }

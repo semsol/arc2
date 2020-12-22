@@ -5,11 +5,11 @@ namespace Tests\db_adapter_depended\store\query;
 use Tests\ARC2_TestCase;
 
 /**
- * Tests for query method - focus on LOAD queries
+ * Tests for query method - focus on LOAD queries.
  */
 class LoadQueryTest extends ARC2_TestCase
 {
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -18,7 +18,7 @@ class LoadQueryTest extends ARC2_TestCase
         $this->fixture->setup();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         $this->fixture->closeDBCon();
     }
@@ -27,7 +27,7 @@ class LoadQueryTest extends ARC2_TestCase
     {
         // check that store is empty
         $res = $this->fixture->query('SELECT * WHERE {?s ?p ?o.}');
-        $this->assertEquals(0, count($res['result']['rows']));
+        $this->assertEquals(0, \count($res['result']['rows']));
 
         $filepath = 'https://raw.githubusercontent.com/semsol/arc2/'
             .'master/tests/data/turtle/manifest.ttl';
@@ -40,14 +40,14 @@ class LoadQueryTest extends ARC2_TestCase
                     .'master/tests/data/turtle/manifest.ttl>
             WHERE {?s ?p ?o.}
         ');
-        $this->assertEquals(1860, count($res['result']['rows']));
+        $this->assertEquals(1860, \count($res['result']['rows']));
     }
 
     public function testLoadInto()
     {
         // check that store is empty
         $res = $this->fixture->query('SELECT * FROM <http://load-example> WHERE {?s ?p ?o.}');
-        $this->assertEquals(0, count($res['result']['rows']));
+        $this->assertEquals(0, \count($res['result']['rows']));
 
         $filepath = 'https://raw.githubusercontent.com/semsol/arc2/'
             .'master/tests/data/turtle/manifest.ttl';
@@ -55,6 +55,6 @@ class LoadQueryTest extends ARC2_TestCase
 
         // check that triples were inserted
         $res = $this->fixture->query('SELECT * FROM <http://load-example> WHERE {?s ?p ?o.}');
-        $this->assertEquals(1860, count($res['result']['rows']));
+        $this->assertEquals(1860, \count($res['result']['rows']));
     }
 }

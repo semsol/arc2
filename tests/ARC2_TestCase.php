@@ -2,9 +2,10 @@
 
 namespace Tests;
 
+use PHPUnit\Framework\TestCase;
 use Psr\SimpleCache\CacheInterface;
 
-class ARC2_TestCase extends \PHPUnit\Framework\TestCase
+class ARC2_TestCase extends TestCase
 {
     /**
      * Store configuration to connect with the database.
@@ -20,22 +21,28 @@ class ARC2_TestCase extends \PHPUnit\Framework\TestCase
      */
     protected $fixture;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         global $dbConfig;
 
         $this->dbConfig = $dbConfig;
 
         // in case we run with a cache, clear it
-        if (isset($this->dbConfig['cache_instance']) && $this->dbConfig['cache_instance'] instanceof CacheInterface) {
+        if (
+            isset($this->dbConfig['cache_instance'])
+            && $this->dbConfig['cache_instance'] instanceof CacheInterface
+        ) {
             $this->dbConfig['cache_instance']->clear();
         }
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         // in case we run with a cache, clear it
-        if (isset($this->dbConfig['cache_instance']) && $this->dbConfig['cache_instance'] instanceof CacheInterface) {
+        if (
+            isset($this->dbConfig['cache_instance'])
+            && $this->dbConfig['cache_instance'] instanceof CacheInterface
+        ) {
             $this->dbConfig['cache_instance']->clear();
         }
 

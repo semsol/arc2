@@ -5,11 +5,11 @@ namespace Tests\db_adapter_depended\store\query;
 use Tests\ARC2_TestCase;
 
 /**
- * Tests for query method - focus on INSERT INTO queries
+ * Tests for query method - focus on INSERT INTO queries.
  */
 class InsertIntoQueryTest extends ARC2_TestCase
 {
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -18,7 +18,7 @@ class InsertIntoQueryTest extends ARC2_TestCase
         $this->fixture->setup();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         $this->fixture->closeDBCon();
     }
@@ -219,9 +219,9 @@ class InsertIntoQueryTest extends ARC2_TestCase
                             'o' => '21 August 2007',
                             'o type' => 'literal',
                         ],
-                    ]
+                    ],
                 ],
-                'query_time' => $res['query_time']
+                'query_time' => $res['query_time'],
             ],
             $res
         );
@@ -289,9 +289,9 @@ class InsertIntoQueryTest extends ARC2_TestCase
                 'query_type' => 'select',
                 'result' => [
                     'variables' => ['s', 'p', 'o'],
-                    'rows' => []
+                    'rows' => [],
                 ],
-                'query_time' => $res['query_time']
+                'query_time' => $res['query_time'],
             ],
             $res
         );

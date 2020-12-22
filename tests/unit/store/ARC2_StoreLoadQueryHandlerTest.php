@@ -9,7 +9,7 @@ class ARC2_StoreLoadQueryHandlerTest extends ARC2_TestCase
 {
     protected $store;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -20,15 +20,15 @@ class ARC2_StoreLoadQueryHandlerTest extends ARC2_TestCase
 
         // remove all tables
         $tables = $this->store->getDBObject()->fetchList('SHOW TABLES');
-        foreach($tables as $table) {
-            $this->store->getDBObject()->simpleQuery('DROP TABLE '. $table['Tables_in_'.$this->dbConfig['db_name']]);
+        foreach ($tables as $table) {
+            $this->store->getDBObject()->simpleQuery('DROP TABLE '.$table['Tables_in_'.$this->dbConfig['db_name']]);
         }
 
         // fresh setup of ARC2
         $this->store->setup();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         $this->store->closeDBCon();
     }

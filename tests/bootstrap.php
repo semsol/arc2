@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__ .'/../vendor/autoload.php';
+require_once __DIR__.'/../vendor/autoload.php';
 
 error_reporting(E_ALL);
 
@@ -8,19 +8,18 @@ require 'ARC2_TestHandler.php';
 
 global $dbConfig;
 
-if (file_exists(__DIR__ .'/config.php')) {
+if (file_exists(__DIR__.'/config.php')) {
     // use custom DB credentials, if available
     $dbConfig = require 'config.php';
-
 } else {
     // standard DB credentials (ready to use in Github Actions)
-    $dbConfig = array(
+    $dbConfig = [
         'db_name' => 'arc2_test',
         'db_user' => 'root',
-        'db_pwd'  => 'Pass123',
+        'db_pwd' => 'Pass123',
         'db_host' => '127.0.0.1',
         'db_port' => isset($_SERVER['DB_PORT']) ? $_SERVER['DB_PORT'] : 3306,
-    );
+    ];
 }
 
 // set defaults for dbConfig entries
@@ -49,7 +48,7 @@ if ('pdo' == getenv('DB_ADAPTER')) {
  *
  * if enabled, we use an instance of ArrayCache which is very fast
  */
-if (true ===\getenv('CACHE_ENABLED') || 'true' == \getenv('CACHE_ENABLED')) {
+if (true === getenv('CACHE_ENABLED') || 'true' == getenv('CACHE_ENABLED')) {
     $dbConfig['cache_enabled'] = true;
     $dbConfig['cache_instance'] = new Symfony\Component\Cache\Simple\ArrayCache();
 }

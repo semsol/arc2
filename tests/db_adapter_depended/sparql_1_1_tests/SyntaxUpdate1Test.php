@@ -3,7 +3,7 @@
 namespace Tests\db_adapter_depended\sparql_1_1_tests;
 
 /**
- * Runs W3C tests from https://www.w3.org/2009/sparql/docs/tests/
+ * Runs W3C tests from https://www.w3.org/2009/sparql/docs/tests/.
  *
  * Version: 2012-10-23 20:52 (sparql11-test-suite-20121023.tar.gz)
  *
@@ -11,7 +11,7 @@ namespace Tests\db_adapter_depended\sparql_1_1_tests;
  */
 class SyntaxUpdate1Test extends ComplianceTest
 {
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -23,7 +23,8 @@ class SyntaxUpdate1Test extends ComplianceTest
      * Helper function to get test query for a given test.
      *
      * @param string $testUri
-     * @return string Query to test.
+     *
+     * @return string query to test
      */
     protected function getTestQuery($testUri)
     {
@@ -38,8 +39,8 @@ class SyntaxUpdate1Test extends ComplianceTest
          */
         $query = $this->store->query('
             PREFIX mf: <http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#> .
-            SELECT * FROM <'. $this->manifestGraphUri .'> WHERE {
-                <'. $testUri .'> mf:action ?queryFile .
+            SELECT * FROM <'.$this->manifestGraphUri.'> WHERE {
+                <'.$testUri.'> mf:action ?queryFile .
             }
         ');
 
@@ -50,46 +51,34 @@ class SyntaxUpdate1Test extends ComplianceTest
      * tests
      */
 
-    public function test_test_1()
+    public function testTest1()
     {
         $this->loadManifestFileIntoStore($this->w3cTestsFolderPath);
-        $query = $this->getTestQuery($this->testPref . 'test_1');
+        $query = $this->getTestQuery($this->testPref.'test_1');
 
         // fire query
         $result = $this->store->query($query);
 
         // check result
-        $this->assertTrue(is_array($result) && isset($result['query_type']));
+        $this->assertTrue(\is_array($result) && isset($result['query_type']));
     }
 
-    public function test_test_2()
+    public function testTest2()
     {
         $this->loadManifestFileIntoStore($this->w3cTestsFolderPath);
-        $query = $this->getTestQuery($this->testPref . 'test_2');
+        $query = $this->getTestQuery($this->testPref.'test_2');
 
         // fire query
         $result = $this->store->query($query);
 
         // check result
-        $this->assertTrue(is_array($result) && isset($result['query_type']));
+        $this->assertTrue(\is_array($result) && isset($result['query_type']));
     }
 
-    public function test_test_41()
+    public function testTest41()
     {
         $this->loadManifestFileIntoStore($this->w3cTestsFolderPath);
-        $query = $this->getTestQuery($this->testPref . 'test_41');
-
-        // fire query
-        $result = $this->store->query($query);
-
-        // check result
-        $this->assertEquals(0, $result);
-    }
-
-    public function test_test_42()
-    {
-        $this->loadManifestFileIntoStore($this->w3cTestsFolderPath);
-        $query = $this->getTestQuery($this->testPref . 'test_42');
+        $query = $this->getTestQuery($this->testPref.'test_41');
 
         // fire query
         $result = $this->store->query($query);
@@ -98,10 +87,10 @@ class SyntaxUpdate1Test extends ComplianceTest
         $this->assertEquals(0, $result);
     }
 
-    public function test_test_43()
+    public function testTest42()
     {
         $this->loadManifestFileIntoStore($this->w3cTestsFolderPath);
-        $query = $this->getTestQuery($this->testPref . 'test_43');
+        $query = $this->getTestQuery($this->testPref.'test_42');
 
         // fire query
         $result = $this->store->query($query);
@@ -110,10 +99,10 @@ class SyntaxUpdate1Test extends ComplianceTest
         $this->assertEquals(0, $result);
     }
 
-    public function test_test_44()
+    public function testTest43()
     {
         $this->loadManifestFileIntoStore($this->w3cTestsFolderPath);
-        $query = $this->getTestQuery($this->testPref . 'test_44');
+        $query = $this->getTestQuery($this->testPref.'test_43');
 
         // fire query
         $result = $this->store->query($query);
@@ -122,10 +111,10 @@ class SyntaxUpdate1Test extends ComplianceTest
         $this->assertEquals(0, $result);
     }
 
-    public function test_test_45()
+    public function testTest44()
     {
         $this->loadManifestFileIntoStore($this->w3cTestsFolderPath);
-        $query = $this->getTestQuery($this->testPref . 'test_45');
+        $query = $this->getTestQuery($this->testPref.'test_44');
 
         // fire query
         $result = $this->store->query($query);
@@ -134,10 +123,10 @@ class SyntaxUpdate1Test extends ComplianceTest
         $this->assertEquals(0, $result);
     }
 
-    public function test_test_46()
+    public function testTest45()
     {
         $this->loadManifestFileIntoStore($this->w3cTestsFolderPath);
-        $query = $this->getTestQuery($this->testPref . 'test_46');
+        $query = $this->getTestQuery($this->testPref.'test_45');
 
         // fire query
         $result = $this->store->query($query);
@@ -146,10 +135,10 @@ class SyntaxUpdate1Test extends ComplianceTest
         $this->assertEquals(0, $result);
     }
 
-    public function test_test_47()
+    public function testTest46()
     {
         $this->loadManifestFileIntoStore($this->w3cTestsFolderPath);
-        $query = $this->getTestQuery($this->testPref . 'test_47');
+        $query = $this->getTestQuery($this->testPref.'test_46');
 
         // fire query
         $result = $this->store->query($query);
@@ -158,10 +147,10 @@ class SyntaxUpdate1Test extends ComplianceTest
         $this->assertEquals(0, $result);
     }
 
-    public function test_test_48()
+    public function testTest47()
     {
         $this->loadManifestFileIntoStore($this->w3cTestsFolderPath);
-        $query = $this->getTestQuery($this->testPref . 'test_48');
+        $query = $this->getTestQuery($this->testPref.'test_47');
 
         // fire query
         $result = $this->store->query($query);
@@ -170,10 +159,10 @@ class SyntaxUpdate1Test extends ComplianceTest
         $this->assertEquals(0, $result);
     }
 
-    public function test_test_49()
+    public function testTest48()
     {
         $this->loadManifestFileIntoStore($this->w3cTestsFolderPath);
-        $query = $this->getTestQuery($this->testPref . 'test_49');
+        $query = $this->getTestQuery($this->testPref.'test_48');
 
         // fire query
         $result = $this->store->query($query);
@@ -182,10 +171,10 @@ class SyntaxUpdate1Test extends ComplianceTest
         $this->assertEquals(0, $result);
     }
 
-    public function test_test_50()
+    public function testTest49()
     {
         $this->loadManifestFileIntoStore($this->w3cTestsFolderPath);
-        $query = $this->getTestQuery($this->testPref . 'test_50');
+        $query = $this->getTestQuery($this->testPref.'test_49');
 
         // fire query
         $result = $this->store->query($query);
@@ -194,16 +183,28 @@ class SyntaxUpdate1Test extends ComplianceTest
         $this->assertEquals(0, $result);
     }
 
-    public function test_test_51()
+    public function testTest50()
     {
         $this->loadManifestFileIntoStore($this->w3cTestsFolderPath);
-        $query = $this->getTestQuery($this->testPref . 'test_51');
+        $query = $this->getTestQuery($this->testPref.'test_50');
+
+        // fire query
+        $result = $this->store->query($query);
+
+        // check result
+        $this->assertEquals(0, $result);
+    }
+
+    public function testTest51()
+    {
+        $this->loadManifestFileIntoStore($this->w3cTestsFolderPath);
+        $query = $this->getTestQuery($this->testPref.'test_51');
 
         // fire query
         $result = $this->store->query($query);
 
         // check current reaction of ARC2, for compatible reasons
-        $this->assertTrue(is_array($result));
+        $this->assertTrue(\is_array($result));
 
         // check result
         $this->markTestSkipped(
@@ -213,10 +214,10 @@ class SyntaxUpdate1Test extends ComplianceTest
         );
     }
 
-    public function test_test_52()
+    public function testTest52()
     {
         $this->loadManifestFileIntoStore($this->w3cTestsFolderPath);
-        $query = $this->getTestQuery($this->testPref . 'test_52');
+        $query = $this->getTestQuery($this->testPref.'test_52');
 
         // fire query
         $result = $this->store->query($query);
@@ -225,10 +226,10 @@ class SyntaxUpdate1Test extends ComplianceTest
         $this->assertEquals(0, $result);
     }
 
-    public function test_test_54()
+    public function testTest54()
     {
         $this->loadManifestFileIntoStore($this->w3cTestsFolderPath);
-        $query = $this->getTestQuery($this->testPref . 'test_54');
+        $query = $this->getTestQuery($this->testPref.'test_54');
 
         // fire query
         $result = $this->store->query($query);

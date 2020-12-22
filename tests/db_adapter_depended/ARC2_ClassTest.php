@@ -9,7 +9,7 @@ class ARC2_ClassTest extends ARC2_TestCase
     protected $dbConnection;
     protected $store;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -59,7 +59,7 @@ class ARC2_ClassTest extends ARC2_TestCase
         $this->assertEquals(
             [
                 'You have an error in your SQL syntax; check the manual that corresponds to your '
-                .$dbsName.' server version for the right syntax to use near \'invalid-query\' at line 1'
+                .$dbsName.' server version for the right syntax to use near \'invalid-query\' at line 1',
             ],
             $this->fixture->errors
         );

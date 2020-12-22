@@ -5,11 +5,11 @@ namespace Tests\db_adapter_depended\store\query;
 use Tests\ARC2_TestCase;
 
 /**
- * Tests for query method - focus on DESCRIBE queries
+ * Tests for query method - focus on DESCRIBE queries.
  */
 class DescribeQueryTest extends ARC2_TestCase
 {
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -18,7 +18,7 @@ class DescribeQueryTest extends ARC2_TestCase
         $this->fixture->setup();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         $this->fixture->closeDBCon();
     }
@@ -39,12 +39,12 @@ class DescribeQueryTest extends ARC2_TestCase
                         'http://p1' => [
                             [
                                 'value' => 'baz',
-                                'type' => 'literal'
-                            ]
-                        ]
-                    ]
+                                'type' => 'literal',
+                            ],
+                        ],
+                    ],
                 ],
-                'query_time' => $res['query_time']
+                'query_time' => $res['query_time'],
             ],
             $res
         );
@@ -66,12 +66,12 @@ class DescribeQueryTest extends ARC2_TestCase
                         'http://p1' => [
                             [
                                 'value' => 'baz',
-                                'type' => 'literal'
-                            ]
-                        ]
-                    ]
+                                'type' => 'literal',
+                            ],
+                        ],
+                    ],
                 ],
-                'query_time' => $res['query_time']
+                'query_time' => $res['query_time'],
             ],
             $res
         );
@@ -93,12 +93,12 @@ class DescribeQueryTest extends ARC2_TestCase
                         'http://p1' => [
                             [
                                 'value' => 'baz',
-                                'type' => 'literal'
-                            ]
-                        ]
-                    ]
+                                'type' => 'literal',
+                            ],
+                        ],
+                    ],
                 ],
-                'query_time' => $res['query_time']
+                'query_time' => $res['query_time'],
             ],
             $res
         );

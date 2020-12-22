@@ -6,7 +6,7 @@ use Tests\ARC2_TestCase;
 
 class ARC2_StoreTest extends ARC2_TestCase
 {
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -15,15 +15,15 @@ class ARC2_StoreTest extends ARC2_TestCase
 
         // remove all tables
         $tables = $this->fixture->getDBObject()->fetchList('SHOW TABLES');
-        foreach($tables as $table) {
-            $this->fixture->getDBObject()->simpleQuery('DROP TABLE '. $table['Tables_in_'.$this->dbConfig['db_name']]);
+        foreach ($tables as $table) {
+            $this->fixture->getDBObject()->simpleQuery('DROP TABLE '.$table['Tables_in_'.$this->dbConfig['db_name']]);
         }
 
         // fresh setup of ARC2
         $this->fixture->setup();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         $this->fixture->closeDBCon();
     }
@@ -40,23 +40,23 @@ class ARC2_StoreTest extends ARC2_TestCase
     {
         // g2t table
         if (isset($this->dbConfig['db_table_prefix'])) {
-            $g2t = $this->dbConfig['db_table_prefix'] . '_';
+            $g2t = $this->dbConfig['db_table_prefix'].'_';
         } else {
             $g2t = '';
         }
         if (isset($this->dbConfig['store_name'])) {
-            $g2t .= $this->dbConfig['store_name'] . '_';
+            $g2t .= $this->dbConfig['store_name'].'_';
         }
         $g2t .= 'g2t';
 
         // id2val table
         if (isset($this->dbConfig['db_table_prefix'])) {
-            $id2val = $this->dbConfig['db_table_prefix'] . '_';
+            $id2val = $this->dbConfig['db_table_prefix'].'_';
         } else {
             $id2val = '';
         }
         if (isset($this->dbConfig['store_name'])) {
-            $id2val .= $this->dbConfig['store_name'] . '_';
+            $id2val .= $this->dbConfig['store_name'].'_';
         }
         $id2val .= 'id2val';
 
@@ -71,7 +71,7 @@ class ARC2_StoreTest extends ARC2_TestCase
         $graphs = [];
 
         // collect graph URI's
-        foreach($list as $row) {
+        foreach ($list as $row) {
             $graphs[] = $row['graphUri'];
         }
 
@@ -106,13 +106,13 @@ class ARC2_StoreTest extends ARC2_TestCase
         $selectQuery = 'SELECT * FROM <http://example.com/> {?s ?p ?o.}';
 
         // check that query is not known in cache
-        $this->assertFalse($this->dbConfig['cache_instance']->has(\hash('sha1', $selectQuery)));
+        $this->assertFalse($this->dbConfig['cache_instance']->has(hash('sha1', $selectQuery)));
 
         $result = $this->fixture->query($selectQuery);
         unset($result['query_time']);
         $this->assertEquals(1, \count($result['result']['rows']));
 
-        $this->assertTrue($this->dbConfig['cache_instance']->has(\hash('sha1', $selectQuery)));
+        $this->assertTrue($this->dbConfig['cache_instance']->has(hash('sha1', $selectQuery)));
 
         // compare cached and raw result
         $cachedResult = $this->fixture->query($selectQuery);
@@ -166,7 +166,7 @@ class ARC2_StoreTest extends ARC2_TestCase
 
     public function testCountDBProcesses()
     {
-        $this->assertTrue(is_integer($this->fixture->countDBProcesses()));
+        $this->assertTrue(\is_int($this->fixture->countDBProcesses()));
     }
 
     /*
@@ -533,7 +533,7 @@ XML;
     public function testInsertSaftRegressionTest1()
     {
         $res = $this->fixture->query('SELECT * FROM <http://example.com/> WHERE { ?s ?p ?o. } ');
-        $this->assertEquals(0, count($res['result']['rows']));
+        $this->assertEquals(0, \count($res['result']['rows']));
 
         $this->fixture->insert(
             file_get_contents(__DIR__.'/../../data/nt/saft-arc2-addition-regression1.nt'),
@@ -541,10 +541,10 @@ XML;
         );
 
         $res1 = $this->fixture->query('SELECT * FROM <http://example.com/> WHERE { ?s ?p ?o. } ');
-        $this->assertEquals(442, count($res1['result']['rows']));
+        $this->assertEquals(442, \count($res1['result']['rows']));
 
         $res2 = $this->fixture->query('SELECT * WHERE { ?s ?p ?o. } ');
-        $this->assertEquals(442, count($res2['result']['rows']));
+        $this->assertEquals(442, \count($res2['result']['rows']));
     }
 
     /**
@@ -559,13 +559,13 @@ XML;
         $res = $this->fixture->query('INSERT INTO <http://localhost/Saft/TestGraph/> {<http://foo/1> <http://foo/2> <http://foo/3> . }');
 
         $res1 = $this->fixture->query('SELECT * FROM <http://localhost/Saft/TestGraph/> WHERE {?s ?p ?o.}');
-        $this->assertEquals(1, count($res1['result']['rows']));
+        $this->assertEquals(1, \count($res1['result']['rows']));
 
         $res2 = $this->fixture->query('SELECT * WHERE {?s ?p ?o.}');
-        $this->assertEquals(1, count($res2['result']['rows']));
+        $this->assertEquals(1, \count($res2['result']['rows']));
 
         $res2 = $this->fixture->query('SELECT ?s ?p ?o WHERE {?s ?p ?o.}');
-        $this->assertEquals(1, count($res2['result']['rows']));
+        $this->assertEquals(1, \count($res2['result']['rows']));
     }
 
     /**
@@ -589,14 +589,14 @@ XML;
         );
 
         $res = $this->fixture->query('SELECT * FROM <http://second-graph/> WHERE {?s ?p ?o.}');
-        $this->assertEquals(1, count($res['result']['rows']));
+        $this->assertEquals(1, \count($res['result']['rows']));
     }
 
     public function testMultipleInsertQuerysInDifferentGraphs()
     {
         $this->markTestSkipped(
             'Adding the same triple into two graphs does not work.'
-            . PHP_EOL . 'Bug report: https://github.com/semsol/arc2/issues/114'
+            .PHP_EOL.'Bug report: https://github.com/semsol/arc2/issues/114'
         );
 
         /*
@@ -608,13 +608,13 @@ XML;
         $this->fixture->query('INSERT INTO <http://graph2/> {<http://foo/a> <http://foo/b> <http://foo/c> . }');
 
         $res = $this->fixture->query('SELECT * FROM <http://graph1/> WHERE {?s ?p ?o.}');
-        $this->assertEquals(1, count($res['result']['rows']));
+        $this->assertEquals(1, \count($res['result']['rows']));
 
         $res = $this->fixture->query('SELECT * FROM <http://graph2/> WHERE {?s ?p ?o.}');
-        $this->assertEquals(2, count($res['result']['rows']));
+        $this->assertEquals(2, \count($res['result']['rows']));
 
         $res = $this->fixture->query('SELECT * WHERE {?s ?p ?o.}');
-        $this->assertEquals(3, count($res['result']['rows']));
+        $this->assertEquals(3, \count($res['result']['rows']));
     }
 
     /*
@@ -643,8 +643,8 @@ XML;
          * remove all tables
          */
         $tables = $this->fixture->getDBObject()->fetchList('SHOW TABLES');
-        foreach($tables as $table) {
-            $this->fixture->getDBObject()->simpleQuery('DROP TABLE '. $table['Tables_in_'.$this->fixture->a['db_name']]);
+        foreach ($tables as $table) {
+            $this->fixture->getDBObject()->simpleQuery('DROP TABLE '.$table['Tables_in_'.$this->fixture->a['db_name']]);
         }
 
         /*
@@ -653,7 +653,7 @@ XML;
         $this->fixture->setup();
 
         $tables = $this->fixture->getDBObject()->fetchList('SHOW TABLES');
-        foreach($tables as $table) {
+        foreach ($tables as $table) {
             $this->assertTrue(
                 false !== strpos($table['Tables_in_'.$this->fixture->a['db_name']], $this->dbConfig['db_table_prefix'].'_')
             );
@@ -669,7 +669,7 @@ XML;
          * check for new prefixes
          */
         $tables = $this->fixture->getDBObject()->fetchList('SHOW TABLES');
-        foreach($tables as $table) {
+        foreach ($tables as $table) {
             $this->assertTrue(
                 false !== strpos($table['Tables_in_'.$this->fixture->a['db_name']], $prefix)
             );
@@ -693,7 +693,7 @@ XML;
 
         $this->assertEquals(
             [
-                'http://original/'
+                'http://original/',
             ],
             $this->getGraphs()
         );
@@ -722,9 +722,9 @@ XML;
                 [
                     't_count' => 2,
                     'delete_time' => $returnVal[0]['delete_time'],
-                    'index_update_time' => $returnVal[0]['index_update_time']
+                    'index_update_time' => $returnVal[0]['index_update_time'],
                 ],
-                false
+                false,
             ],
             $returnVal
         );
@@ -755,7 +755,7 @@ XML;
          */
         $tables = $this->fixture->getDBObject()->fetchList('SHOW TABLES');
         $foundArcPrefix = $foundReplicatePrefix = false;
-        foreach($tables as $table) {
+        foreach ($tables as $table) {
             // check for original table
             if (false !== strpos($table['Tables_in_'.$this->dbConfig['db_name']], $this->dbConfig['store_name'].'_')) {
                 $foundArcPrefix = true;

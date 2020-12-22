@@ -5,7 +5,7 @@ namespace Tests\db_adapter_depended\sparql_1_1_tests;
 use Tests\ARC2_TestCase;
 
 /**
- * Runs W3C tests from https://www.w3.org/2009/sparql/docs/tests/
+ * Runs W3C tests from https://www.w3.org/2009/sparql/docs/tests/.
  *
  * Version: 2012-10-23 20:52 (sparql11-test-suite-20121023.tar.gz)
  *
@@ -38,7 +38,7 @@ abstract class ComplianceTest extends ARC2_TestCase
      */
     protected $w3cTestsFolderPath;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -53,10 +53,7 @@ abstract class ComplianceTest extends ARC2_TestCase
         $this->store->setup();
     }
 
-    /**
-     *
-     */
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         $this->store->reset();
         $this->store->closeDBCon();
@@ -68,7 +65,8 @@ abstract class ComplianceTest extends ARC2_TestCase
      * Helper function to get expected query result.
      *
      * @param string $testUri
-     * @return \SimpleXMLElement Instance of \SimpleXMLElement representing the result.
+     *
+     * @return \SimpleXMLElement instance of \SimpleXMLElement representing the result
      */
     protected function getExpectedResult($testUri)
     {
@@ -79,14 +77,14 @@ abstract class ComplianceTest extends ARC2_TestCase
          */
         $res = $this->store->query('
             PREFIX mf: <http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#> .
-            SELECT * FROM <'. $this->manifestGraphUri .'> WHERE {
-                <'. $testUri .'> mf:result ?resultFile .
+            SELECT * FROM <'.$this->manifestGraphUri.'> WHERE {
+                <'.$testUri.'> mf:result ?resultFile .
             }
         ');
 
         // if no result was given, expect test is of type NegativeSyntaxTest11,
         // which has no data (group-data-X.ttl) and result (.srx) file.
-        if (0 < count($res['result']['rows'])) {
+        if (0 < \count($res['result']['rows'])) {
             return new \SimpleXMLElement(file_get_contents($res['result']['rows'][0]['resultFile']));
         } else {
             return null;
@@ -97,14 +95,16 @@ abstract class ComplianceTest extends ARC2_TestCase
      * Helper function to get the number of rows in a table.
      *
      * @param string $tableName
-     * @return int Number of rows in the target table.
+     *
+     * @return int number of rows in the target table
      */
     protected function getRowCount($tableName)
     {
         $row = $this->store->getDBObject()->fetchRow(
-            'SELECT COUNT(*) as count FROM '. $tableName,
+            'SELECT COUNT(*) as count FROM '.$tableName,
             $this->store->getDBCon()
         );
+
         return $row['count'];
     }
 
@@ -112,7 +112,8 @@ abstract class ComplianceTest extends ARC2_TestCase
      * Helper function to load data for a given test.
      *
      * @param string $testUri
-     * @return array Parsed file content.
+     *
+     * @return array parsed file content
      */
     protected function getTestData($testUri)
     {
@@ -126,16 +127,17 @@ abstract class ComplianceTest extends ARC2_TestCase
         $file = $this->store->query('
             PREFIX mf: <http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#> .
             PREFIX qt: <http://www.w3.org/2001/sw/DataAccess/tests/test-query#> .
-            SELECT * FROM <'. $this->manifestGraphUri .'> WHERE {
-                <'. $testUri .'> mf:action [ qt:data ?file ] .
+            SELECT * FROM <'.$this->manifestGraphUri.'> WHERE {
+                <'.$testUri.'> mf:action [ qt:data ?file ] .
             }
         ');
 
         // if no result was given, expect test is of type NegativeSyntaxTest11,
         // which has no data (group-data-X.ttl) and result (.srx) file.
-        if (0 < count($file['result']['rows'])) {
+        if (0 < \count($file['result']['rows'])) {
             $parser = \ARC2::getTurtleParser();
             $parser->parse($file['result']['rows'][0]['file']);
+
             return $parser->getSimpleIndex();
         } else {
             return null;
@@ -146,7 +148,8 @@ abstract class ComplianceTest extends ARC2_TestCase
      * Helper function to get test query for a given test.
      *
      * @param string $testUri
-     * @return string Query to test.
+     *
+     * @return string query to test
      */
     protected function getTestQuery($testUri)
     {
@@ -160,18 +163,18 @@ abstract class ComplianceTest extends ARC2_TestCase
         $query = $this->store->query('
             PREFIX mf: <http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#> .
             PREFIX qt: <http://www.w3.org/2001/sw/DataAccess/tests/test-query#> .
-            SELECT * FROM <'. $this->manifestGraphUri .'> WHERE {
-                <'. $testUri .'> mf:action [ qt:query ?queryFile ] .
+            SELECT * FROM <'.$this->manifestGraphUri.'> WHERE {
+                <'.$testUri.'> mf:action [ qt:query ?queryFile ] .
             }
         ');
 
         // if test is of type NegativeSyntaxTest11, mf:action points not to a blank node,
         // but directly to the query file.
-        if (0 == count($query['result']['rows'])) {
+        if (0 == \count($query['result']['rows'])) {
             $query = $this->store->query('
                 PREFIX mf: <http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#> .
-                SELECT * FROM <'. $this->manifestGraphUri .'> WHERE {
-                    <'. $testUri .'> mf:action ?queryFile .
+                SELECT * FROM <'.$this->manifestGraphUri.'> WHERE {
+                    <'.$testUri.'> mf:action ?queryFile .
                 }
             ');
         }
@@ -183,7 +186,7 @@ abstract class ComplianceTest extends ARC2_TestCase
         if (false !== strpos($query, 'ASK')
             || false !== strpos($query, 'CONSTRUCT')
             || false !== strpos($query, 'SELECT')) {
-            $query = str_replace('WHERE', 'FROM <'. $this->dataGraphUri .'> WHERE', $query);
+            $query = str_replace('WHERE', 'FROM <'.$this->dataGraphUri.'> WHERE', $query);
         }
 
         return $query;
@@ -193,14 +196,15 @@ abstract class ComplianceTest extends ARC2_TestCase
      * Helper function to get test type.
      *
      * @param string $testUri
+     *
      * @return string Type URI
      */
     protected function getTestType($testUri)
     {
         $type = $this->store->query('
             PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-            SELECT * FROM <'. $this->manifestGraphUri .'> WHERE {
-                <'. $testUri .'> rdf:type ?type .
+            SELECT * FROM <'.$this->manifestGraphUri.'> WHERE {
+                <'.$testUri.'> rdf:type ?type .
             }
         ');
 
@@ -210,7 +214,6 @@ abstract class ComplianceTest extends ARC2_TestCase
     /**
      * Transforms ARC2 query result to a \SimpleXMLElement instance for later comparison.
      *
-     * @param array $result
      * @return \SimpleXMLElement
      */
     protected function getXmlVersionOfResult(array $result)
@@ -262,16 +265,14 @@ abstract class ComplianceTest extends ARC2_TestCase
                 $w->writeAttribute('name', $var);
 
                 // if a variable type is set
-                if (isset($row[$var .' type'])) {
-
+                if (isset($row[$var.' type'])) {
                     // uri
-                    if ('uri' == $row[$var .' type']) {
+                    if ('uri' == $row[$var.' type']) {
                         // example: <uri>http://example/s1</uri>
                         $w->startElement('uri');
                         $w->text($row[$var]);
                         $w->endElement();
-
-                    } elseif ('literal' == $row[$var . ' type']) {
+                    } elseif ('literal' == $row[$var.' type']) {
                         // example: <literal datatype="http://www.w3.org/2001/XMLSchema#integer">9</literal>
                         $w->startElement('literal');
 
@@ -294,7 +295,7 @@ abstract class ComplianceTest extends ARC2_TestCase
         }
 
         // add <result></result> if no data were found
-        if (0 == count($result['result']['rows'])) {
+        if (0 == \count($result['result']['rows'])) {
             $w->startElement('result');
             $w->endElement();
         }
@@ -317,7 +318,7 @@ abstract class ComplianceTest extends ARC2_TestCase
     {
         // parse manifest.ttl and load its content into $this->manifestGraphUri
         $parser = \ARC2::getTurtleParser();
-        $parser->parse($folderPath .'/manifest.ttl');
+        $parser->parse($folderPath.'/manifest.ttl');
         $this->store->insert($parser->getSimpleIndex(), $this->manifestGraphUri);
     }
 
@@ -340,39 +341,37 @@ abstract class ComplianceTest extends ARC2_TestCase
 
         // get test type (this determines, if we expect a normal test or one, that must fail)
         $negTestUri = 'http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#NegativeSyntaxTest11';
-        $type = $this->getTestType($this->testPref . $testName);
+        $type = $this->getTestType($this->testPref.$testName);
 
         // test has to FAIL
         if ($negTestUri == $type) {
             // get query to test
-            $testQuery = $this->getTestQuery($this->testPref . $testName);
+            $testQuery = $this->getTestQuery($this->testPref.$testName);
 
             $this->assertFalse(empty($testQuery), 'Can not test, because test query is empty.');
 
             $arc2Result = $this->store->query($testQuery);
             if (0 == $arc2Result) {
                 $this->assertEquals(0, $arc2Result);
-
             } elseif (isset($arc2Result['result']['rows'])) {
-                $this->assertEquals(0, count($arc2Result['result']['rows']));
-
+                $this->assertEquals(0, \count($arc2Result['result']['rows']));
             } else {
-                throw new \Exception('Invalid result by query method: '. json_encode($arc2Result));
+                throw new \Exception('Invalid result by query method: '.json_encode($arc2Result));
             }
 
-        // test has to be SUCCESSFUL
+            // test has to be SUCCESSFUL
         } else {
             // get test data
-            $data = $this->getTestData($this->testPref . $testName);
+            $data = $this->getTestData($this->testPref.$testName);
 
             // load test data into graph
             $this->store->insert($data, $this->dataGraphUri);
 
             // get query to test
-            $testQuery = $this->getTestQuery($this->testPref . $testName);
+            $testQuery = $this->getTestQuery($this->testPref.$testName);
 
             // get expected result
-            $expectedResult = $this->getExpectedResult($this->testPref . $testName);
+            $expectedResult = $this->getExpectedResult($this->testPref.$testName);
 
             // get actual result for given test query
             $actualResult = $this->store->query($testQuery);

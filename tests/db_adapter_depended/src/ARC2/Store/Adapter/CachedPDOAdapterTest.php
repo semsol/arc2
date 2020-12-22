@@ -7,7 +7,7 @@ use Tests\ARC2_TestCase;
 
 class CachedPDOAdapterTest extends ARC2_TestCase
 {
-    public function setUp(): void
+    protected function setUp(): void
     {
         // stop, if pdo_mysql is not available
         if (false == \extension_loaded('pdo_mysql')) {
@@ -29,8 +29,8 @@ class CachedPDOAdapterTest extends ARC2_TestCase
 
         // remove all tables
         $tables = $this->fixture->fetchList('SHOW TABLES');
-        foreach($tables as $table) {
-            $this->fixture->simpleQuery('DROP TABLE '. $table['Tables_in_'.$this->dbConfig['db_name']]);
+        foreach ($tables as $table) {
+            $this->fixture->simpleQuery('DROP TABLE '.$table['Tables_in_'.$this->dbConfig['db_name']]);
         }
     }
 

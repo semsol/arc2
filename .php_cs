@@ -20,6 +20,7 @@ return PhpCsFixer\Config::create()
         ->in(__DIR__.'/sparqlscript')
         ->in(__DIR__.'/src')
         ->in(__DIR__.'/store')
+        ->in(__DIR__.'/tests')
         ->name('*.php')
         ->append([
             __FILE__,

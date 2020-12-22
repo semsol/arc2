@@ -3,7 +3,7 @@
 namespace Tests\db_adapter_depended\sparql_1_1_tests;
 
 /**
- * Runs W3C tests from https://www.w3.org/2009/sparql/docs/tests/
+ * Runs W3C tests from https://www.w3.org/2009/sparql/docs/tests/.
  *
  * Version: 2012-10-23 20:52 (sparql11-test-suite-20121023.tar.gz)
  *
@@ -11,7 +11,7 @@ namespace Tests\db_adapter_depended\sparql_1_1_tests;
  */
 class AggregatesTest extends ComplianceTest
 {
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -23,23 +23,23 @@ class AggregatesTest extends ComplianceTest
      * tests
      */
 
-    public function test_agg_avg_01()
+    public function testAggAvg01()
     {
         $this->loadManifestFileIntoStore($this->w3cTestsFolderPath);
 
         $testname = 'agg-avg-01';
 
         // get test data
-        $data = $this->getTestData($this->testPref . $testname);
+        $data = $this->getTestData($this->testPref.$testname);
 
         // load test data into graph
         $this->store->insert($data, $this->dataGraphUri);
 
         // get query to test
-        $testQuery = $this->getTestQuery($this->testPref . $testname);
+        $testQuery = $this->getTestQuery($this->testPref.$testname);
 
         // get expected result
-        $expectedResult = $this->getExpectedResult($this->testPref . $testname);
+        $expectedResult = $this->getExpectedResult($this->testPref.$testname);
 
         // get actual result for given test query
         $actualResult = $this->store->query($testQuery);
@@ -56,12 +56,12 @@ class AggregatesTest extends ComplianceTest
         );
     }
 
-    public function test_agg_empty_group()
+    public function testAggEmptyGroup()
     {
         $this->assertTrue($this->runTestFor('agg-empty-group'));
     }
 
-    public function test_agg_min_01()
+    public function testAggMin01()
     {
         $this->markTestSkipped(
             'Skipped, because of known bug that ARC2 \'s Turtle parser can not parse decimals. '
@@ -77,47 +77,47 @@ class AggregatesTest extends ComplianceTest
         $this->assertTrue($this->runTestFor('agg-min-01'));
     }
 
-    public function test_agg01()
+    public function testAgg01()
     {
         $this->assertTrue($this->runTestFor('agg01'));
     }
 
-    public function test_agg02()
+    public function testAgg02()
     {
         $this->assertTrue($this->runTestFor('agg02'));
     }
 
-    public function test_agg04()
+    public function testAgg04()
     {
         $this->assertTrue($this->runTestFor('agg04'));
     }
 
-    public function test_agg05()
+    public function testAgg05()
     {
         $this->assertTrue($this->runTestFor('agg05'));
     }
 
-    public function test_agg08()
+    public function testAgg08()
     {
         $this->assertTrue($this->runTestFor('agg08'));
     }
 
-    public function test_agg09()
+    public function testAgg09()
     {
         $this->assertTrue($this->runTestFor('agg09'));
     }
 
-    public function test_agg10()
+    public function testAgg10()
     {
         $this->assertTrue($this->runTestFor('agg10'));
     }
 
-    public function test_agg11()
+    public function testAgg11()
     {
         $this->assertTrue($this->runTestFor('agg11'));
     }
 
-    public function test_agg12()
+    public function testAgg12()
     {
         $this->assertTrue($this->runTestFor('agg12'));
     }

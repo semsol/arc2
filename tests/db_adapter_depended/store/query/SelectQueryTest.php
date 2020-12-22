@@ -5,11 +5,11 @@ namespace Tests\db_adapter_depended\store\query;
 use Tests\ARC2_TestCase;
 
 /**
- * Tests for query method - focus on SELECT queries
+ * Tests for query method - focus on SELECT queries.
  */
 class SelectQueryTest extends ARC2_TestCase
 {
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -18,7 +18,7 @@ class SelectQueryTest extends ARC2_TestCase
         $this->fixture->setup();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         $this->fixture->closeDBCon();
     }
@@ -36,16 +36,16 @@ class SelectQueryTest extends ARC2_TestCase
                 'query_type' => 'select',
                 'result' => [
                     'variables' => [
-                        'o'
+                        'o',
                     ],
                     'rows' => [
                         [
                             'o' => 'baz',
-                            'o type' => 'literal'
-                        ]
+                            'o type' => 'literal',
+                        ],
                     ],
                 ],
-                'query_time' => $res['query_time']
+                'query_time' => $res['query_time'],
             ],
             $res
         );
@@ -64,16 +64,16 @@ class SelectQueryTest extends ARC2_TestCase
                 'query_type' => 'select',
                 'result' => [
                     'variables' => [
-                        'o'
+                        'o',
                     ],
                     'rows' => [
                         [
                             'o' => 'baz',
-                            'o type' => 'literal'
-                        ]
+                            'o type' => 'literal',
+                        ],
                     ],
                 ],
-                'query_time' => $res['query_time']
+                'query_time' => $res['query_time'],
             ],
             $res
         );
@@ -106,7 +106,7 @@ class SelectQueryTest extends ARC2_TestCase
                 'query_type' => 'select',
                 'result' => [
                     'variables' => [
-                        's', 'o', 'o2'
+                        's', 'o', 'o2',
                     ],
                     'rows' => [
                         [
@@ -115,7 +115,7 @@ class SelectQueryTest extends ARC2_TestCase
                             'o' => 'http://s1',
                             'o type' => 'uri',
                             'o2' => 'http://s2',
-                            'o2 type' => 'uri'
+                            'o2 type' => 'uri',
                         ],
                         [
                             's' => 'http://s3',
@@ -123,7 +123,7 @@ class SelectQueryTest extends ARC2_TestCase
                             'o' => 'http://s1',
                             'o type' => 'uri',
                             'o2' => 'http://s3',
-                            'o2 type' => 'uri'
+                            'o2 type' => 'uri',
                         ],
                         [
                             's' => 'http://s1',
@@ -131,7 +131,7 @@ class SelectQueryTest extends ARC2_TestCase
                             'o' => 'http://s2',
                             'o type' => 'uri',
                             'o2' => 'http://s3',
-                            'o2 type' => 'uri'
+                            'o2 type' => 'uri',
                         ],
                         [
                             's' => 'http://s1',
@@ -139,7 +139,7 @@ class SelectQueryTest extends ARC2_TestCase
                             'o' => 'http://s2',
                             'o type' => 'uri',
                             'o2' => 'http://s4',
-                            'o2 type' => 'uri'
+                            'o2 type' => 'uri',
                         ],
                         [
                             's' => 'http://s1',
@@ -147,7 +147,7 @@ class SelectQueryTest extends ARC2_TestCase
                             'o' => 'http://s3',
                             'o type' => 'uri',
                             'o2' => 'http://s1',
-                            'o2 type' => 'uri'
+                            'o2 type' => 'uri',
                         ],
                         [
                             's' => 'http://s2',
@@ -155,17 +155,17 @@ class SelectQueryTest extends ARC2_TestCase
                             'o' => 'http://s3',
                             'o type' => 'uri',
                             'o2' => 'http://s1',
-                            'o2 type' => 'uri'
+                            'o2 type' => 'uri',
                         ],
                         [
                             's' => 'http://s2',
                             's type' => 'uri',
                             'o' => 'http://s4',
-                            'o type' => 'uri'
+                            'o type' => 'uri',
                         ],
                     ],
                 ],
-                'query_time' => $res['query_time']
+                'query_time' => $res['query_time'],
             ],
             $res
         );
@@ -195,7 +195,7 @@ class SelectQueryTest extends ARC2_TestCase
                 'query_type' => 'select',
                 'result' => [
                     'variables' => [
-                        's', 'o', 'o2'
+                        's', 'o', 'o2',
                     ],
                     'rows' => [
                         [
@@ -206,7 +206,7 @@ class SelectQueryTest extends ARC2_TestCase
                         ],
                     ],
                 ],
-                'query_time' => $res['query_time']
+                'query_time' => $res['query_time'],
             ],
             $res
         );
@@ -225,16 +225,16 @@ class SelectQueryTest extends ARC2_TestCase
                 'query_type' => 'select',
                 'result' => [
                     'variables' => [
-                        'o'
+                        'o',
                     ],
                     'rows' => [
                         [
                             'o' => 'baz',
-                            'o type' => 'literal'
-                        ]
+                            'o type' => 'literal',
+                        ],
                     ],
                 ],
-                'query_time' => $res['query_time']
+                'query_time' => $res['query_time'],
             ],
             $res
         );
@@ -263,11 +263,11 @@ class SelectQueryTest extends ARC2_TestCase
                 'query_type' => 'select',
                 'result' => [
                     'variables' => [
-                        's', 'o'
+                        's', 'o',
                     ],
-                    'rows' => []
+                    'rows' => [],
                 ],
-                'query_time' => $res['query_time']
+                'query_time' => $res['query_time'],
             ],
             $res
         );
@@ -292,7 +292,7 @@ class SelectQueryTest extends ARC2_TestCase
                 'query_type' => 'select',
                 'result' => [
                     'variables' => [
-                        's', 'o'
+                        's', 'o',
                     ],
                     'rows' => [
                         [
@@ -300,10 +300,10 @@ class SelectQueryTest extends ARC2_TestCase
                             's type' => 'uri',
                             'o' => 'foo',
                             'o type' => 'literal',
-                        ]
-                    ]
+                        ],
+                    ],
                 ],
-                'query_time' => $res['query_time']
+                'query_time' => $res['query_time'],
             ],
             $res
         );
@@ -328,7 +328,7 @@ class SelectQueryTest extends ARC2_TestCase
                 'query_type' => 'select',
                 'result' => [
                     'variables' => [
-                        's', 'o'
+                        's', 'o',
                     ],
                     'rows' => [
                         [
@@ -337,10 +337,10 @@ class SelectQueryTest extends ARC2_TestCase
                             'o' => '3',
                             'o type' => 'literal',
                             'o datatype' => 'http://www.w3.org/2001/XMLSchema#integer',
-                        ]
-                    ]
+                        ],
+                    ],
                 ],
-                'query_time' => $res['query_time']
+                'query_time' => $res['query_time'],
             ],
             $res
         );
@@ -365,7 +365,7 @@ class SelectQueryTest extends ARC2_TestCase
                 'query_type' => 'select',
                 'result' => [
                     'variables' => [
-                        's', 'o'
+                        's', 'o',
                     ],
                     'rows' => [
                         [
@@ -373,10 +373,10 @@ class SelectQueryTest extends ARC2_TestCase
                             's type' => 'uri',
                             'o' => $res['result']['rows'][0]['o'],
                             'o type' => 'bnode',
-                        ]
-                    ]
+                        ],
+                    ],
                 ],
-                'query_time' => $res['query_time']
+                'query_time' => $res['query_time'],
             ],
             $res
         );
@@ -401,11 +401,11 @@ class SelectQueryTest extends ARC2_TestCase
                 'query_type' => 'select',
                 'result' => [
                     'variables' => [
-                        's', 'o'
+                        's', 'o',
                     ],
-                    'rows' => []
+                    'rows' => [],
                 ],
-                'query_time' => $res['query_time']
+                'query_time' => $res['query_time'],
             ],
             $res
         );
@@ -430,7 +430,7 @@ class SelectQueryTest extends ARC2_TestCase
                 'query_type' => 'select',
                 'result' => [
                     'variables' => [
-                        's', 'o'
+                        's', 'o',
                     ],
                     'rows' => [
                         [
@@ -438,10 +438,10 @@ class SelectQueryTest extends ARC2_TestCase
                             's type' => 'uri',
                             'o' => 'urn:id',
                             'o type' => 'uri',
-                        ]
-                    ]
+                        ],
+                    ],
                 ],
-                'query_time' => $res['query_time']
+                'query_time' => $res['query_time'],
             ],
             $res
         );
@@ -466,11 +466,11 @@ class SelectQueryTest extends ARC2_TestCase
                 'query_type' => 'select',
                 'result' => [
                     'variables' => [
-                        's', 'o'
+                        's', 'o',
                     ],
-                    'rows' => []
+                    'rows' => [],
                 ],
-                'query_time' => $res['query_time']
+                'query_time' => $res['query_time'],
             ],
             $res
         );
@@ -495,7 +495,7 @@ class SelectQueryTest extends ARC2_TestCase
                 'query_type' => 'select',
                 'result' => [
                     'variables' => [
-                        's', 'o'
+                        's', 'o',
                     ],
                     'rows' => [
                         [
@@ -503,10 +503,10 @@ class SelectQueryTest extends ARC2_TestCase
                             's type' => 'uri',
                             'o' => 'foo',
                             'o type' => 'literal',
-                        ]
-                    ]
+                        ],
+                    ],
                 ],
-                'query_time' => $res['query_time']
+                'query_time' => $res['query_time'],
             ],
             $res
         );
@@ -531,11 +531,11 @@ class SelectQueryTest extends ARC2_TestCase
                 'query_type' => 'select',
                 'result' => [
                     'variables' => [
-                        's', 'o'
+                        's', 'o',
                     ],
-                    'rows' => []
+                    'rows' => [],
                 ],
-                'query_time' => $res['query_time']
+                'query_time' => $res['query_time'],
             ],
             $res
         );
@@ -560,7 +560,7 @@ class SelectQueryTest extends ARC2_TestCase
                 'query_type' => 'select',
                 'result' => [
                     'variables' => [
-                        's', 'o'
+                        's', 'o',
                     ],
                     'rows' => [
                         [
@@ -568,10 +568,10 @@ class SelectQueryTest extends ARC2_TestCase
                             's type' => 'uri',
                             'o' => 'urn:id',
                             'o type' => 'uri',
-                        ]
-                    ]
+                        ],
+                    ],
                 ],
-                'query_time' => $res['query_time']
+                'query_time' => $res['query_time'],
             ],
             $res
         );
@@ -596,11 +596,11 @@ class SelectQueryTest extends ARC2_TestCase
                 'query_type' => 'select',
                 'result' => [
                     'variables' => [
-                        's', 'o'
+                        's', 'o',
                     ],
-                    'rows' => []
+                    'rows' => [],
                 ],
-                'query_time' => $res['query_time']
+                'query_time' => $res['query_time'],
             ],
             $res
         );
@@ -627,7 +627,7 @@ class SelectQueryTest extends ARC2_TestCase
                 'query_type' => 'select',
                 'result' => [
                     'variables' => [
-                        's', 'o'
+                        's', 'o',
                     ],
                     'rows' => [
                         [
@@ -635,11 +635,11 @@ class SelectQueryTest extends ARC2_TestCase
                             's type' => 'uri',
                             'o' => 'in en',
                             'o type' => 'literal',
-                            'o lang' => 'en'
-                        ]
+                            'o lang' => 'en',
+                        ],
                     ],
                 ],
-                'query_time' => $res['query_time']
+                'query_time' => $res['query_time'],
             ],
             $res
         );
@@ -666,7 +666,7 @@ class SelectQueryTest extends ARC2_TestCase
                 'query_type' => 'select',
                 'result' => [
                     'variables' => [
-                        's', 'o'
+                        's', 'o',
                     ],
                     'rows' => [
                         [
@@ -674,11 +674,11 @@ class SelectQueryTest extends ARC2_TestCase
                             's type' => 'uri',
                             'o' => 'in en',
                             'o type' => 'literal',
-                            'o lang' => 'en'
-                        ]
+                            'o lang' => 'en',
+                        ],
                     ],
                 ],
-                'query_time' => $res['query_time']
+                'query_time' => $res['query_time'],
             ],
             $res
         );
@@ -704,18 +704,18 @@ class SelectQueryTest extends ARC2_TestCase
                 'query_type' => 'select',
                 'result' => [
                     'variables' => [
-                        's', 'o'
+                        's', 'o',
                     ],
                     'rows' => [
                         [
                             's' => 'http://s',
                             's type' => 'uri',
                             'o' => 'Alice',
-                            'o type' => 'literal'
-                        ]
+                            'o type' => 'literal',
+                        ],
                     ],
                 ],
-                'query_time' => $res['query_time']
+                'query_time' => $res['query_time'],
             ],
             $res
         );
@@ -741,18 +741,18 @@ class SelectQueryTest extends ARC2_TestCase
                 'query_type' => 'select',
                 'result' => [
                     'variables' => [
-                        's', 'o'
+                        's', 'o',
                     ],
                     'rows' => [
                         [
                             's' => 'http://s',
                             's type' => 'uri',
                             'o' => 'Alice',
-                            'o type' => 'literal'
-                        ]
+                            'o type' => 'literal',
+                        ],
                     ],
                 ],
-                'query_time' => $res['query_time']
+                'query_time' => $res['query_time'],
             ],
             $res
         );
@@ -779,7 +779,7 @@ class SelectQueryTest extends ARC2_TestCase
                 'query_type' => 'select',
                 'result' => [
                     'variables' => [
-                        's', 'o'
+                        's', 'o',
                     ],
                     'rows' => [
                         [
@@ -787,11 +787,11 @@ class SelectQueryTest extends ARC2_TestCase
                             's type' => 'uri',
                             'o' => 'in en',
                             'o type' => 'literal',
-                            'o lang' => 'en'
-                        ]
+                            'o lang' => 'en',
+                        ],
                     ],
                 ],
-                'query_time' => $res['query_time']
+                'query_time' => $res['query_time'],
             ],
             $res
         );
@@ -818,11 +818,11 @@ class SelectQueryTest extends ARC2_TestCase
                 'query_type' => 'select',
                 'result' => [
                     'variables' => [
-                        's', 'o'
+                        's', 'o',
                     ],
                     'rows' => [],
                 ],
-                'query_time' => $res['query_time']
+                'query_time' => $res['query_time'],
             ],
             $res
         );
@@ -847,7 +847,7 @@ class SelectQueryTest extends ARC2_TestCase
                 'query_type' => 'select',
                 'result' => [
                     'variables' => [
-                        'c'
+                        'c',
                     ],
                     'rows' => [
                         [
@@ -856,7 +856,7 @@ class SelectQueryTest extends ARC2_TestCase
                         ],
                     ],
                 ],
-                'query_time' => $res['query_time']
+                'query_time' => $res['query_time'],
             ],
             $res
         );
@@ -881,7 +881,7 @@ class SelectQueryTest extends ARC2_TestCase
                 'query_type' => 'select',
                 'result' => [
                     'variables' => [
-                        'c'
+                        'c',
                     ],
                     'rows' => [
                         [
@@ -890,7 +890,7 @@ class SelectQueryTest extends ARC2_TestCase
                         ],
                     ],
                 ],
-                'query_time' => $res['query_time']
+                'query_time' => $res['query_time'],
             ],
             $res
         );
@@ -915,7 +915,7 @@ class SelectQueryTest extends ARC2_TestCase
                 'query_type' => 'select',
                 'result' => [
                     'variables' => [
-                        'c'
+                        'c',
                     ],
                     'rows' => [
                         [
@@ -924,7 +924,7 @@ class SelectQueryTest extends ARC2_TestCase
                         ],
                     ],
                 ],
-                'query_time' => $res['query_time']
+                'query_time' => $res['query_time'],
             ],
             $res
         );
@@ -949,7 +949,7 @@ class SelectQueryTest extends ARC2_TestCase
                 'query_type' => 'select',
                 'result' => [
                     'variables' => [
-                        'c'
+                        'c',
                     ],
                     'rows' => [
                         [
@@ -958,7 +958,7 @@ class SelectQueryTest extends ARC2_TestCase
                         ],
                     ],
                 ],
-                'query_time' => $res['query_time']
+                'query_time' => $res['query_time'],
             ],
             $res
         );
@@ -988,16 +988,16 @@ class SelectQueryTest extends ARC2_TestCase
                 'query_type' => 'select',
                 'result' => [
                     'variables' => [
-                        'count'
+                        'count',
                     ],
                     'rows' => [
                         [
                             'count' => '3',
                             'count type' => 'literal',
-                        ]
+                        ],
                     ],
                 ],
-                'query_time' => $res['query_time']
+                'query_time' => $res['query_time'],
             ],
             $res
         );
@@ -1038,7 +1038,7 @@ class SelectQueryTest extends ARC2_TestCase
                 'result' => [
                     'variables' => [
                         'who',
-                        'persons'
+                        'persons',
                     ],
                     'rows' => [
                         [
@@ -1055,7 +1055,7 @@ class SelectQueryTest extends ARC2_TestCase
                         ],
                     ],
                 ],
-                'query_time' => $res['query_time']
+                'query_time' => $res['query_time'],
             ],
             $res
         );
@@ -1084,7 +1084,7 @@ class SelectQueryTest extends ARC2_TestCase
                 'query_type' => 'select',
                 'result' => [
                     'variables' => [
-                        's', 'p', 'o'
+                        's', 'p', 'o',
                     ],
                     'rows' => [
                         [
@@ -1105,7 +1105,7 @@ class SelectQueryTest extends ARC2_TestCase
                         ],
                     ],
                 ],
-                'query_time' => $res['query_time']
+                'query_time' => $res['query_time'],
             ],
             $res
         );
@@ -1130,7 +1130,7 @@ class SelectQueryTest extends ARC2_TestCase
                 'query_type' => 'select',
                 'result' => [
                     'variables' => [
-                        's', 'p', 'o'
+                        's', 'p', 'o',
                     ],
                     'rows' => [
                         [
@@ -1151,7 +1151,7 @@ class SelectQueryTest extends ARC2_TestCase
                         ],
                     ],
                 ],
-                'query_time' => $res['query_time']
+                'query_time' => $res['query_time'],
             ],
             $res
         );
@@ -1176,7 +1176,7 @@ class SelectQueryTest extends ARC2_TestCase
                 'query_type' => 'select',
                 'result' => [
                     'variables' => [
-                        's', 'p', 'o'
+                        's', 'p', 'o',
                     ],
                     'rows' => [
                         [
@@ -1197,7 +1197,7 @@ class SelectQueryTest extends ARC2_TestCase
                         ],
                     ],
                 ],
-                'query_time' => $res['query_time']
+                'query_time' => $res['query_time'],
             ],
             $res
         );
@@ -1228,7 +1228,7 @@ class SelectQueryTest extends ARC2_TestCase
                 'result' => [
                     'variables' => [
                         's',
-                        'id'
+                        'id',
                     ],
                     'rows' => [
                         [
@@ -1251,7 +1251,7 @@ class SelectQueryTest extends ARC2_TestCase
                         ],
                     ],
                 ],
-                'query_time' => $res['query_time']
+                'query_time' => $res['query_time'],
             ],
             $res
         );
@@ -1278,7 +1278,7 @@ class SelectQueryTest extends ARC2_TestCase
                 'result' => [
                     'variables' => [
                         's',
-                        'id'
+                        'id',
                     ],
                     'rows' => [
                         [
@@ -1298,10 +1298,10 @@ class SelectQueryTest extends ARC2_TestCase
                             's type' => 'uri',
                             'id' => '1',
                             'id type' => 'literal',
-                        ]
+                        ],
                     ],
                 ],
-                'query_time' => $res['query_time']
+                'query_time' => $res['query_time'],
             ],
             $res
         );
@@ -1348,7 +1348,7 @@ class SelectQueryTest extends ARC2_TestCase
                 'query_type' => 'select',
                 'result' => [
                     'variables' => [
-                        'p'
+                        'p',
                     ],
                     'rows' => [
                         [
@@ -1361,7 +1361,7 @@ class SelectQueryTest extends ARC2_TestCase
                         ],
                     ],
                 ],
-                'query_time' => $res['query_time']
+                'query_time' => $res['query_time'],
             ],
             $res
         );
@@ -1392,7 +1392,7 @@ class SelectQueryTest extends ARC2_TestCase
                 'result' => [
                     'variables' => [
                         's',
-                        'id'
+                        'id',
                     ],
                     'rows' => [
                         [
@@ -1415,7 +1415,7 @@ class SelectQueryTest extends ARC2_TestCase
                         ],
                     ],
                 ],
-                'query_time' => $res['query_time']
+                'query_time' => $res['query_time'],
             ],
             $res
         );

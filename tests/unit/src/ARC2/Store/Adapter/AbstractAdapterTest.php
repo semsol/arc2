@@ -7,30 +7,36 @@ use Tests\ARC2_TestCase;
 abstract class AbstractAdapterTest extends ARC2_TestCase
 {
     abstract protected function checkAdapterRequirements();
+
     abstract protected function getAdapterInstance($config);
+
     abstract public function testConnectUseGivenConnection();
+
     abstract public function testEscape();
+
     abstract public function testGetAdapterName();
+
     abstract public function testGetConnection();
+
     abstract public function testGetNumberOfRowsInvalidQuery();
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->checkAdapterRequirements();
 
         $this->fixture = $this->getAdapterInstance($this->dbConfig);
-        $result = $this->fixture->connect();
+        $this->fixture->connect();
 
         // remove all tables
         $tables = $this->fixture->fetchList('SHOW TABLES');
-        foreach($tables as $table) {
-            $this->fixture->simpleQuery('DROP TABLE '. $table['Tables_in_'.$this->dbConfig['db_name']]);
+        foreach ($tables as $table) {
+            $this->fixture->simpleQuery('DROP TABLE '.$table['Tables_in_'.$this->dbConfig['db_name']]);
         }
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         if (null !== $this->fixture) {
             $this->fixture->disconnect();
@@ -41,8 +47,8 @@ abstract class AbstractAdapterTest extends ARC2_TestCase
     {
         // remove all tables
         $tables = $this->fixture->fetchList('SHOW TABLES');
-        foreach($tables as $table) {
-            $this->fixture->simpleQuery('DROP TABLE '. $table['Tables_in_'.$this->dbConfig['db_name']]);
+        foreach ($tables as $table) {
+            $this->fixture->simpleQuery('DROP TABLE '.$table['Tables_in_'.$this->dbConfig['db_name']]);
         }
     }
 
@@ -59,7 +65,7 @@ abstract class AbstractAdapterTest extends ARC2_TestCase
         $this->fixture->connect();
 
         $tables = $this->fixture->fetchList('SHOW TABLES');
-        $this->assertTrue(is_array($tables));
+        $this->assertTrue(\is_array($tables));
     }
 
     /*
@@ -87,7 +93,7 @@ abstract class AbstractAdapterTest extends ARC2_TestCase
             name VARCHAR(30) NOT NULL
         )';
         $this->fixture->simpleQuery($sql);
-        $this->assertEquals(null, $this->fixture->fetchRow('SELECT * FROM users'));
+        $this->assertFalse($this->fixture->fetchRow('SELECT * FROM users'));
 
         // add data
         $this->fixture->simpleQuery('INSERT INTO users (id, name) VALUE (1, "foobar");');
@@ -121,7 +127,7 @@ abstract class AbstractAdapterTest extends ARC2_TestCase
                 [
                     'id' => 1,
                     'name' => 'foobar',
-                ]
+                ],
             ],
             $this->fixture->fetchList('SELECT * FROM users')
         );
@@ -135,12 +141,12 @@ abstract class AbstractAdapterTest extends ARC2_TestCase
     {
         // g2t table
         if (isset($this->dbConfig['db_table_prefix'])) {
-            $table = $this->dbConfig['db_table_prefix'] . '_';
+            $table = $this->dbConfig['db_table_prefix'].'_';
         } else {
             $table = '';
         }
         if (isset($this->dbConfig['store_name'])) {
-            $table .= $this->dbConfig['store_name'] . '_';
+            $table .= $this->dbConfig['store_name'].'_';
         }
         $table .= 'setting';
 
@@ -169,7 +175,7 @@ abstract class AbstractAdapterTest extends ARC2_TestCase
     {
         // connect and check
         $this->fixture->connect();
-        $this->assertTrue(in_array($this->fixture->getDBSName(), array('mariadb', 'mysql')));
+        $this->assertTrue(\in_array($this->fixture->getDBSName(), ['mariadb', 'mysql']));
     }
 
     public function testGetDBSNameNoConnection()

@@ -8,7 +8,7 @@ use Tests\ARC2_TestCase;
 
 class AdapterFactoryTest extends ARC2_TestCase
 {
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -38,6 +38,6 @@ class AdapterFactoryTest extends ARC2_TestCase
 
     public function testGetSupportedAdapters()
     {
-        $this->assertEquals(array('mysqli', 'pdo'), $this->fixture->getSupportedAdapters());
+        $this->assertEquals(['mysqli', 'pdo'], $this->fixture->getSupportedAdapters());
     }
 }
