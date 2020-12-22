@@ -182,7 +182,7 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler
             $r = "\n".'`_pos_` mediumint NOT NULL AUTO_INCREMENT PRIMARY KEY, '.$r;
         }
 
-        return  $r ? $r."\n" : '';
+        return $r ? $r."\n" : '';
     }
 
     public function getFinalQueryResult($q_sql, $tmp_tbl)
@@ -216,7 +216,7 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler
         $rows = [];
         $types = [0 => 'uri', 1 => 'bnode', 2 => 'literal'];
         if (0 < count($entries)) {
-            foreach($entries as $pre_row) {
+            foreach ($entries as $pre_row) {
                 $row = [];
                 foreach ($vars as $var) {
                     if (isset($pre_row[$var])) {
@@ -474,7 +474,8 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler
         $nl = "\n";
         $where_sql = $this->getWHERESQL();  /* pre-fills $index['sub_joins'] $index['constraints'] */
         $order_sql = $this->getORDERSQL();  /* pre-fills $index['sub_joins'] $index['constraints'] */
-        return ''. (
+
+        return ''.(
             $this->is_union_query
                 ? 'SELECT'
                 : 'SELECT'.$this->getDistinctSQL()).$nl.
@@ -928,7 +929,7 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler
                 $sub_r .= $sub_r ? $nl.' AND '.$sub_sub_r : $sub_sub_r;
             }
         }
-        $r .= $sub_r ? $sub_r : '';
+        $r .= $sub_r ?: '';
         /* left join dependencies */
         foreach ($this->index['left_join'] as $id) {
             $d_joins = $this->getDependentJoins($id);
@@ -1003,7 +1004,7 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler
         $sub_ids = $this->v('patterns', [], $pattern);
         foreach ($sub_ids as $sub_id) {
             $sub_r = $this->getPatternSQL($this->getPattern($sub_id), $context);
-            $r .= ($r && $sub_r) ? $nl.'  AND ('.$sub_r.')' : ($sub_r ? $sub_r : '');
+            $r .= ($r && $sub_r) ? $nl.'  AND ('.$sub_r.')' : ($sub_r ?: '');
         }
 
         return $r ? $r : '';
@@ -1818,10 +1819,10 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler
         $nl = "\n";
         $limit = $this->v('limit', -1, $this->infos['query']);
         $offset = $this->v('offset', -1, $this->infos['query']);
-        if ($limit != -1) {
-            $offset = ($offset == -1) ? 0 : $this->store->a['db_object']->escape($offset);
+        if (-1 != $limit) {
+            $offset = (-1 == $offset) ? 0 : $this->store->a['db_object']->escape($offset);
             $r = 'LIMIT '.$offset.','.$limit;
-        } elseif ($offset != -1) {
+        } elseif (-1 != $offset) {
             // mysql doesn't support stand-alone offsets
             $r = 'LIMIT '.$this->store->a['db_object']->escape($offset).',999999999999';
         }

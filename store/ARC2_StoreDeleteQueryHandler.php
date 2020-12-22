@@ -189,7 +189,7 @@ class ARC2_StoreDeleteQueryHandler extends ARC2_StoreQueryHandler
                     WHERE T.t IS NULL
                 ';
                 $this->store->a['db_object']->simpleQuery($sql);
-             }
+            }
         }
         /* release lock */
         $this->store->releaseLock();

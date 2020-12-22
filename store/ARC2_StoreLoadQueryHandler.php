@@ -165,7 +165,7 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler
         $rows = $this->store->a['db_object']->fetchList($sql);
 
         if (is_array($rows)) {
-            foreach($rows as $row) {
+            foreach ($rows as $row) {
                 $r = ($r < $row['id']) ? $row['id'] : $r;
             }
         }
@@ -184,7 +184,7 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler
 
         $row = $this->store->a['db_object']->fetchRow($sql);
         if (isset($row['id'])) {
-            return $row['id']+1;
+            return $row['id'] + 1;
         }
 
         return 1;
@@ -216,7 +216,7 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler
                 $sql = 'SELECT id AS `id`, val AS `val` FROM '.$tbl_prefix.$sub_tbl." WHERE val_hash = BINARY '".$this->getValueHash($val)."'";
                 $rows = $this->store->a['db_object']->fetchList($sql);
                 if (is_array($rows)) {
-                    foreach($rows as $row) {
+                    foreach ($rows as $row) {
                         if ($row['val'] == $val) {
                             $id = $row['id'];
                             break;
@@ -273,6 +273,7 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler
         $row = $this->store->a['db_object']->fetchRow($sql);
         if (isset($row['t'])) {
             $this->triple_ids[$val] = $row['t']; /* hack for "don't insert this triple" */
+
             return [$row['t']]; /* hack for "don't insert this triple" */
 
         /* new */
@@ -298,13 +299,13 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler
     public function getOComp($val)
     {
         /* try date (e.g. 21 August 2007) */
-        if (preg_match('/^[0-9]{1,2}\s+[a-z]+\s+[0-9]{4}/i', $val) && ($uts = strtotime($val)) && ($uts !== -1)) {
+        if (preg_match('/^[0-9]{1,2}\s+[a-z]+\s+[0-9]{4}/i', $val) && ($uts = strtotime($val)) && (-1 !== $uts)) {
             return date("Y-m-d\TH:i:s", $uts);
         }
 
         /* xsd date (e.g. 2009-05-28T18:03:38+09:00 2009-05-28T18:03:38GMT) */
-        if (true === (bool) \strtotime($val)) {
-            return \date('Y-m-d\TH:i:s\Z', \strtotime($val));
+        if (true === (bool) strtotime($val)) {
+            return date('Y-m-d\TH:i:s\Z', strtotime($val));
         }
 
         if (is_numeric($val)) {
@@ -412,7 +413,7 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler
                     $this->insert_times[$tbl] = [
                         'min' => min($dur, $this->insert_times[$tbl]['min']),
                         'max' => max($dur, $this->insert_times[$tbl]['max']),
-                        'sum' => $dur + $this->insert_times[$tbl]['sum']
+                        'sum' => $dur + $this->insert_times[$tbl]['sum'],
                     ];
                 }
                 /* reset term id buffers */

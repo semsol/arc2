@@ -33,7 +33,7 @@ class mysqliAdapter extends AbstractAdapter
     /**
      * Connect to server or storing a given connection.
      *
-     * @return string|MysqliDbExtended String if an error occoured, instance of MysqliDbExtended otherwise.
+     * @return string|MysqliDbExtended string if an error occoured, instance of MysqliDbExtended otherwise
      */
     public function connect($existingConnection = null)
     {
@@ -166,7 +166,7 @@ class mysqliAdapter extends AbstractAdapter
     }
 
     /**
-     * Returns the version of the database server like 05-00-12
+     * Returns the version of the database server like 05-00-12.
      */
     public function getServerVersion()
     {
@@ -213,6 +213,7 @@ class mysqliAdapter extends AbstractAdapter
         }
 
         $prefix .= $this->getStoreName().'_';
+
         return $prefix;
     }
 
@@ -221,7 +222,7 @@ class mysqliAdapter extends AbstractAdapter
      * this function directly. It is only used once to make sure, ARC2 keeps its backward compatibility
      * while in the 2.x branch.
      *
-     * @param string $sql Query to execute.
+     * @param string $sql query to execute
      *
      * @return mysqli result|false
      */
@@ -233,7 +234,7 @@ class mysqliAdapter extends AbstractAdapter
     /**
      * @param string $sql Query
      *
-     * @return bool True if query ran fine, false otherwise.
+     * @return bool true if query ran fine, false otherwise
      */
     public function simpleQuery($sql)
     {
@@ -247,11 +248,12 @@ class mysqliAdapter extends AbstractAdapter
     /**
      * @param string $sql Query with return of affected rows
      *
-     * @return bool True if query ran fine, false otherwise.
+     * @return bool true if query ran fine, false otherwise
      */
     public function exec($sql)
     {
         $this->db->simpleQuery($sql);
+
         return $this->db->getAffectedRows();
     }
 }

@@ -12,7 +12,7 @@ class MysqliDbExtended extends \MysqliDb
     /**
      * Returns the number of affected rows, if you ran a query using simpleQuery before.
      *
-     * @return int Affected rows by an UPDATE/DELETE query.
+     * @return int affected rows by an UPDATE/DELETE query
      */
     public function getAffectedRows()
     {
@@ -23,7 +23,7 @@ class MysqliDbExtended extends \MysqliDb
      * If you ran a query using MysqliDbExtended::simpleQuery and an error occoured, you can
      * get the error code with this function.
      *
-     * @return int Error code, if available.
+     * @return int error code, if available
      */
     public function getErrorCode()
     {
@@ -34,7 +34,7 @@ class MysqliDbExtended extends \MysqliDb
      * If you ran a query using MysqliDbExtended::simpleQuery and an error occoured, you can
      * get the error message with this function.
      *
-     * @return string Non-empty string, if an error occoured, empty string otherwise.
+     * @return string non-empty string, if an error occoured, empty string otherwise
      */
     public function getErrorMessage()
     {
@@ -46,7 +46,7 @@ class MysqliDbExtended extends \MysqliDb
      */
     public function getLastInsertId()
     {
-        if (is_object($this->last_result)) {
+        if (\is_object($this->last_result)) {
             return $this->last_result->insert_id;
         }
 
@@ -57,17 +57,17 @@ class MysqliDbExtended extends \MysqliDb
      * Executes a SQL statement and returns the number of rows. This function will return 0,
      * regardless of errors in the query.
      *
-     * @param string $sql Query to execute.
+     * @param string $sql query to execute
      *
-     * @return int Number of rows, if available, 0 otherwise.
+     * @return int number of rows, if available, 0 otherwise
      */
     public function getNumberOfRows($sql = null)
     {
         if (null != $sql) {
             $result = $this->mysqli()->query($sql);
-            return is_object($result) ? $result->num_rows : 0;
 
-        } elseif (is_object($this->last_result)) {
+            return \is_object($result) ? $result->num_rows : 0;
+        } elseif (\is_object($this->last_result)) {
             return $this->last_result->num_rows;
         }
 
@@ -89,7 +89,7 @@ class MysqliDbExtended extends \MysqliDb
      * this function directly. It is only used once to make sure, ARC2 keeps its backward compatibility
      * while in the 2.x branch.
      *
-     * @param string $sql Query to execute.
+     * @param string $sql query to execute
      *
      * @return mysqli result|false
      */
@@ -99,13 +99,14 @@ class MysqliDbExtended extends \MysqliDb
     }
 
     /**
-     * @param string $sql Query to execute.
+     * @param string $sql query to execute
      *
-     * @return bool True if query runs without problems, false otherwise.
+     * @return bool true if query runs without problems, false otherwise
      */
     public function simpleQuery($sql, $num_rows = null)
     {
         $this->last_result = $this->mysqli()->query($sql, $num_rows);
+
         return $this->last_result ? true : false;
     }
 }

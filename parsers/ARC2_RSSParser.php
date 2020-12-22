@@ -182,7 +182,7 @@ class ARC2_RSSParser extends ARC2_LegacyXMLParser
                 }
                 /* date handling */
                 if (in_array($k, [$this->dc.'date', $this->dct.'modified'])) {
-                    if (!preg_match('/^[0-9]{4}/', $v) && ($sub_v = strtotime($v)) && ($sub_v != -1)) {
+                    if (!preg_match('/^[0-9]{4}/', $v) && ($sub_v = strtotime($v)) && (-1 != $sub_v)) {
                         $tz = date('Z', $sub_v); /* timezone offset */
                         $sub_v -= $tz; /* utc */
                         $v = date('Y-m-d\TH:i:s\Z', $sub_v);

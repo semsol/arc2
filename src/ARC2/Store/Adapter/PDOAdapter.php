@@ -31,7 +31,7 @@ class PDOAdapter extends AbstractAdapter
     /**
      * Connect to server or storing a given connection.
      *
-     * @param EasyDB $existingConnection Default is null.
+     * @param EasyDB $existingConnection default is null
      */
     public function connect($existingConnection = null)
     {
@@ -48,11 +48,9 @@ class PDOAdapter extends AbstractAdapter
              * - db_pdo_protocol: Protocol to determine server, e.g. mysql
              */
             if (false == isset($this->configuration['db_pdo_protocol'])) {
-                throw new \Exception(
-                    'When using PDO the protocol has to be given (e.g. mysql). Please set db_pdo_protocol in database configuration.'
-                );
+                throw new \Exception('When using PDO the protocol has to be given (e.g. mysql). Please set db_pdo_protocol in database configuration.');
             }
-            $dsn = $this->configuration['db_pdo_protocol'].':host='. $this->configuration['db_host'];
+            $dsn = $this->configuration['db_pdo_protocol'].':host='.$this->configuration['db_host'];
             if (isset($this->configuration['db_name'])) {
                 $dsn .= ';dbname='.$this->configuration['db_name'];
             }
@@ -126,8 +124,8 @@ class PDOAdapter extends AbstractAdapter
          * remember, this value will be surrounded by quotes later on!
          * so we don't send it back with quotes around.
          */
-        if ("'" == \substr($quoted, 0, 1)) {
-            $quoted = \substr($quoted, 1, \strlen($quoted)-2);
+        if ("'" == substr($quoted, 0, 1)) {
+            $quoted = substr($quoted, 1, \strlen($quoted) - 2);
         }
 
         return $quoted;
@@ -143,7 +141,7 @@ class PDOAdapter extends AbstractAdapter
         // save query
         $this->queries[] = [
             'query' => $sql,
-            'by_function' => 'fetchList'
+            'by_function' => 'fetchList',
         ];
 
         if (null == $this->db) {
@@ -163,7 +161,7 @@ class PDOAdapter extends AbstractAdapter
         // save query
         $this->queries[] = [
             'query' => $sql,
-            'by_function' => 'fetchRow'
+            'by_function' => 'fetchRow',
         ];
 
         if (null == $this->db) {
@@ -175,7 +173,7 @@ class PDOAdapter extends AbstractAdapter
         $stmt->execute();
         $rows = $stmt->fetchAll();
         if (0 < \count($rows)) {
-            $row = \array_values($rows)[0];
+            $row = array_values($rows)[0];
         }
         $stmt->closeCursor();
 
@@ -209,11 +207,11 @@ class PDOAdapter extends AbstractAdapter
             return;
         }
 
-        $clientVersion = \strtolower($this->db->getAttribute(\PDO::ATTR_CLIENT_VERSION));
-        $serverVersion = \strtolower($this->db->getAttribute(\PDO::ATTR_SERVER_VERSION));
-        if (false !== \strpos($clientVersion, 'mariadb') || false !== \strpos($serverVersion, 'mariadb')) {
+        $clientVersion = strtolower($this->db->getAttribute(\PDO::ATTR_CLIENT_VERSION));
+        $serverVersion = strtolower($this->db->getAttribute(\PDO::ATTR_SERVER_VERSION));
+        if (false !== strpos($clientVersion, 'mariadb') || false !== strpos($serverVersion, 'mariadb')) {
             $return = 'mariadb';
-        } elseif (false !== \strpos($clientVersion, 'mysql') || false !== \strpos($serverVersion, 'mysql')) {
+        } elseif (false !== strpos($clientVersion, 'mysql') || false !== strpos($serverVersion, 'mysql')) {
             $return = 'mysql';
         } else {
             $return = null;
@@ -228,18 +226,18 @@ class PDOAdapter extends AbstractAdapter
     }
 
     /**
-     * Returns the version of the database server like 05-00-12
+     * Returns the version of the database server like 05-00-12.
      */
     public function getServerVersion()
     {
-        $res = \preg_match(
+        $res = preg_match(
             "/([0-9]+)\.([0-9]+)\.([0-9]+)/",
             $this->getServerInfo(),
             $matches
         );
 
         return 1 == $res
-            ? \sprintf('%02d-%02d-%02d', $matches[1], $matches[2], $matches[3])
+            ? sprintf('%02d-%02d-%02d', $matches[1], $matches[2], $matches[3])
             : '00-00-00';
     }
 
@@ -263,13 +261,14 @@ class PDOAdapter extends AbstractAdapter
         // save query
         $this->queries[] = [
             'query' => $sql,
-            'by_function' => 'getNumberOfRows'
+            'by_function' => 'getNumberOfRows',
         ];
 
         $stmt = $this->db->prepare($sql);
         $stmt->execute();
         $rowCount = \count($stmt->fetchAll());
         $stmt->closeCursor();
+
         return $rowCount;
     }
 
@@ -290,20 +289,21 @@ class PDOAdapter extends AbstractAdapter
         }
 
         $prefix .= $this->getStoreName().'_';
+
         return $prefix;
     }
 
     /**
      * @param string $sql Query
      *
-     * @return bool True if query ran fine, false otherwise.
+     * @return bool true if query ran fine, false otherwise
      */
     public function simpleQuery($sql)
     {
         // save query
         $this->queries[] = [
             'query' => $sql,
-            'by_function' => 'simpleQuery'
+            'by_function' => 'simpleQuery',
         ];
 
         if (false === $this->db instanceof \PDO) {
@@ -313,6 +313,7 @@ class PDOAdapter extends AbstractAdapter
         $stmt = $this->db->prepare($sql);
         $stmt->execute();
         $stmt->closeCursor();
+
         return true;
     }
 
@@ -321,14 +322,14 @@ class PDOAdapter extends AbstractAdapter
      *
      * @param string $sql
      *
-     * @return int Number of affected rows.
+     * @return int number of affected rows
      */
     public function exec($sql)
     {
         // save query
         $this->queries[] = [
             'query' => $sql,
-            'by_function' => 'exec'
+            'by_function' => 'exec',
         ];
 
         return $this->db->exec($sql);

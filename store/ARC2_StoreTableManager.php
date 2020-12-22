@@ -75,6 +75,7 @@ class ARC2_StoreTableManager extends ARC2_Store
         UNIQUE KEY (t), '.$index_code.' KEY (misc)
       ) '.$this->getTableOptionsCode().'
     ';
+
         return $this->a['db_object']->simpleQuery($sql);
     }
 

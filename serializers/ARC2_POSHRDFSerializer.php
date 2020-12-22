@@ -63,7 +63,7 @@ class ARC2_POSHRDFSerializer extends ARC2_RDFSerializer
                 foreach ($os as $o) {
                     $r .= $n.$this->getObjectValue($o);
                 }
-                $r .= '    
+                $r .= '
           </div>
         ';
             }

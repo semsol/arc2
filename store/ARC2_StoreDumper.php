@@ -47,7 +47,7 @@ class ARC2_StoreDumper extends ARC2_Class
             if (false == is_array($rows)) {
                 break;
             }
-            foreach($rows as $row) {
+            foreach ($rows as $row) {
                 echo $this->getEntry($row);
                 $proceed = 1;
             }
@@ -72,7 +72,7 @@ class ARC2_StoreDumper extends ARC2_Class
             if (false == is_array($rows)) {
                 break;
             }
-            foreach($rows as $row) {
+            foreach ($rows as $row) {
                 fwrite($fp, $this->getEntry($row));
                 $proceed = 1;
             }

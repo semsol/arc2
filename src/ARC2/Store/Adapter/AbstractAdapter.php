@@ -19,19 +19,19 @@ abstract class AbstractAdapter
      *
      * @var array
      */
-    protected $errors = array();
+    protected $errors = [];
 
     /**
      * Sent queries.
      *
      * @var array
      */
-    protected $queries = array();
+    protected $queries = [];
 
     /**
      * @param array $configuration Default is array(). Only use, if you have your own mysqli connection.
      */
-    public function __construct(array $configuration = array())
+    public function __construct(array $configuration = [])
     {
         $this->configuration = $configuration;
 

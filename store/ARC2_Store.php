@@ -110,7 +110,7 @@ class ARC2_Store extends ARC2_Class
     }
 
     /**
-     * @param int $force 1 if you want to force a connection.
+     * @param int $force 1 if you want to force a connection
      *
      * @return mysqli mysqli-connection, only if mysqli adapter was selected. null otherwise,
      *                because direct access to DB connection is not recommended.
@@ -169,6 +169,7 @@ class ARC2_Store extends ARC2_Class
     public function getCollation()
     {
         $row = $this->db->fetchRow('SHOW TABLE STATUS LIKE "'.$this->getTablePrefix().'setting"');
+
         return isset($row['Collation']) ? $row['Collation'] : '';
     }
 
@@ -208,7 +209,7 @@ class ARC2_Store extends ARC2_Class
             $tbl = $this->getTablePrefix().'o2val';
 
             $rows = $this->db->fetchList('SHOW INDEX FROM '.$tbl);
-            foreach($rows as $row) {
+            foreach ($rows as $row) {
                 if ('val' != $row['Column_name']) {
                     continue;
                 }
@@ -300,6 +301,7 @@ class ARC2_Store extends ARC2_Class
             } catch (\Exception $e) {
                 // when using PDO, an exception gets thrown if $tbl does not exist.
                 $this->errors[] = $e->getMessage();
+
                 return 0;
             }
         }
@@ -539,13 +541,13 @@ class ARC2_Store extends ARC2_Class
     /**
      * Executes a SPARQL query.
      *
-     * @param string $q             SPARQL query
-     * @param string $result_format Possible values: infos, raw, rows, row
+     * @param string $q              SPARQL query
+     * @param string $result_format  Possible values: infos, raw, rows, row
      * @param string $src
-     * @param int $keep_bnode_ids   Keep blank node IDs? Default is 0
-     * @param int $log_query        Log executed queries? Default is 0
+     * @param int    $keep_bnode_ids Keep blank node IDs? Default is 0
+     * @param int    $log_query      Log executed queries? Default is 0
      *
-     * @return array|int Array if query returned a result, 0 otherwise.
+     * @return array|int array if query returned a result, 0 otherwise
      */
     public function query($q, $result_format = '', $src = '', $keep_bnode_ids = 0, $log_query = 0)
     {
@@ -556,7 +558,7 @@ class ARC2_Store extends ARC2_Class
             $infos = ['query' => ['type' => 'dump']];
         } else {
             // check cache
-            $key = \hash('sha1', $q);
+            $key = hash('sha1', $q);
             if ($this->cacheEnabled() && $this->cache->has($key.'_infos')) {
                 $infos = $this->cache->get($key.'_infos');
                 $errors = $this->cache->get($key.'_errors');
@@ -590,10 +592,9 @@ class ARC2_Store extends ARC2_Class
             $t1 = ARC2::mtime();
 
             // if cache is enabled, get/store result
-            $key = \hash('sha1', $q);
+            $key = hash('sha1', $q);
             if ($this->cacheEnabled() && $this->cache->has($key)) {
                 $result = $this->cache->get($key);
-
             } else {
                 $result = $this->runQuery($infos, $qt, $keep_bnode_ids, $q);
 
@@ -711,12 +712,11 @@ class ARC2_Store extends ARC2_Class
         $r = 0;
         /* via hash */
         if (preg_match('/^(s2val|o2val)$/', $tbl) && $this->hasHashColumn($tbl)) {
-
             $rows = $this->db->fetchList(
                 'SELECT id, val FROM '.$this->getTablePrefix().$tbl." WHERE val_hash = '".$this->getValueHash($val)."' ORDER BY id"
             );
             if (is_array($rows) && 0 < count($rows)) {
-                foreach($rows as $row) {
+                foreach ($rows as $row) {
                     if ($row['val'] == $val) {
                         $r = $row['id'];
                         break;
@@ -840,7 +840,7 @@ class ARC2_Store extends ARC2_Class
     }
 
     /**
-     * @param string $res URI
+     * @param string $res           URI
      * @param string $unnamed_label How to label a resource without a name?
      *
      * @return string
@@ -870,6 +870,7 @@ class ARC2_Store extends ARC2_Class
             $result = $this->query('SELECT ?label WHERE { <'.$res.'> <'.$labelProperty.'> ?label }');
             if (isset($result['result']['rows'][0])) {
                 $this->resource_labels[$res] = $result['result']['rows'][0]['label'];
+
                 return $result['result']['rows'][0]['label'];
             }
         }
@@ -879,6 +880,7 @@ class ARC2_Store extends ARC2_Class
         $r = preg_replace_callback('/([a-z])([A-Z])/', function ($matches) {
             return $matches[1].' '.strtolower($matches[2]);
         }, $r);
+
         return $r;
     }
 

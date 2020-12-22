@@ -225,6 +225,7 @@ class ARC2_NTriplesSerializer extends ARC2_RDFSerializer
         if ($no < 1114112) {
             return '\\U'.sprintf('%08X', $no);
         }  /* #x10000-#x10FFFF (65536-1114111) */
+
         return '';                                                /* not defined => ignore */
     }
 }

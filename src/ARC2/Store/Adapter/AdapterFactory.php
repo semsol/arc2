@@ -16,11 +16,11 @@ class AdapterFactory
 {
     /**
      * @param string $adapterName
-     * @param array $configuration Default is array()
+     * @param array  $configuration Default is array()
      */
-    public function getInstanceFor($adapterName, $configuration = array())
+    public function getInstanceFor($adapterName, $configuration = [])
     {
-        if (in_array($adapterName, $this->getSupportedAdapters())) {
+        if (\in_array($adapterName, $this->getSupportedAdapters())) {
             /*
              * mysqli
              */
@@ -28,6 +28,7 @@ class AdapterFactory
                 if (false == class_exists('\\ARC2\\Store\\Adapter\\mysqliAdapter')) {
                     require_once 'mysqliAdapter.php';
                 }
+
                 return new mysqliAdapter($configuration);
             /*
              * PDO
@@ -38,21 +39,20 @@ class AdapterFactory
                     if (false == class_exists('\\ARC2\\Store\\Adapter\\CachedPDOAdapter')) {
                         require_once 'CachedPDOAdapter.php';
                     }
+
                     return new CachedPDOAdapter($configuration);
                 // no cache
                 } else {
                     if (false == class_exists('\\ARC2\\Store\\Adapter\\PDOAdapter')) {
                         require_once 'PDOAdapter.php';
                     }
+
                     return new PDOAdapter($configuration);
                 }
             }
         }
 
-        throw new \Exception(
-            'Unknown adapter name given. Currently supported are: '
-            .implode(', ', $this->getSupportedAdapters())
-        );
+        throw new \Exception('Unknown adapter name given. Currently supported are: '.implode(', ', $this->getSupportedAdapters()));
     }
 
     /**
@@ -60,6 +60,6 @@ class AdapterFactory
      */
     public function getSupportedAdapters()
     {
-        return array('mysqli', 'pdo');
+        return ['mysqli', 'pdo'];
     }
 }

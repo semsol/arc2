@@ -22,7 +22,7 @@ class CachedPDOAdapter extends PDOAdapter
     protected $cacheEnabled;
     protected $cache;
 
-    public function __construct(array $configuration = array())
+    public function __construct(array $configuration = [])
     {
         parent::__construct($configuration);
 
@@ -67,10 +67,10 @@ class CachedPDOAdapter extends PDOAdapter
         // sql query is known
         if ($this->cache->has($key)) {
             return $this->cache->get($key);
-
         } else {
             $result = parent::fetchList($sql);
             $this->cache->set($key, $result);
+
             return $result;
         }
     }
@@ -87,10 +87,10 @@ class CachedPDOAdapter extends PDOAdapter
         // sql query is known
         if ($this->cache->has($key)) {
             return $this->cache->get($key);
-
         } else {
             $result = parent::fetchRow($sql);
             $this->cache->set($key, $result);
+
             return $result;
         }
     }
@@ -107,22 +107,23 @@ class CachedPDOAdapter extends PDOAdapter
         // sql query is known
         if ($this->cache->has($key)) {
             return $this->cache->get($key);
-
         } else {
             $result = parent::getNumberOfRows($sql);
             $this->cache->set($key, $result);
+
             return $result;
         }
     }
 
     /**
      * catches the first part of the query
-     * we need that to determine if its an query which changes the DB in any way
+     * we need that to determine if its an query which changes the DB in any way.
      */
     protected function queryChangesDb($sql)
     {
         $sqlPart = substr(trim($sql), 0, 4);
-        return true === in_array($sqlPart, ['CREA', 'DROP', 'DELE', 'INSE', 'RENA', 'UPDA',]);
+
+        return true === \in_array($sqlPart, ['CREA', 'DROP', 'DELE', 'INSE', 'RENA', 'UPDA']);
     }
 
     public function simpleQuery($sql)
