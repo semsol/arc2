@@ -1,14 +1,23 @@
 # ARC2
 
-[![Build](https://travis-ci.org/semsol/arc2.svg?branch=master)](https://travis-ci.org/semsol/arc2)
-[![Coverage Status](https://coveralls.io/repos/github/semsol/arc2/badge.svg?branch=master)](https://coveralls.io/github/semsol/arc2?branch=master)
 [![Latest Stable Version](https://poser.pugx.org/semsol/arc2/v/stable.svg)](https://packagist.org/packages/semsol/arc2)
 [![Total Downloads](https://poser.pugx.org/semsol/arc2/downloads.svg)](https://packagist.org/packages/semsol/arc2)
 [![Latest Unstable Version](https://poser.pugx.org/semsol/arc2/v/unstable.svg)](https://packagist.org/packages/semsol/arc2)
 [![License](https://poser.pugx.org/semsol/arc2/license.svg)](https://packagist.org/packages/semsol/arc2)
 
-ARC2 is a PHP 7.2 library for working with RDF. It also provides a MySQL-based triplestore with SPARQL support.
+ARC2 is a PHP 7.2+ library for working with RDF. It also provides a MySQL-based triplestore with SPARQL support.
 Older versions of PHP may work, but are not longer tested.
+
+**Test status:**
+
+| Database     | Status                                                                         |
+|--------------|--------------------------------------------------------------------------------|
+| MariaDB 10.1 | ![](https://github.com/semsol/arc2/workflows/MariaDB%2010.1%20Tests/badge.svg) |
+| MariaDB 10.2 | ![](https://github.com/semsol/arc2/workflows/MariaDB%2010.2%20Tests/badge.svg) |
+| MariaDB 10.3 | ![](https://github.com/semsol/arc2/workflows/MariaDB%2010.3%20Tests/badge.svg) |
+| MariaDB 10.4 | ![](https://github.com/semsol/arc2/workflows/MariaDB%2010.4%20Tests/badge.svg) |
+| MariaDB 10.5 | ![](https://github.com/semsol/arc2/workflows/MariaDB%2010.5%20Tests/badge.svg) |
+| MySQL 5.7    | ![](https://github.com/semsol/arc2/workflows/MySQL%205.7%20Tests/badge.svg)    |
 
 ## Documentation
 
@@ -18,35 +27,39 @@ For the documentation, see the [Wiki](https://github.com/semsol/arc2/wiki#core-d
 
 Package available on [Composer](https://packagist.org/packages/semsol/arc2).
 
-If you're using Composer to manage dependencies, you can use
+You should use Composer for installation:
 
 ```bash
 composer require semsol/arc2:^2
 ```
 
-Further information about composer usage can be found [here](https://getcomposer.org/doc/01-basic-usage.md#autoloading), for instance about autoloading ARC2 classes.
+Further information about Composer usage can be found [here](https://getcomposer.org/doc/01-basic-usage.md#autoloading), for instance about autoloading ARC2 classes.
 
 ## Requirements
 
 #### PHP
 
-|   5.6   | 7.0  | 7.1  | 7.2  | 7.3  | 7.4  |
-|:-------:|:----:|:----:|:----:|:----:|:----:|
-| :+1:(1) | :+1:(1) | :+1:(1) | :+1: | :+1: | :+1: |
-
-(1) It is compatible with PHP 5.3+ but old versions are no longer tested.
+| 7.2  | 7.3  | 7.4  | 8.0  |
+|------|------|------|------|
+| :+1: | :+1: | :+1: | :+1: |
 
 #### Database systems
 
-|           | 5.5  | 5.6  | 5.7  |       8.0       |
-|:---------:|:----:|:----:|:----:|:---------------:|
-| **MySQL** | :+1: | :+1: | :+1: | :collision: (1) |
+This section is relevant, if you wanna use database related functionality.
 
-|             |     10.0      | 10.1 | 10.2 | 10.3 | 10.4 | 10.5 |
-|:-----------:|:-------------:|:----:|:----:|:----:|:----:|:----:|
-| **MariaDB** | :question:(2) | :+1: | :+1: | :+1: | :+1: | :+1: |
+**MySQL**
 
-(1) As long as ARC2 uses mysqli, a connection to MySQL Server 8.0 is not possible. For more information, please look [here](https://github.com/semsol/arc2/commit/0ad48d61753b15ae02ff19f615b14aa52b6557f1). But its planned to switch to PDO ([issue](https://github.com/semsol/arc2/issues/109))
+| 5.5  | 5.6  | 5.7  | 8.0             |
+|------|------|------|-----------------|
+| :+1: | :+1: | :+1: | :collision: (1) |
+
+**MariaDB**
+
+| 10.0          | 10.1 | 10.2 | 10.3 | 10.4 | 10.5 |
+|---------------|------|------|------|------|------|
+| :question:(2) | :+1: | :+1: | :+1: | :+1: | :+1: |
+
+(1) As long as ARC2 uses mysqli, a connection to MySQL Server 8.0 is not possible. For more information, please look [here](https://github.com/semsol/arc2/commit/0ad48d61753b15ae02ff19f615b14aa52b6557f1).
 
 (2) Not tested anymore, because outdated version.
 
