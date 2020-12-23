@@ -1,0 +1,73 @@
+name: SQLite Tests
+
+on: push
+
+jobs:
+    test:
+        name: |
+            SQLite Tests - PHP ${{ matrix.php-versions }}
+        runs-on: ubuntu-latest
+
+        strategy:
+            # if one of the matrix-entries break, all entries getting canceled.
+            fail-fast: true
+            matrix:
+                include:
+                    # PHP 7.2
+                    -   php-versions: 7.2
+                        DB_ADAPTER: pdo
+                        DB_PDO_PROTOCOL: sqlite
+                        DB_USE_MEMORY: true
+                    -   php-versions: 7.2
+                        DB_ADAPTER: pdo
+                        DB_PDO_PROTOCOL: sqlite
+                        CACHE_ENABLED: true
+                        DB_USE_MEMORY: true
+                    # PHP 7.3
+                    -   php-versions: 7.3
+                        DB_ADAPTER: pdo
+                        DB_PDO_PROTOCOL: sqlite
+                        DB_USE_MEMORY: true
+                    -   php-versions: 7.3
+                        DB_ADAPTER: pdo
+                        DB_PDO_PROTOCOL: sqlite
+                        CACHE_ENABLED: true
+                        DB_USE_MEMORY: true
+                    # PHP 7.4
+                    -   php-versions: 7.4
+                        DB_ADAPTER: pdo
+                        DB_PDO_PROTOCOL: sqlite
+                        DB_USE_MEMORY: true
+                    -   php-versions: 7.4
+                        DB_ADAPTER: pdo
+                        DB_PDO_PROTOCOL: sqlite
+                        CACHE_ENABLED: true
+                        DB_USE_MEMORY: true
+                    # PHP 8.0
+                    -   php-versions: 8.0
+                        DB_ADAPTER: pdo
+                        DB_PDO_PROTOCOL: sqlite
+                        DB_USE_MEMORY: true
+                    -   php-versions: 8.0
+                        DB_ADAPTER: pdo
+                        DB_PDO_PROTOCOL: sqlite
+                        CACHE_ENABLED: true
+                        DB_USE_MEMORY: true
+
+        steps:
+            -   name: Checkout
+                uses: actions/checkout@v2
+
+            -   name: Install PHP
+                uses: shivammathur/setup-php@v2
+                with:
+                    php-version: ${{ matrix.php-versions }}
+                    coverage: xdebug
+                    ini-values: memory_limit=1G
+
+            -   name: Install Composer dependencies
+                run: composer install --no-progress --no-suggest --prefer-dist --optimize-autoloader
+
+            -   name: Tests
+                run: |
+                    vendor/bin/phpunit ${{ matrix.COVERAGE_FLAGS }}

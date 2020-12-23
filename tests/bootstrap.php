@@ -36,6 +36,10 @@ if ('pdo' == getenv('DB_ADAPTER')) {
     if (!empty(getenv('DB_PDO_PROTOCOL'))) {
         $dbConfig['db_adapter'] = 'pdo';
         $dbConfig['db_pdo_protocol'] = getenv('DB_PDO_PROTOCOL');
+
+        if ('true' == getenv('DB_USE_MEMORY')) {
+            unset($dbConfig['db_name']);
+        }
     } else {
         throw new \Exception('Environment variable DB_PDO_PROTOCOL not set. Possible values are: mysql');
     }
