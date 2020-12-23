@@ -9,6 +9,7 @@
 
 use ARC2\Store\Adapter\AbstractAdapter;
 use ARC2\Store\Adapter\AdapterFactory;
+use ARC2\Store\Adapter\PDOSQLite;
 use ARC2\Store\TableManager\SQLite;
 
 ARC2::inc('Class');
@@ -181,14 +182,20 @@ class ARC2_Store extends ARC2_Class
     public function getColumnType()
     {
         if (!$this->v('column_type')) {
-            $tbl = $this->getTablePrefix().'g2t';
+            // SQLite
+            if ($this->getDBObject() instanceof PDOSQLite) {
+                $this->column_type = 'INTEGER';
+            } else {
+                // MySQL
+                $tbl = $this->getTablePrefix().'g2t';
 
-            $row = $this->db->fetchRow('SHOW COLUMNS FROM '.$tbl.' LIKE "t"');
-            if (null == $row) {
-                $row = ['Type' => 'mediumint'];
+                $row = $this->db->fetchRow('SHOW COLUMNS FROM '.$tbl.' LIKE "t"');
+                if (null == $row) {
+                    $row = ['Type' => 'mediumint'];
+                }
+
+                $this->column_type = preg_match('/mediumint/', $row['Type']) ? 'mediumint' : 'int';
             }
-
-            $this->column_type = preg_match('/mediumint/', $row['Type']) ? 'mediumint' : 'int';
         }
 
         return $this->column_type;
@@ -200,8 +207,15 @@ class ARC2_Store extends ARC2_Class
         if (!isset($this->$var_name)) {
             $tbl = $this->getTablePrefix().$tbl;
 
-            $row = $this->db->fetchRow('SHOW COLUMNS FROM '.$tbl.' LIKE "val_hash"');
-            $this->$var_name = null !== $row;
+            $value = true;
+
+            // only check if SQLite is NOT being used
+            if (false === $this->getDBObject() instanceof PDOSQLite) {
+                $row = $this->db->fetchRow('SHOW COLUMNS FROM '.$tbl.' LIKE "val_hash"');
+                $value = null !== $row;
+            }
+
+            $this->$var_name = $value;
         }
 
         return $this->$var_name;
@@ -247,9 +261,20 @@ class ARC2_Store extends ARC2_Class
         $this->db->simpleQuery('DROP INDEX vft ON '.$tbl);
     }
 
-    public function countDBProcesses()
+    /**
+     * @todo required?
+     *
+     * @return int real process amount when using MySQL, 1 otherwise
+     */
+    public function countDBProcesses(): int
     {
-        return $this->db->getNumberOfRows('SHOW PROCESSLIST');
+        $amount = 1;
+
+        if (false === $this->getDBObject() instanceof PDOSQLite) {
+            $amount = $this->db->getNumberOfRows('SHOW PROCESSLIST');
+        }
+
+        return $amount;
     }
 
     /**
@@ -337,17 +362,23 @@ class ARC2_Store extends ARC2_Class
 
     public function extendColumns()
     {
-        ARC2::inc('StoreTableManager');
-        $mgr = new ARC2_StoreTableManager($this->a, $this);
-        $mgr->extendColumns();
-        $this->column_type = 'int';
+        $cfg = $this->getDBObject()->getConfiguration();
+
+        if (false === $this->getDBObject() instanceof PDOSQLite) {
+            ARC2::inc('StoreTableManager');
+            $mgr = new ARC2_StoreTableManager($this->a, $this);
+            $mgr->extendColumns();
+            $this->column_type = 'int';
+        }
     }
 
     public function splitTables()
     {
-        ARC2::inc('StoreTableManager');
-        $mgr = new ARC2_StoreTableManager($this->a, $this);
-        $mgr->splitTables();
+        if (false === $this->getDBObject() instanceof PDOSQLite) {
+            ARC2::inc('StoreTableManager');
+            $mgr = new ARC2_StoreTableManager($this->a, $this);
+            $mgr->splitTables();
+        }
     }
 
     public function hasSetting($k)
@@ -545,6 +576,16 @@ class ARC2_Store extends ARC2_Class
         $tbls = $this->getTables();
         $old_prefix = $this->getTablePrefix();
         $new_prefix = $new_store->getTablePrefix();
+
+        /*
+         * Use appropriate INSERT syntax, depending on the DBS.
+         */
+        if ($this->getDBObject() instanceof PDOSQLite) {
+            $sqlHead = 'INSERT OR IGNORE INTO ';
+        } else {
+            $sqlHead = 'INSERT IGNORE INTO ';
+        }
+
         foreach ($tbls as $tbl) {
             $this->db->simpleQuery('INSERT IGNORE INTO '.$new_prefix.$tbl.' SELECT * FROM '.$old_prefix.$tbl);
             if (!empty($this->db->getErrorMessage())) {
@@ -743,7 +784,18 @@ class ARC2_Store extends ARC2_Class
         }
         /* exact match */
         else {
-            $sql = 'SELECT id FROM '.$this->getTablePrefix().$tbl." WHERE val = BINARY '".$this->db->escape($val)."' LIMIT 1";
+            if ($this->getDBObject() instanceof PDOSQLite) {
+                $sql = 'SELECT id
+                    FROM '.$this->getTablePrefix().$tbl."
+                    WHERE val = '".$this->db->escape($val)."'
+                    LIMIT 1";
+            } else {
+                $sql = 'SELECT id
+                    FROM '.$this->getTablePrefix().$tbl."
+                    WHERE val = BINARY '".$this->db->escape($val)."'
+                    LIMIT 1";
+            }
+
             $row = $this->db->fetchRow($sql);
 
             if (null !== $row && isset($row['id'])) {
@@ -772,6 +824,15 @@ class ARC2_Store extends ARC2_Class
 
     public function getLock($t_out = 10, $t_out_init = '')
     {
+        /*
+         * We assume locks are not required when using SQLite.
+         * Either its an in memory database, which has no concurrent reads
+         * or its a file and SQLite takes care of it.
+         */
+        if ($this->getDBObject() instanceof PDOSQLite) {
+            return 1;
+        }
+
         if (!$t_out_init) {
             $t_out_init = $t_out;
         }
@@ -802,8 +863,16 @@ class ARC2_Store extends ARC2_Class
         return $this->db->simpleQuery('DO RELEASE_LOCK("'.$this->a['db_name'].'.'.$this->getTablePrefix().'.write_lock")');
     }
 
+    /**
+     * @deprecated
+     */
     public function processTables($level = 2, $operation = 'optimize')
     {
+        // no processing required when using SQLite
+        if ($this->getDBObject() instanceof PDOSQLite) {
+            return;
+        }
+
         /*
          * level:
          *      1. triple + g2t
@@ -829,6 +898,9 @@ class ARC2_Store extends ARC2_Class
         }
     }
 
+    /**
+     * @deprecated
+     */
     public function optimizeTables($level = 2)
     {
         if ($this->v('ignore_optimization')) {
@@ -838,11 +910,17 @@ class ARC2_Store extends ARC2_Class
         return $this->processTables($level, 'optimize');
     }
 
+    /**
+     * @deprecated
+     */
     public function checkTables($level = 2)
     {
         return $this->processTables($level, 'check');
     }
 
+    /**
+     * @deprecated
+     */
     public function repairTables($level = 2)
     {
         return $this->processTables($level, 'repair');

@@ -14,12 +14,7 @@ class ARC2_StoreTest extends ARC2_TestCase
         $this->fixture->createDBCon();
 
         // remove all tables
-        $tables = $this->fixture->getDBObject()->fetchList('SHOW TABLES');
-        foreach ($tables as $table) {
-            $this->fixture->getDBObject()->simpleQuery(
-                'DROP TABLE '.$table['Tables_in_'.$this->dbConfig['db_name']]
-            );
-        }
+        $this->fixture->getDBObject()->deleteAllTables();
 
         // fresh setup of ARC2
         $this->fixture->setup();
@@ -636,6 +631,29 @@ XML;
     }
 
     /*
+     * Tests for logQuery
+     */
+
+    /**
+     * This test captures a weird situation: when running CHECK TABLE xxx multiple times,
+     * you will receive the exception below.
+     *
+     * @todo remove this, if processTables gets removed too
+     */
+    public function testProcessTables()
+    {
+        $msg = 'SQLSTATE[HY000]: General error: 2014 Cannot execute queries while other '
+            .'unbuffered queries are active.  Consider using PDOStatement::fetchAll().  '
+            .'Alternatively, if your code is only ever going to run against mysql, you '
+            .'may enable query buffering by setting the PDO::MYSQL_ATTR_USE_BUFFERED_QUERY attribute.';
+        $this->expectExceptionMessage($msg);
+
+        $this->fixture->processTables(2, 'check');
+        $this->fixture->processTables(2, 'optimize');
+        $this->fixture->processTables(2, 'repair');
+    }
+
+    /*
      * Tests for renameTo
      */
 
@@ -644,10 +662,7 @@ XML;
         /*
          * remove all tables
          */
-        $tables = $this->fixture->getDBObject()->fetchList('SHOW TABLES');
-        foreach ($tables as $table) {
-            $this->fixture->getDBObject()->simpleQuery('DROP TABLE '.$table['Tables_in_'.$this->fixture->a['db_name']]);
-        }
+        $this->fixture->getDBObject()->deleteAllTables();
 
         /*
          * create fresh store and check tables
@@ -657,7 +672,10 @@ XML;
         $tables = $this->fixture->getDBObject()->fetchList('SHOW TABLES');
         foreach ($tables as $table) {
             $this->assertTrue(
-                false !== strpos($table['Tables_in_'.$this->fixture->a['db_name']], $this->dbConfig['db_table_prefix'].'_')
+                false !== strpos(
+                    $table['Tables_in_'.$this->fixture->a['db_name']],
+                    $this->dbConfig['db_table_prefix'].'_'
+                )
             );
         }
 

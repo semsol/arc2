@@ -14,10 +14,7 @@ class ARC2_StoreTest extends ARC2_TestCase
         $this->fixture->createDBCon();
 
         // remove all tables
-        $tables = $this->fixture->getDBObject()->fetchList('SHOW TABLES');
-        foreach ($tables as $table) {
-            $this->fixture->getDBObject()->simpleQuery('DROP TABLE '.$table['Tables_in_'.$this->dbConfig['db_name']]);
-        }
+        $this->fixture->getDBObject()->deleteAllTables();
 
         // fresh setup of ARC2
         $this->fixture->setup();

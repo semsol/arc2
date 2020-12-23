@@ -60,9 +60,9 @@ class ARC2_TestHandler extends ARC2_Class
             }
             $this->reader->closeStream();
             unset($this->reader);
-            $fp = @fopen('tmp/'.$fname, 'w');
-            @fwrite($fp, $r);
-            @fclose($fp);
+            $fp = fopen('tmp/'.$fname, 'w');
+            fwrite($fp, $r);
+            fclose($fp);
 
             return $r;
         }

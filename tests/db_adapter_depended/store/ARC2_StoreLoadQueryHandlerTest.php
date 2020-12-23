@@ -19,14 +19,7 @@ class ARC2_StoreLoadQueryHandlerTest extends ARC2_TestCase
         $this->store->createDBCon();
 
         // remove all tables
-        if (false === $this->store->getDBObject() instanceof PDOSQLite) {
-            $tables = $this->store->getDBObject()->fetchList('SHOW TABLES');
-            foreach ($tables as $table) {
-                $this->store->getDBObject()->simpleQuery(
-                    'DROP TABLE '.$table['Tables_in_'.$this->dbConfig['db_name']]
-                );
-            }
-        }
+        $this->store->getDBObject()->deleteAllTables();
         $this->store->setUp();
 
         $this->fixture = new ARC2_StoreLoadQueryHandler($this->store, $this);

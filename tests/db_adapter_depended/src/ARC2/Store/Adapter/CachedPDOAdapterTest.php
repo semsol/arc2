@@ -28,10 +28,7 @@ class CachedPDOAdapterTest extends ARC2_TestCase
         $this->fixture = new CachedPDOAdapter($this->dbConfig);
 
         // remove all tables
-        $tables = $this->fixture->fetchList('SHOW TABLES');
-        foreach ($tables as $table) {
-            $this->fixture->simpleQuery('DROP TABLE '.$table['Tables_in_'.$this->dbConfig['db_name']]);
-        }
+        $this->fixture->deleteAllTables();
     }
 
     public function testFetchRow()

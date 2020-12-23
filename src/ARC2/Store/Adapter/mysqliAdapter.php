@@ -252,6 +252,10 @@ class mysqliAdapter extends AbstractAdapter
      */
     public function exec($sql)
     {
+        if (null == $this->db) {
+            $this->connect();
+        }
+
         $this->db->simpleQuery($sql);
 
         return $this->db->getAffectedRows();

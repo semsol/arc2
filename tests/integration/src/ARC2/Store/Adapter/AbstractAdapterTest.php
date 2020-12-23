@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\unit\src\ARC2\Store\Adapter;
+namespace Tests\integration\src\ARC2\Store\Adapter;
 
 use Tests\ARC2_TestCase;
 
@@ -30,10 +30,7 @@ abstract class AbstractAdapterTest extends ARC2_TestCase
         $this->fixture->connect();
 
         // remove all tables
-        $tables = $this->fixture->fetchList('SHOW TABLES');
-        foreach ($tables as $table) {
-            $this->fixture->simpleQuery('DROP TABLE '.$table['Tables_in_'.$this->dbConfig['db_name']]);
-        }
+        $this->fixture->deleteAllTables();
     }
 
     protected function tearDown(): void
@@ -48,7 +45,7 @@ abstract class AbstractAdapterTest extends ARC2_TestCase
         // remove all tables
         $tables = $this->fixture->fetchList('SHOW TABLES');
         foreach ($tables as $table) {
-            $this->fixture->simpleQuery('DROP TABLE '.$table['Tables_in_'.$this->dbConfig['db_name']]);
+            $this->fixture->exec('DROP TABLE '.$table['Tables_in_'.$this->dbConfig['db_name']]);
         }
     }
 
@@ -74,9 +71,9 @@ abstract class AbstractAdapterTest extends ARC2_TestCase
 
     public function testExec()
     {
-        $this->fixture->simpleQuery('CREATE TABLE users (id INT(6), name VARCHAR(30) NOT NULL)');
-        $this->fixture->simpleQuery('INSERT INTO users (id, name) VALUE (1, "foobar");');
-        $this->fixture->simpleQuery('INSERT INTO users (id, name) VALUE (2, "foobar2");');
+        $this->fixture->exec('CREATE TABLE users (id INT(6), name VARCHAR(30) NOT NULL)');
+        $this->fixture->exec('INSERT INTO users (id, name) VALUE (1, "foobar");');
+        $this->fixture->exec('INSERT INTO users (id, name) VALUE (2, "foobar2");');
 
         $this->assertEquals(2, $this->fixture->exec('DELETE FROM users;'));
     }
@@ -92,11 +89,11 @@ abstract class AbstractAdapterTest extends ARC2_TestCase
             id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
             name VARCHAR(30) NOT NULL
         )';
-        $this->fixture->simpleQuery($sql);
+        $this->fixture->exec($sql);
         $this->assertFalse($this->fixture->fetchRow('SELECT * FROM users'));
 
         // add data
-        $this->fixture->simpleQuery('INSERT INTO users (id, name) VALUE (1, "foobar");');
+        $this->fixture->exec('INSERT INTO users (id, name) VALUE (1, "foobar");');
         $this->assertEquals(
             [
                 'id' => 1,
@@ -117,11 +114,11 @@ abstract class AbstractAdapterTest extends ARC2_TestCase
             id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
             name VARCHAR(30) NOT NULL
         )';
-        $this->fixture->simpleQuery($sql);
+        $this->fixture->exec($sql);
         $this->assertEquals([], $this->fixture->fetchList('SELECT * FROM users'));
 
         // add data
-        $this->fixture->simpleQuery('INSERT INTO users (id, name) VALUE (1, "foobar");');
+        $this->fixture->exec('INSERT INTO users (id, name) VALUE (1, "foobar");');
         $this->assertEquals(
             [
                 [
@@ -156,7 +153,7 @@ abstract class AbstractAdapterTest extends ARC2_TestCase
           val text NOT NULL,
           UNIQUE KEY (k)
         ) ENGINE=MyISAM CHARACTER SET utf8 COLLATE utf8_unicode_ci DELAY_KEY_WRITE = 1';
-        $this->fixture->simpleQuery($sql);
+        $this->fixture->exec($sql);
 
         $this->assertEquals('utf8_unicode_ci', $this->fixture->getCollation());
     }
@@ -196,7 +193,7 @@ abstract class AbstractAdapterTest extends ARC2_TestCase
     public function testGetNumberOfRows()
     {
         // create test table
-        $this->fixture->simpleQuery('
+        $this->fixture->exec('
             CREATE TABLE pet (name VARCHAR(20));
         ');
 
@@ -211,7 +208,7 @@ abstract class AbstractAdapterTest extends ARC2_TestCase
     {
         // valid query
         $sql = 'CREATE TABLE MyGuests (id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY)';
-        $this->fixture->simpleQuery($sql);
+        $this->fixture->exec($sql);
 
         $foundTable = false;
         foreach ($this->fixture->fetchList('SHOW TABLES') as $entry) {
@@ -255,16 +252,16 @@ abstract class AbstractAdapterTest extends ARC2_TestCase
     }
 
     /*
-     * Tests for simpleQuery
+     * Tests for exec
      */
 
     public function testSimpleQueryNoConnection()
     {
-        // test, that it creates a connection itself, when calling simpleQuery
+        // test, that it creates a connection itself, when calling exec
         $this->fixture->disconnect();
 
         $db = $this->getAdapterInstance($this->dbConfig);
         $sql = 'CREATE TABLE MyGuests (id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY)';
-        $this->assertTrue($db->simpleQuery($sql));
+        $this->assertEquals(0, $db->exec($sql));
     }
 }

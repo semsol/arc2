@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\unit\src\ARC2\Store\Adapter;
+namespace Tests\integration\src\ARC2\Store\Adapter;
 
 use ARC2\Store\Adapter\CachedPDOAdapter;
 

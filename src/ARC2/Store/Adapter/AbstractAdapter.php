@@ -15,13 +15,6 @@ abstract class AbstractAdapter
     protected $db;
 
     /**
-     * Stores errors of failed queries.
-     *
-     * @var array
-     */
-    protected $errors = [];
-
-    /**
      * Sent queries.
      *
      * @var array
@@ -38,9 +31,23 @@ abstract class AbstractAdapter
         $this->checkRequirements();
     }
 
+    public function deleteAllTables(): void
+    {
+        // remove all tables
+        $tables = $this->fetchList('SHOW TABLES');
+        foreach ($tables as $table) {
+            $this->exec('DROP TABLE '.$table['Tables_in_'.$this->configuration['db_name']]);
+        }
+    }
+
     public function getConfiguration(): array
     {
         return $this->configuration;
+    }
+
+    public function getQueries(): array
+    {
+        return $this->queries;
     }
 
     abstract public function checkRequirements();

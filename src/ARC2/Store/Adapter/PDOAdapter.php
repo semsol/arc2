@@ -342,6 +342,10 @@ class PDOAdapter extends AbstractAdapter
             'by_function' => 'exec',
         ];
 
+        if (null == $this->db) {
+            $this->connect();
+        }
+
         return $this->db->exec($sql);
     }
 }

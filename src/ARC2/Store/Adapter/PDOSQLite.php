@@ -41,7 +41,10 @@ class PDOSQLite extends PDOAdapter
         // create your own connection
         } elseif (false === $this->db instanceof PDO) {
             // set path to SQLite file
-            if (isset($this->configuration['db_name'])) {
+            if (
+                isset($this->configuration['db_name'])
+                && !empty($this->configuration['db_name'])
+            ) {
                 $dsn = 'sqlite:'.$this->configuration['db_name'];
             } else {
                 // use in-memory
@@ -52,9 +55,7 @@ class PDOSQLite extends PDOAdapter
 
             $this->db->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
 
-            // errors DONT lead to exceptions
-            // set to false for compatibility reasons with mysqli. ARC2 using mysqli does not throw any
-            // exceptions, instead collects errors in a hidden array.
+            // errors lead to exceptions
             $this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
             // default fetch mode is associative
@@ -62,6 +63,10 @@ class PDOSQLite extends PDOAdapter
         }
 
         return $this->db;
+    }
+
+    public function deleteAllTables(): void
+    {
     }
 
     public function getCollation()
