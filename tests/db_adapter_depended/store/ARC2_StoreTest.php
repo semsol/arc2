@@ -631,29 +631,6 @@ XML;
     }
 
     /*
-     * Tests for logQuery
-     */
-
-    /**
-     * This test captures a weird situation: when running CHECK TABLE xxx multiple times,
-     * you will receive the exception below.
-     *
-     * @todo remove this, if processTables gets removed too
-     */
-    public function testProcessTables()
-    {
-        $msg = 'SQLSTATE[HY000]: General error: 2014 Cannot execute queries while other '
-            .'unbuffered queries are active.  Consider using PDOStatement::fetchAll().  '
-            .'Alternatively, if your code is only ever going to run against mysql, you '
-            .'may enable query buffering by setting the PDO::MYSQL_ATTR_USE_BUFFERED_QUERY attribute.';
-        $this->expectExceptionMessage($msg);
-
-        $this->fixture->processTables(2, 'check');
-        $this->fixture->processTables(2, 'optimize');
-        $this->fixture->processTables(2, 'repair');
-    }
-
-    /*
      * Tests for renameTo
      */
 
