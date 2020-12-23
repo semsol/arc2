@@ -12,6 +12,10 @@ class mysqliAdapterTest extends AbstractAdapterTest
         if (false == \extension_loaded('mysqli') || false == \function_exists('mysqli_connect')) {
             $this->markTestSkipped('Test skipped, because extension mysqli is not installed.');
         }
+
+        if ('mysqli' !== $this->dbConfig['db_adapter']) {
+            $this->markTestSkipped('Db adapter is not mysqli, therefore skip tests with queryDB.');
+        }
     }
 
     protected function getAdapterInstance($configuration)

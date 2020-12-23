@@ -19,6 +19,10 @@ class PDOAdapterTest extends AbstractAdapterTest
                 'Test skipped, because db_pdo_protocol is not set. Its ok, if this happens in unit test environment.'
             );
         }
+
+        if ('mysql' !== $this->dbConfig['db_pdo_protocol']) {
+            $this->markTestSkipped('Skipped, because PDO protocol is not "mysql".');
+        }
     }
 
     protected function getAdapterInstance($configuration)
