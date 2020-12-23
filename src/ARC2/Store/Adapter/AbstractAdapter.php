@@ -15,6 +15,11 @@ abstract class AbstractAdapter
     protected $db;
 
     /**
+     * @var int
+     */
+    protected $lastRowCount;
+
+    /**
      * Sent queries.
      *
      * @var array
@@ -27,6 +32,7 @@ abstract class AbstractAdapter
     public function __construct(array $configuration = [])
     {
         $this->configuration = $configuration;
+        $this->lastRowCount = 0;
 
         $this->checkRequirements();
     }

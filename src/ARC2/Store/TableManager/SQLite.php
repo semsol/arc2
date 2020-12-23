@@ -21,31 +21,17 @@ class SQLite extends ARC2_Store
         parent::__construct($a, $caller);
     }
 
-    public function createTables()
+    public function createTables(): void
     {
-        if (!$this->createTripleTable()) {
-            return $this->addError('Could not create "triple" table ('.$this->a['db_object']->getErrorMessage().').');
-        }
-        if (!$this->createG2TTable()) {
-            return $this->addError('Could not create "g2t" table ('.$this->a['db_object']->getErrorMessage().').');
-        }
-        if (!$this->createID2ValTable()) {
-            return $this->addError('Could not create "id2val" table ('.$this->a['db_object']->getErrorMessage().').');
-        }
-        if (!$this->createS2ValTable()) {
-            return $this->addError('Could not create "s2val" table ('.$this->a['db_object']->getErrorMessage().').');
-        }
-        if (!$this->createO2ValTable()) {
-            return $this->addError('Could not create "o2val" table ('.$this->a['db_object']->getErrorMessage().').');
-        }
-        if (!$this->createSettingTable()) {
-            return $this->addError('Could not create "setting" table ('.$this->a['db_object']->getErrorMessage().').');
-        }
-
-        return 1;
+        $this->createTripleTable();
+        $this->createG2TTable();
+        $this->createID2ValTable();
+        $this->createS2ValTable();
+        $this->createO2ValTable();
+        $this->createSettingTable();
     }
 
-    public function createTripleTable($suffix = 'triple')
+    public function createTripleTable($suffix = 'triple'): void
     {
         $sql = 'CREATE TABLE IF NOT EXISTS '.$this->getTablePrefix().$suffix.' (
             t INTEGER UNSIGNED NOT NULL UNIQUE,
@@ -53,16 +39,16 @@ class SQLite extends ARC2_Store
             p INTEGER UNSIGNED NOT NULL,
             o INTEGER UNSIGNED NOT NULL,
             o_lang_dt INTEGER UNSIGNED NOT NULL,
-            o_comp TEXT NOT NULL,                    -- normalized value for ORDER BY operations
-            s_type INTEGER UNSIGNED NOT NULL DEFAULT 0,       -- uri/bnode => 0/1
-            o_type INTEGER UNSIGNED NOT NULL DEFAULT 0,       -- uri/bnode/literal => 0/1/2
-            misc INTEGER NOT NULL DEFAULT 0          -- temporary flags
+            o_comp TEXT NOT NULL,                       -- normalized value for ORDER BY operations
+            s_type INTEGER UNSIGNED NOT NULL DEFAULT 0, -- uri/bnode => 0/1
+            o_type INTEGER UNSIGNED NOT NULL DEFAULT 0, -- uri/bnode/literal => 0/1/2
+            misc INTEGER NOT NULL DEFAULT 0             -- temporary flags
         )';
 
-        return $this->a['db_object']->exec($sql);
+        $this->a['db_object']->exec($sql);
     }
 
-    public function createG2TTable()
+    public function createG2TTable(): void
     {
         $sql = 'CREATE TABLE IF NOT EXISTS '.$this->getTablePrefix().'g2t (
             g INTEGER UNSIGNED NOT NULL,
@@ -70,10 +56,10 @@ class SQLite extends ARC2_Store
             UNIQUE (g,t)
         )';
 
-        return $this->a['db_object']->exec($sql);
+        $this->a['db_object']->exec($sql);
     }
 
-    public function createID2ValTable()
+    public function createID2ValTable(): void
     {
         $sql = 'CREATE TABLE IF NOT EXISTS '.$this->getTablePrefix().'id2val (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -83,10 +69,10 @@ class SQLite extends ARC2_Store
             UNIQUE (id,val_type)
         )';
 
-        return $this->a['db_object']->exec($sql);
+        $this->a['db_object']->exec($sql);
     }
 
-    public function createS2ValTable()
+    public function createS2ValTable(): void
     {
         $sql = 'CREATE TABLE IF NOT EXISTS '.$this->getTablePrefix().'s2val (
             id INTEGER UNSIGNED NOT NULL,
@@ -96,10 +82,10 @@ class SQLite extends ARC2_Store
             UNIQUE (id)
         )';
 
-        return $this->a['db_object']->exec($sql);
+        $this->a['db_object']->exec($sql);
     }
 
-    public function createO2ValTable()
+    public function createO2ValTable(): void
     {
         $sql = 'CREATE TABLE IF NOT EXISTS '.$this->getTablePrefix().'o2val (
             id INTEGER NOT NULL,
@@ -109,10 +95,10 @@ class SQLite extends ARC2_Store
             UNIQUE (id)
         )';
 
-        return $this->a['db_object']->exec($sql);
+        $this->a['db_object']->exec($sql);
     }
 
-    public function createSettingTable()
+    public function createSettingTable(): void
     {
         $sql = 'CREATE TABLE IF NOT EXISTS '.$this->getTablePrefix().'setting (
             k TEXT NOT NULL,
@@ -120,6 +106,6 @@ class SQLite extends ARC2_Store
             UNIQUE (k)
         )';
 
-        return $this->a['db_object']->exec($sql);
+        $this->a['db_object']->exec($sql);
     }
 }

@@ -78,7 +78,8 @@ class ARC2_Store extends ARC2_Class
     public function createDBCon()
     {
         // build connection credential array
-        foreach (['db_host' => 'localhost', 'db_user' => '', 'db_pwd' => '', 'db_name' => ''] as $k => $v) {
+        $credentArr = ['db_host' => 'localhost', 'db_user' => '', 'db_pwd' => '', 'db_name' => ''];
+        foreach ($credentArr as $k => $v) {
             $this->a[$k] = $this->v($k, $v, $this->a);
         }
 
@@ -327,30 +328,22 @@ class ARC2_Store extends ARC2_Class
 
             try {
                 // mysqli way
-                return $this->db->simpleQuery('SELECT 1 FROM '.$tbl.' LIMIT 0') ? 1 : 0;
+                $this->db->fetchRow('SELECT 1 FROM '.$tbl.' LIMIT 1');
+
+                return true;
             } catch (\Exception $e) {
                 // when using PDO, an exception gets thrown if $tbl does not exist.
-                $this->errors[] = $e->getMessage();
-
-                return 0;
             }
         }
 
-        return 0;
+        return false;
     }
 
     public function setUp($force = 0)
     {
         if (($force || !$this->isSetUp()) && false !== $this->getDBCon()) {
-            $db = $this->getDBObject();
-
             // PDO with SQLite
-            if (
-                null !== $db
-                && $db->getConfiguration()
-                && 'pdo' == $db->getAdapterName()
-                && 'sqlite' == $db->getConfiguration()['db_pdo_protocol']
-            ) {
+            if ($this->a['db_object'] instanceof PDOSQLite) {
                 (new SQLite($this->a, $this))->createTables();
             } else {
                 // default way
@@ -489,7 +482,11 @@ class ARC2_Store extends ARC2_Class
             if ($keep_settings && ('setting' == $tbl)) {
                 continue;
             }
-            $this->db->simpleQuery('TRUNCATE '.$prefix.$tbl);
+            if ($this->getDBObject() instanceof PDOSQLite) {
+                $this->db->simpleQuery('DELETE FROM '.$prefix.$tbl);
+            } else {
+                $this->db->simpleQuery('TRUNCATE '.$prefix.$tbl);
+            }
         }
     }
 
@@ -587,7 +584,7 @@ class ARC2_Store extends ARC2_Class
         }
 
         foreach ($tbls as $tbl) {
-            $this->db->simpleQuery('INSERT IGNORE INTO '.$new_prefix.$tbl.' SELECT * FROM '.$old_prefix.$tbl);
+            $this->db->simpleQuery($sqlHead.$new_prefix.$tbl.' SELECT * FROM '.$old_prefix.$tbl);
             if (!empty($this->db->getErrorMessage())) {
                 return $this->addError($this->db->getErrorMessage());
             }
@@ -860,7 +857,18 @@ class ARC2_Store extends ARC2_Class
 
     public function releaseLock()
     {
-        return $this->db->simpleQuery('DO RELEASE_LOCK("'.$this->a['db_name'].'.'.$this->getTablePrefix().'.write_lock")');
+        /*
+         * We assume locks are not required when using SQLite.
+         * Either its an in memory database, which has no concurrent reads
+         * or its a file and SQLite takes care of it.
+         */
+        if ($this->getDBObject() instanceof PDOSQLite) {
+            return true;
+        }
+
+        $sql = 'DO RELEASE_LOCK("'.$this->a['db_name'].'.'.$this->getTablePrefix().'.write_lock")';
+
+        return $this->db->simpleQuery($sql);
     }
 
     /**

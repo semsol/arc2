@@ -29,7 +29,7 @@ class PDOSQLite extends PDOAdapter
     /**
      * Connect to server or storing a given connection.
      *
-     * @param EasyDB $existingConnection default is null
+     * @param PDO $existingConnection default is null
      */
     public function connect($existingConnection = null)
     {
@@ -60,6 +60,30 @@ class PDOSQLite extends PDOAdapter
 
             // default fetch mode is associative
             $this->db->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+
+            /*
+             * define CONCAT function (otherwise SQLite will throw an exception)
+             */
+            $this->db->sqliteCreateFunction('CONCAT', function ($pattern, $string) {
+                $result = '';
+
+                foreach (\func_get_args() as $str) {
+                    $result .= $str;
+                }
+
+                return $result;
+            });
+
+            /*
+             * define REGEXP function (otherwise SQLite will throw an exception)
+             */
+            $this->db->sqliteCreateFunction('REGEXP', function ($pattern, $string) {
+                if (0 < preg_match('/'.$pattern.'/i', $string)) {
+                    return true;
+                }
+
+                return false;
+            }, 2);
         }
 
         return $this->db;
@@ -67,6 +91,11 @@ class PDOSQLite extends PDOAdapter
 
     public function deleteAllTables(): void
     {
+        $this->exec(
+            'SELECT "drop table " || name || ";"
+               FROM sqlite_master
+              WHERE type = "table";'
+        );
     }
 
     public function getCollation()
@@ -91,6 +120,6 @@ class PDOSQLite extends PDOAdapter
 
     public function getServerVersion()
     {
-        return null;
+        return $this->fetchRow('select sqlite_version()')['sqlite_version()'];
     }
 }

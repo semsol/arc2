@@ -248,10 +248,14 @@ class mysqliAdapter extends AbstractAdapter
     /**
      * @param string $sql Query with return of affected rows
      *
-     * @return bool true if query ran fine, false otherwise
+     * @return int number of affected rows
      */
     public function exec($sql)
     {
+        if (null == $this->db) {
+            $this->connect();
+        }
+
         $this->db->simpleQuery($sql);
 
         return $this->db->getAffectedRows();

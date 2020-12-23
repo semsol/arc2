@@ -2,6 +2,7 @@
 
 namespace Tests\db_adapter_depended\store;
 
+use ARC2\Store\Adapter\PDOSQLite;
 use Tests\ARC2_TestCase;
 
 class ARC2_StoreTest extends ARC2_TestCase
@@ -338,7 +339,14 @@ XML;
     // just check pattern
     public function testGetDBVersion()
     {
-        $result = preg_match('/[0-9]{2}-[0-9]{2}-[0-9]{2}/', $this->fixture->getDBVersion(), $match);
+        // SQLite
+        if ($this->fixture->getDBObject() instanceof PDOSQLite) {
+            $pattern = '/[0-9]{1,}\.[0-9]{1,}\.[0-9]{1,}/';
+        } else {
+            // MySQL
+            $pattern = '/[0-9]{2}-[0-9]{2}-[0-9]{2}/';
+        }
+        $result = preg_match($pattern, $this->fixture->getDBVersion(), $match);
         $this->assertEquals(1, $result);
     }
 
@@ -733,7 +741,10 @@ XML;
 
     public function testReplicateTo()
     {
-        if ('05-06' == substr($this->fixture->getDBVersion(), 0, 5)) {
+        if (
+            '05-06' == substr($this->fixture->getDBVersion(), 0, 5)
+            && false === $this->fixture->getDBObject() instanceof PDOSQLite
+        ) {
             $this->markTestSkipped(
                 'With MySQL 5.6 ARC2_Store::replicateTo does not work. Tables keep their names.'
             );

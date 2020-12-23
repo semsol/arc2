@@ -14,7 +14,8 @@ ARC2::inc('StoreQueryHandler');
 class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler
 {
     public function __construct($a, &$caller)
-    {/* caller has to be a store */
+    {
+        /* caller has to be a store */
         parent::__construct($a, $caller);
     }
 
@@ -24,7 +25,8 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler
     }
 
     public function __init()
-    {/* db_con, store_log_inserts */
+    {
+        /* db_con, store_log_inserts */
         parent::__init();
         $this->store = $this->caller;
         $this->write_buffer_size = $this->v('store_write_buffer', 2500, $this->a);
@@ -90,11 +92,12 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler
         $this->max_term_id = $this->getMaxTermID();
         $this->max_triple_id = $this->getMaxTripleID();
         $this->column_type = $this->store->getColumnType();
-        //$this->createMergeTable();
+
         $this->term_ids = [];
         $this->triple_ids = [];
         $this->sql_buffers = [];
         $r = $loader->parse($url, $data);
+
         /* done */
         $this->checkSQLBuffers(1);
         if ($this->log_inserts) {
@@ -229,7 +232,13 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler
         }
         /* db */
         $tbl_prefix = $this->store->getTablePrefix();
-        $sub_tbls = ('id' == $tbl) ? ['id2val', 's2val', 'o2val'] : ('s' == $tbl ? ['s2val', 'id2val', 'o2val'] : ['o2val', 'id2val', 's2val']);
+        $sub_tbls = ('id' == $tbl)
+            ? ['id2val', 's2val', 'o2val']
+            : ('s' == $tbl
+                ? ['s2val', 'id2val', 'o2val']
+                : ['o2val', 'id2val', 's2val']
+            );
+
         foreach ($sub_tbls as $sub_tbl) {
             $id = 0;
             /* via hash */
@@ -309,18 +318,20 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler
         /* db */
         $sql = 'SELECT t
                   FROM '.$this->store->getTablePrefix().'triple
-                 WHERE s = '.$t['s'].' AND p = '.$t['p'].' AND o = '.$t['o'].'
-                        AND o_lang_dt = '.$t['o_lang_dt'].' AND s_type = '.$t['s_type'].'
-                        AND o_type = '.$t['o_type'].'
+                 WHERE s = '.$t['s'].'
+                    AND p = '.$t['p'].'
+                    AND o = '.$t['o'].'
+                    AND o_lang_dt = '.$t['o_lang_dt'].'
+                    AND s_type = '.$t['s_type'].'
+                    AND o_type = '.$t['o_type'].'
                  LIMIT 1';
         $row = $this->store->a['db_object']->fetchRow($sql);
         if (isset($row['t'])) {
             $this->triple_ids[$val] = $row['t']; /* hack for "don't insert this triple" */
 
             return [$row['t']]; /* hack for "don't insert this triple" */
-
-        /* new */
         } else {
+            /* new */
             $this->triple_ids[$val] = $this->max_triple_id;
             ++$this->max_triple_id;
             /* split tables ? */
@@ -342,7 +353,11 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler
     public function getOComp($val)
     {
         /* try date (e.g. 21 August 2007) */
-        if (preg_match('/^[0-9]{1,2}\s+[a-z]+\s+[0-9]{4}/i', $val) && ($uts = strtotime($val)) && (-1 !== $uts)) {
+        if (
+            preg_match('/^[0-9]{1,2}\s+[a-z]+\s+[0-9]{4}/i', $val)
+            && ($uts = strtotime($val))
+            && (-1 !== $uts)
+        ) {
             return date("Y-m-d\TH:i:s", $uts);
         }
 
@@ -363,8 +378,7 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler
             return $val;
         }
 
-        /* any other string: remove tags, linebreaks etc., but keep MB-chars  */
-        //$val = substr(trim(preg_replace('/[\W\s]+/is', '-', strip_tags($val))), 0, 35);
+        /* any other string: remove tags, linebreaks etc., but keep MB-chars */
         // [\PL\s]+ ( = non-Letters) kills digits
         $re = $this->has_pcre_unicode ? '/[\PL\s]+/isu' : '/[\s\'\"\´\`]+/is';
         $re = '/[\s\'\"\´\`]+/is';
@@ -412,8 +426,18 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler
     {
         $tbl = 'g2t';
         $sql = ', ';
+
+        /*
+         * Use appropriate INSERT syntax, depending on the DBS.
+         */
+        if ($this->store->getDBObject() instanceof PDOSQLite) {
+            $sqlHead = 'INSERT OR IGNORE INTO ';
+        } else {
+            $sqlHead = 'INSERT IGNORE INTO ';
+        }
+
         if (!isset($this->sql_buffers[$tbl])) {
-            $this->sql_buffers[$tbl] = 'INSERT IGNORE INTO '.$this->store->getTablePrefix().$tbl.' (g, t) VALUES';
+            $this->sql_buffers[$tbl] = $sqlHead.$this->store->getTablePrefix().$tbl.' (g, t) VALUES';
             $sql = ' ';
         }
         $this->sql_buffers[$tbl] .= $sql.'('.$g2t['g'].', '.$g2t['t'].')';
@@ -434,7 +458,17 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler
         }
         if (!isset($this->sql_buffers[$tbl])) {
             $this->sql_buffers[$tbl] = '';
-            $sql = 'INSERT IGNORE INTO '.$this->store->getTablePrefix().$tbl.'('.$cols.') VALUES ';
+
+            /*
+             * Use appropriate INSERT syntax, depending on the DBS.
+             */
+            if ($this->store->getDBObject() instanceof PDOSQLite) {
+                $sqlHead = 'INSERT OR IGNORE INTO ';
+            } else {
+                $sqlHead = 'INSERT IGNORE INTO ';
+            }
+
+            $sql = $sqlHead.$this->store->getTablePrefix().$tbl.'('.$cols.') VALUES ';
         } else {
             $sql = ', ';
         }
@@ -538,7 +572,7 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler
         $speed_now = round($tc_diff / $dur_diff);
 
         $r = $tc_diff.' in '.round($dur_diff, 5).' = '.$speed_now.' t/s  ('.$tc_now.' in '.round($dur_full, 5).' = '.$speed_full.' t/s )';
-        $fp = fopen('arc_insert_log.txt', 'a');
+        $fp = fopen(__DIR__.'/../arc_insert_log.txt', 'a');
         fwrite($fp, $r."\r\n");
         fclose($fp);
 

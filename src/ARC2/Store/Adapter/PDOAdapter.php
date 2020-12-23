@@ -36,6 +36,11 @@ class PDOAdapter extends AbstractAdapter
         return 'pdo';
     }
 
+    public function getAffectedRows(): int
+    {
+        return $this->lastRowCount;
+    }
+
     /**
      * Connect to server or storing a given connection.
      *
@@ -322,6 +327,7 @@ class PDOAdapter extends AbstractAdapter
 
         $stmt = $this->db->prepare($sql);
         $stmt->execute();
+        $this->lastRowCount = $stmt->rowCount();
         $stmt->closeCursor();
 
         return true;
