@@ -49,11 +49,12 @@ if (file_exists(__DIR__.'/config.php')) {
          */
         $dbConfig['db_adapter'] = getenv('DB_ADAPTER') ?? $_SERVER['DB_ADAPTER'];
         if ('pdo' == $dbConfig['db_adapter']) {
-            $dbConfig['db_pdo_protcol'] = getenv('DB_PDO_PROTOCOL') ?? $_SERVER['DB_PDO_PROTOCOL'];
+            $dbConfig['db_pdo_protocol'] = getenv('DB_PDO_PROTOCOL') ?? $_SERVER['DB_PDO_PROTOCOL'];
 
             if (empty($dbConfig['db_pdo_protocol'])) {
                 throw new \Exception(
-                    'Environment variable DB_PDO_PROTOCOL not set. Possible values are: mysql, sqlite'
+                    'Neither environment variable DB_PDO_PROTOCOL nor $_SERVER["DB_PDO_PROTOCOL"] are set.'
+                    .' Possible values are: mysql, sqlite'
                 );
             }
         } elseif ('mysqli' == $dbConfig['db_adapter']) {
