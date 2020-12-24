@@ -77,5 +77,7 @@ if (file_exists(__DIR__.'/config.php')) {
             $dbConfig['cache_enabled'] = true;
             $dbConfig['cache_instance'] = new Symfony\Component\Cache\Simple\ArrayCache();
         }
+
+        var_dump($dbConfig);
     }
 }
