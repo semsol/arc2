@@ -43,7 +43,7 @@ if ('pdo' == getenv('DB_ADAPTER')) {
     } else {
         throw new \Exception('Environment variable DB_PDO_PROTOCOL not set. Possible values are: mysql');
     }
-} elseif (!isset($dbConfig['db_adapter'])) {
+} elseif ('mysqli' == getenv('DB_ADAPTER')) {
     $dbConfig['db_adapter'] = 'mysqli';
 }
 
