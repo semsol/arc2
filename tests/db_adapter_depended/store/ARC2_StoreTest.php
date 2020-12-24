@@ -658,8 +658,10 @@ XML;
          */
         $this->fixture->setup();
 
-        foreach ($this->fixture->getDBObject()->getAllTables() as $table) {
-            $this->assertTrue(false !== strpos($table, $this->dbConfig['db_table_prefix'].'_'));
+        if (isset($this->dbConfig['db_table_prefix'])) {
+            foreach ($this->fixture->getDBObject()->getAllTables() as $table) {
+                $this->assertTrue(false !== strpos($table, $this->dbConfig['db_table_prefix'].'_'));
+            }
         }
 
         /*

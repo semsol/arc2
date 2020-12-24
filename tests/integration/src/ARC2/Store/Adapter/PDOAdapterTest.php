@@ -37,7 +37,12 @@ class PDOAdapterTest extends AbstractAdapterTest
         // create connection outside of the instance
         $dsn = $this->dbConfig['db_pdo_protocol'].':host='.$this->dbConfig['db_host'];
         $dsn .= ';dbname='.$this->dbConfig['db_name'];
+
+        // port
+        $dsn .= ';port='.$this->dbConfig['db_port'];
+
         $dsn .= ';charset=utf8mb4';
+
         $connection = new \PDO(
             $dsn,
             $this->dbConfig['db_user'],

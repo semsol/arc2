@@ -34,17 +34,17 @@ if (file_exists(__DIR__.'/config.php')) {
         $dbConfig = ['db_adapter' => 'pdo', 'db_pdo_protocol' => 'sqlite'];
     } else {
         /**
-         * Either one of: pdo (mysql, sqlite), mysqli
+         * Either one of: pdo (mysql, sqlite), mysqli.
          */
         $dbConfig = [
             'db_name' => 'arc2_test',
             'db_user' => 'root',
-            'db_pwd'  => 'Pass123',
+            'db_pwd' => 'Pass123',
             'db_host' => '127.0.0.1',
             'db_port' => $_SERVER['DB_PORT'] ?: 3306,
         ];
 
-        /**
+        /*
          * DB Adapter (PDO or mysqli)
          */
         $dbConfig['db_adapter'] = getenv('DB_ADAPTER') ?? $_SERVER['DB_ADAPTER'];
@@ -52,10 +52,7 @@ if (file_exists(__DIR__.'/config.php')) {
             $dbConfig['db_pdo_protocol'] = getenv('DB_PDO_PROTOCOL') ?? $_SERVER['DB_PDO_PROTOCOL'];
 
             if (empty($dbConfig['db_pdo_protocol'])) {
-                throw new \Exception(
-                    'Neither environment variable DB_PDO_PROTOCOL nor $_SERVER["DB_PDO_PROTOCOL"] are set.'
-                    .' Possible values are: mysql, sqlite'
-                );
+                throw new \Exception('Neither environment variable DB_PDO_PROTOCOL nor $_SERVER["DB_PDO_PROTOCOL"] are set.'.' Possible values are: mysql, sqlite');
             }
         } elseif ('mysqli' == $dbConfig['db_adapter']) {
             $dbConfig['db_adapter'] = 'mysqli';
