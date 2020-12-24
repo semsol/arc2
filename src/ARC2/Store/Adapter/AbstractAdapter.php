@@ -46,6 +46,17 @@ abstract class AbstractAdapter
         }
     }
 
+    public function getAllTables(): array
+    {
+        $tables = $this->fetchList('SHOW TABLES');
+        $result = [];
+        foreach ($tables as $table) {
+            $result[] = $table['Tables_in_'.$this->configuration['db_name']];
+        }
+
+        return $result;
+    }
+
     public function getConfiguration(): array
     {
         return $this->configuration;

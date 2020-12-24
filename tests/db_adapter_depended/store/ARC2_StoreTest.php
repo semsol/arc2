@@ -253,15 +253,13 @@ XML;
     {
         // make sure all tables were created
         $this->fixture->setup();
-        $tables = $this->fixture->getDBObject()->fetchList('SHOW TABLES');
-        $this->assertEquals(6, \count($tables));
+        $this->assertEquals(6, \count($this->fixture->getDBObject()->getAllTables()));
 
         // remove all tables
         $this->fixture->drop();
 
         // check that all tables were removed
-        $tables = $this->fixture->getDBObject()->fetchList('SHOW TABLES');
-        $this->assertEquals(0, \count($tables));
+        $this->assertEquals(0, \count($this->fixture->getDBObject()->getAllTables()));
     }
 
     /*
@@ -326,7 +324,13 @@ XML;
         $res2 = $this->fixture->disableFulltextSearch();
 
         $this->assertNull($res1);
-        $this->assertEquals(1, $res2);
+
+        if ($this->fixture->getDBObject() instanceof PDOSQLite) {
+            // TODO remove that if else in the future, after ...FulltextSearch functions
+            //      got more clear return values.
+        } else {
+            $this->assertEquals(1, $res2);
+        }
 
         $this->assertEquals(0, $this->fixture->a['db_object']->getErrorCode());
         $this->assertEquals('', $this->fixture->a['db_object']->getErrorMessage());
@@ -654,14 +658,8 @@ XML;
          */
         $this->fixture->setup();
 
-        $tables = $this->fixture->getDBObject()->fetchList('SHOW TABLES');
-        foreach ($tables as $table) {
-            $this->assertTrue(
-                false !== strpos(
-                    $table['Tables_in_'.$this->fixture->a['db_name']],
-                    $this->dbConfig['db_table_prefix'].'_'
-                )
-            );
+        foreach ($this->fixture->getDBObject()->getAllTables() as $table) {
+            $this->assertTrue(false !== strpos($table, $this->dbConfig['db_table_prefix'].'_'));
         }
 
         /*
@@ -673,11 +671,12 @@ XML;
         /*
          * check for new prefixes
          */
-        $tables = $this->fixture->getDBObject()->fetchList('SHOW TABLES');
-        foreach ($tables as $table) {
-            $this->assertTrue(
-                false !== strpos($table['Tables_in_'.$this->fixture->a['db_name']], $prefix)
-            );
+        foreach ($this->fixture->getDBObject()->getAllTables() as $table) {
+            // ignore SQLite tables
+            if ('sqlite_sequence' == $table) {
+                continue;
+            }
+            $this->assertTrue(false !== strpos($table, $prefix), 'Renaming failed for '.$table);
         }
     }
 
@@ -748,6 +747,8 @@ XML;
             $this->markTestSkipped(
                 'With MySQL 5.6 ARC2_Store::replicateTo does not work. Tables keep their names.'
             );
+        } elseif ($this->fixture->getDBObject() instanceof PDOSQLite) {
+            $this->markTestSkipped('replicateTo not yet implemented when using SQLite.');
         }
 
         // test data

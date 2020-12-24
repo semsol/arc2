@@ -98,6 +98,24 @@ class PDOSQLite extends PDOAdapter
         );
     }
 
+    /**
+     * It gets all tables from the current database.
+     */
+    public function getAllTables(): array
+    {
+        $tables = $this->fetchList('SELECT name FROM sqlite_master WHERE type="table";');
+        $result = [];
+        foreach ($tables as $table) {
+            // ignore SQLite tables
+            if (false !== strpos($table['name'], 'sqlite_')) {
+                continue;
+            }
+            $result[] = $table['name'];
+        }
+
+        return $result;
+    }
+
     public function getCollation()
     {
         return '';

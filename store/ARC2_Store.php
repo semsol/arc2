@@ -224,6 +224,10 @@ class ARC2_Store extends ARC2_Class
 
     public function hasFulltextIndex()
     {
+        if ($this->getDBObject() instanceof PDOSQLite) {
+            return true;
+        }
+
         if (!isset($this->has_fulltext_index)) {
             $this->has_fulltext_index = 0;
             $tbl = $this->getTablePrefix().'o2val';
@@ -246,6 +250,10 @@ class ARC2_Store extends ARC2_Class
 
     public function enableFulltextSearch()
     {
+        if ($this->getDBObject() instanceof PDOSQLite) {
+            return;
+        }
+
         if ($this->hasFulltextIndex()) {
             return 1;
         }
@@ -255,6 +263,10 @@ class ARC2_Store extends ARC2_Class
 
     public function disableFulltextSearch()
     {
+        if ($this->getDBObject() instanceof PDOSQLite) {
+            return;
+        }
+
         if (!$this->hasFulltextIndex()) {
             return 1;
         }
@@ -555,7 +567,13 @@ class ARC2_Store extends ARC2_Class
         $new_prefix .= $new_prefix ? '_' : '';
         $new_prefix .= $name.'_';
         foreach ($tbls as $tbl) {
-            $this->db->simpleQuery('RENAME TABLE '.$old_prefix.$tbl.' TO '.$new_prefix.$tbl);
+            if ($this->getDBObject() instanceof PDOSQLite) {
+                $sql = 'ALTER TABLE '.$old_prefix.$tbl.' RENAME TO '.$new_prefix.$tbl;
+            } else {
+                $sql = 'RENAME TABLE '.$old_prefix.$tbl.' TO '.$new_prefix.$tbl;
+            }
+
+            $this->db->simpleQuery($sql);
             if (!empty($this->db->getErrorMessage())) {
                 return $this->addError($this->db->getErrorMessage());
             }
@@ -566,6 +584,10 @@ class ARC2_Store extends ARC2_Class
 
     public function replicateTo($name)
     {
+        if ($this->getDBObject() instanceof PDOSQLite) {
+            throw new Exception('replicateTo not supported with SQLite as DB adapter yet.');
+        }
+
         $conf = array_merge($this->a, ['store_name' => $name]);
         $new_store = ARC2::getStore($conf);
         $new_store->setUp();
