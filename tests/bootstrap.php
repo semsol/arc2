@@ -36,19 +36,20 @@ if (file_exists(__DIR__.'/config.php')) {
     /**
      * DB Adapter (PDO or mysqli)
      */
-    if ('pdo' == getenv('DB_ADAPTER')) {
+    $dbAdapter = getenv('DB_ADAPTER') ?? $_SERVER['DB_ADAPTER'];
+    if ('pdo' == $dbAdapter) {
         $dbConfig['db_adapter'] = 'pdo';
-        $dbConfig['db_pdo_protocol'] = getenv('DB_PDO_PROTOCOL');
+        $dbConfig['db_pdo_protocol'] = getenv('DB_PDO_PROTOCOL') ?? $_SERVER['DB_PDO_PROTOCOL'];
 
         if (empty($dbConfig['db_pdo_protocol'])) {
             throw new \Exception(
                 'Environment variable DB_PDO_PROTOCOL not set. Possible values are: mysql, sqlite'
             );
         }
-    } elseif ('mysqli' == getenv('DB_ADAPTER')) {
+    } elseif ('mysqli' == $dbAdapter) {
         $dbConfig['db_adapter'] = 'mysqli';
     } else {
-        throw new Exception('Environment variable DB_ADAPTER is not set.');
+        throw new Exception('Neither environment variable DB_ADAPTER nor $_SERVER["DB_ADAPTER"] are set.');
     }
 
     // set defaults for dbConfig entries
@@ -61,7 +62,8 @@ if (file_exists(__DIR__.'/config.php')) {
     }
 
     // SQLite in memory only: unset db_name to force it to use sqlite::memory:
-    if ('true' == getenv('DB_USE_MEMORY')) {
+    $useMemory = getenv('DB_USE_MEMORY') ?? $_SERVER['DB_USE_MEMORY'];
+    if ('true' == $useMemory) {
         unset($dbConfig['db_name']);
     }
 
