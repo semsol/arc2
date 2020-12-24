@@ -9,7 +9,7 @@
 
 use ARC2\Store\Adapter\AbstractAdapter;
 use ARC2\Store\Adapter\AdapterFactory;
-use ARC2\Store\Adapter\PDOSQLite;
+use ARC2\Store\Adapter\PDOSQLiteAdapter;
 use ARC2\Store\TableManager\SQLite;
 
 ARC2::inc('Class');
@@ -184,7 +184,7 @@ class ARC2_Store extends ARC2_Class
     {
         if (!$this->v('column_type')) {
             // SQLite
-            if ($this->getDBObject() instanceof PDOSQLite) {
+            if ($this->getDBObject() instanceof PDOSQLiteAdapter) {
                 $this->column_type = 'INTEGER';
             } else {
                 // MySQL
@@ -211,7 +211,7 @@ class ARC2_Store extends ARC2_Class
             $value = true;
 
             // only check if SQLite is NOT being used
-            if (false === $this->getDBObject() instanceof PDOSQLite) {
+            if (false === $this->getDBObject() instanceof PDOSQLiteAdapter) {
                 $row = $this->db->fetchRow('SHOW COLUMNS FROM '.$tbl.' LIKE "val_hash"');
                 $value = null !== $row;
             }
@@ -224,7 +224,7 @@ class ARC2_Store extends ARC2_Class
 
     public function hasFulltextIndex()
     {
-        if ($this->getDBObject() instanceof PDOSQLite) {
+        if ($this->getDBObject() instanceof PDOSQLiteAdapter) {
             return true;
         }
 
@@ -250,7 +250,7 @@ class ARC2_Store extends ARC2_Class
 
     public function enableFulltextSearch()
     {
-        if ($this->getDBObject() instanceof PDOSQLite) {
+        if ($this->getDBObject() instanceof PDOSQLiteAdapter) {
             return;
         }
 
@@ -263,7 +263,7 @@ class ARC2_Store extends ARC2_Class
 
     public function disableFulltextSearch()
     {
-        if ($this->getDBObject() instanceof PDOSQLite) {
+        if ($this->getDBObject() instanceof PDOSQLiteAdapter) {
             return;
         }
 
@@ -283,7 +283,7 @@ class ARC2_Store extends ARC2_Class
     {
         $amount = 1;
 
-        if (false === $this->getDBObject() instanceof PDOSQLite) {
+        if (false === $this->getDBObject() instanceof PDOSQLiteAdapter) {
             $amount = $this->db->getNumberOfRows('SHOW PROCESSLIST');
         }
 
@@ -355,7 +355,7 @@ class ARC2_Store extends ARC2_Class
     {
         if (($force || !$this->isSetUp()) && false !== $this->getDBCon()) {
             // PDO with SQLite
-            if ($this->a['db_object'] instanceof PDOSQLite) {
+            if ($this->a['db_object'] instanceof PDOSQLiteAdapter) {
                 (new SQLite($this->a, $this))->createTables();
             } else {
                 // default way
@@ -369,7 +369,7 @@ class ARC2_Store extends ARC2_Class
     {
         $cfg = $this->getDBObject()->getConfiguration();
 
-        if (false === $this->getDBObject() instanceof PDOSQLite) {
+        if (false === $this->getDBObject() instanceof PDOSQLiteAdapter) {
             ARC2::inc('StoreTableManager');
             $mgr = new ARC2_StoreTableManager($this->a, $this);
             $mgr->extendColumns();
@@ -379,7 +379,7 @@ class ARC2_Store extends ARC2_Class
 
     public function splitTables()
     {
-        if (false === $this->getDBObject() instanceof PDOSQLite) {
+        if (false === $this->getDBObject() instanceof PDOSQLiteAdapter) {
             ARC2::inc('StoreTableManager');
             $mgr = new ARC2_StoreTableManager($this->a, $this);
             $mgr->splitTables();
@@ -494,7 +494,7 @@ class ARC2_Store extends ARC2_Class
             if ($keep_settings && ('setting' == $tbl)) {
                 continue;
             }
-            if ($this->getDBObject() instanceof PDOSQLite) {
+            if ($this->getDBObject() instanceof PDOSQLiteAdapter) {
                 $this->db->simpleQuery('DELETE FROM '.$prefix.$tbl);
             } else {
                 $this->db->simpleQuery('TRUNCATE '.$prefix.$tbl);
@@ -567,7 +567,7 @@ class ARC2_Store extends ARC2_Class
         $new_prefix .= $new_prefix ? '_' : '';
         $new_prefix .= $name.'_';
         foreach ($tbls as $tbl) {
-            if ($this->getDBObject() instanceof PDOSQLite) {
+            if ($this->getDBObject() instanceof PDOSQLiteAdapter) {
                 $sql = 'ALTER TABLE '.$old_prefix.$tbl.' RENAME TO '.$new_prefix.$tbl;
             } else {
                 $sql = 'RENAME TABLE '.$old_prefix.$tbl.' TO '.$new_prefix.$tbl;
@@ -584,7 +584,7 @@ class ARC2_Store extends ARC2_Class
 
     public function replicateTo($name)
     {
-        if ($this->getDBObject() instanceof PDOSQLite) {
+        if ($this->getDBObject() instanceof PDOSQLiteAdapter) {
             throw new Exception('replicateTo not supported with SQLite as DB adapter yet.');
         }
 
@@ -599,7 +599,7 @@ class ARC2_Store extends ARC2_Class
         /*
          * Use appropriate INSERT syntax, depending on the DBS.
          */
-        if ($this->getDBObject() instanceof PDOSQLite) {
+        if ($this->getDBObject() instanceof PDOSQLiteAdapter) {
             $sqlHead = 'INSERT OR IGNORE INTO ';
         } else {
             $sqlHead = 'INSERT IGNORE INTO ';
@@ -803,7 +803,7 @@ class ARC2_Store extends ARC2_Class
         }
         /* exact match */
         else {
-            if ($this->getDBObject() instanceof PDOSQLite) {
+            if ($this->getDBObject() instanceof PDOSQLiteAdapter) {
                 $sql = 'SELECT id
                     FROM '.$this->getTablePrefix().$tbl."
                     WHERE val = '".$this->db->escape($val)."'
@@ -848,7 +848,7 @@ class ARC2_Store extends ARC2_Class
          * Either its an in memory database, which has no concurrent reads
          * or its a file and SQLite takes care of it.
          */
-        if ($this->getDBObject() instanceof PDOSQLite) {
+        if ($this->getDBObject() instanceof PDOSQLiteAdapter) {
             return 1;
         }
 
@@ -884,7 +884,7 @@ class ARC2_Store extends ARC2_Class
          * Either its an in memory database, which has no concurrent reads
          * or its a file and SQLite takes care of it.
          */
-        if ($this->getDBObject() instanceof PDOSQLite) {
+        if ($this->getDBObject() instanceof PDOSQLiteAdapter) {
             return true;
         }
 
@@ -899,7 +899,7 @@ class ARC2_Store extends ARC2_Class
     public function processTables($level = 2, $operation = 'optimize')
     {
         // no processing required when using SQLite
-        if ($this->getDBObject() instanceof PDOSQLite) {
+        if ($this->getDBObject() instanceof PDOSQLiteAdapter) {
             return;
         }
 

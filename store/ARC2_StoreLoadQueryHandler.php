@@ -7,7 +7,7 @@
  * @homepage <https://github.com/semsol/arc2>
  */
 
-use ARC2\Store\Adapter\PDOSQLite;
+use ARC2\Store\Adapter\PDOSQLiteAdapter;
 
 ARC2::inc('StoreQueryHandler');
 
@@ -173,14 +173,14 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler
             $sql .= $sql ? ' UNION ' : '';
 
             // if its NOT SQLite add ( and ) around each SELECT ... FROM ... part
-            if (false === $this->store->getDBObject() instanceof PDOSQLite) {
+            if (false === $this->store->getDBObject() instanceof PDOSQLiteAdapter) {
                 $sql .= '(';
             }
 
             $sql .= 'SELECT MAX(id) as id FROM '.$this->store->getTablePrefix().$tbl;
 
             // if its NOT SQLite add ( and ) around each SELECT ... FROM ... part
-            if (false === $this->store->getDBObject() instanceof PDOSQLite) {
+            if (false === $this->store->getDBObject() instanceof PDOSQLiteAdapter) {
                 $sql .= ')';
             }
         }
@@ -243,7 +243,7 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler
             $id = 0;
             /* via hash */
             if (preg_match('/^(s2val|o2val)$/', $sub_tbl) && $this->hasHashColumn($sub_tbl)) {
-                if ($this->store->getDBObject() instanceof PDOSQLite) {
+                if ($this->store->getDBObject() instanceof PDOSQLiteAdapter) {
                     $sql = 'SELECT id, val
                        FROM '.$tbl_prefix.$sub_tbl.'
                       WHERE val_hash = "'.$this->getValueHash($val).'"';
@@ -265,7 +265,7 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler
             } else {
                 $binaryValue = $this->store->a['db_object']->escape($val);
                 if (false !== empty($binaryValue)) {
-                    if ($this->store->getDBObject() instanceof PDOSQLite) {
+                    if ($this->store->getDBObject() instanceof PDOSQLiteAdapter) {
                         $sql = 'SELECT id
                             FROM '.$tbl_prefix.$sub_tbl."
                             WHERE val = '".$binaryValue."'";
@@ -402,7 +402,7 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler
         /*
          * Use appropriate INSERT syntax, depending on the DBS.
          */
-        if ($this->store->getDBObject() instanceof PDOSQLite) {
+        if ($this->store->getDBObject() instanceof PDOSQLiteAdapter) {
             $sqlHead = 'INSERT OR IGNORE INTO ';
         } else {
             $sqlHead = 'INSERT IGNORE INTO ';
@@ -430,7 +430,7 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler
         /*
          * Use appropriate INSERT syntax, depending on the DBS.
          */
-        if ($this->store->getDBObject() instanceof PDOSQLite) {
+        if ($this->store->getDBObject() instanceof PDOSQLiteAdapter) {
             $sqlHead = 'INSERT OR IGNORE INTO ';
         } else {
             $sqlHead = 'INSERT IGNORE INTO ';
@@ -462,7 +462,7 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler
             /*
              * Use appropriate INSERT syntax, depending on the DBS.
              */
-            if ($this->store->getDBObject() instanceof PDOSQLite) {
+            if ($this->store->getDBObject() instanceof PDOSQLiteAdapter) {
                 $sqlHead = 'INSERT OR IGNORE INTO ';
             } else {
                 $sqlHead = 'INSERT IGNORE INTO ';

@@ -7,7 +7,7 @@
  * @homepage <https://github.com/semsol/arc2>
  */
 
-use ARC2\Store\Adapter\PDOSQLite;
+use ARC2\Store\Adapter\PDOSQLiteAdapter;
 
 ARC2::inc('StoreQueryHandler');
 
@@ -121,7 +121,7 @@ class ARC2_StoreDeleteQueryHandler extends ARC2_StoreQueryHandler
                 continue;
             }
             if ($gq) {
-                if ($this->store->getDBObject() instanceof PDOSQLite) {
+                if ($this->store->getDBObject() instanceof PDOSQLiteAdapter) {
                     $sql = 'DELETE FROM '.$tbl_prefix.'g2t WHERE t IN (';
                     $sql .= '   SELECT G.t
                                   FROM '.$tbl_prefix.'g2t G
@@ -138,7 +138,7 @@ class ARC2_StoreDeleteQueryHandler extends ARC2_StoreQueryHandler
                     $this->refs_deleted = 1;
                 }
             } else {/* triples only */
-                if ($this->store->getDBObject() instanceof PDOSQLite) {
+                if ($this->store->getDBObject() instanceof PDOSQLiteAdapter) {
                     // it contains things like "T.s", but we can't use a table alias
                     // with SQLite when running DELETE queries.
                     $q = str_replace('T.', '', $q);
@@ -185,7 +185,7 @@ class ARC2_StoreDeleteQueryHandler extends ARC2_StoreQueryHandler
         $numRows = $this->store->a['db_object']->getNumberOfRows($sql);
         if (0 < $numRows) {
             /* delete unconnected triples */
-            if ($this->store->getDBObject() instanceof PDOSQLite) {
+            if ($this->store->getDBObject() instanceof PDOSQLiteAdapter) {
                 $sql = 'DELETE FROM '.$tbl_prefix.'triple WHERE t IN (';
                 $sql .= '   SELECT T.t
                               FROM '.$tbl_prefix.'triple T

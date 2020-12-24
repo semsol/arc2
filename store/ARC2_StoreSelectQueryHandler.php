@@ -9,7 +9,7 @@
  * @version   2010-11-16
  */
 
-use ARC2\Store\Adapter\PDOSQLite;
+use ARC2\Store\Adapter\PDOSQLiteAdapter;
 
 ARC2::inc('StoreQueryHandler');
 
@@ -71,7 +71,7 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler
             $sub_r = $this->getQuerySQL();
             $r .= $r ? $nl.'UNION'.$this->getDistinctSQL().$nl : '';
 
-            $setBracket = $this->is_union_query && !$this->store->getDBObject() instanceof PDOSQLite;
+            $setBracket = $this->is_union_query && !$this->store->getDBObject() instanceof PDOSQLiteAdapter;
             $r .= $setBracket ? '('.$sub_r.')' : $sub_r;
 
             $this->indexes[$i] = $this->index;
@@ -134,7 +134,7 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler
             $tbl = 'Q'.md5($tbl);
         }
 
-        if ($this->store->getDBObject() instanceof PDOSQLite) {
+        if ($this->store->getDBObject() instanceof PDOSQLiteAdapter) {
             $tmp_sql = 'CREATE TABLE '.$tbl.' ( ';
             $tmp_sql .= $this->getTempTableDefForSQLite($q_sql).')';
         } else {
@@ -1819,7 +1819,7 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler
             }
             /* REGEXP */
             $opt = '';
-            if (!$this->store->getDBObject() instanceof PDOSQLite) {
+            if (!$this->store->getDBObject() instanceof PDOSQLiteAdapter) {
                 $opt = ('i' == $sub_r_3) ? '' : 'BINARY ';
             }
 

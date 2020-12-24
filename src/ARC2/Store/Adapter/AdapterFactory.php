@@ -49,7 +49,7 @@ class AdapterFactory
                     isset($configuration['db_pdo_protocol'])
                     && 'sqlite' == $configuration['db_pdo_protocol']
                 ) {
-                    return new PDOSQLite($configuration);
+                    return new PDOSQLiteAdapter($configuration);
                 } else {
                     // no cache
                     if (false == class_exists(PDOAdapter::class)) {

@@ -172,7 +172,10 @@ abstract class AbstractAdapterTest extends ARC2_TestCase
     {
         // connect and check
         $this->fixture->connect();
-        $this->assertTrue(\in_array($this->fixture->getDBSName(), ['mariadb', 'mysql']));
+        $this->assertTrue(
+            \in_array($this->fixture->getDBSName(), ['sqlite', 'mariadb', 'mysql']),
+            'Found: '.$this->fixture->getDBSName()
+        );
     }
 
     public function testGetDBSNameNoConnection()
@@ -193,9 +196,7 @@ abstract class AbstractAdapterTest extends ARC2_TestCase
     public function testGetNumberOfRows()
     {
         // create test table
-        $this->fixture->exec('
-            CREATE TABLE pet (name VARCHAR(20));
-        ');
+        $this->fixture->exec('CREATE TABLE pet (name VARCHAR(20));');
 
         $this->assertEquals(1, $this->fixture->getNumberOfRows('SHOW TABLES'));
     }
@@ -211,8 +212,8 @@ abstract class AbstractAdapterTest extends ARC2_TestCase
         $this->fixture->exec($sql);
 
         $foundTable = false;
-        foreach ($this->fixture->fetchList('SHOW TABLES') as $entry) {
-            if ('MyGuests' == $entry['Tables_in_'.$this->dbConfig['db_name']]) {
+        foreach ($this->fixture->getAllTables() as $table) {
+            if ('MyGuests' == $table) {
                 $foundTable = true;
                 break;
             }

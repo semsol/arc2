@@ -14,14 +14,12 @@ class CachedPDOAdapterTest extends ARC2_TestCase
             $this->markTestSkipped('Test skipped, because extension pdo_mysql is not installed.');
         }
 
-        // stop, if pdo_db_protocol is not set in dbConfig
-        if (false == isset($this->dbConfig['db_pdo_protocol'])) {
-            $this->markTestSkipped(
-                'Test skipped, because db_pdo_protocol is not set. Its ok, if this happens in unit test environment.'
-            );
-        }
-
         parent::setUp();
+
+        // stop, if pdo_db_protocol is not set in dbConfig
+        if ('mysql' != $this->dbConfig['db_pdo_protocol']) {
+            $this->markTestSkipped('Test skipped, because db_pdo_protocol is not "mysql".');
+        }
 
         $this->dbConfig['cache_enabled'] = true;
 

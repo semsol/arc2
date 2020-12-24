@@ -8,7 +8,7 @@
  * @version   2010-11-16
  */
 
-use ARC2\Store\Adapter\PDOSQLite;
+use ARC2\Store\Adapter\PDOSQLiteAdapter;
 
 ARC2::inc('Store');
 
@@ -261,7 +261,7 @@ class ARC2_StoreTableManager extends ARC2_Store
         /*
          * Use appropriate INSERT syntax, depending on the DBS.
          */
-        if ($this->store->getDBObject() instanceof PDOSQLite) {
+        if ($this->store->getDBObject() instanceof PDOSQLiteAdapter) {
             $sqlHead = 'INSERT OR IGNORE INTO ';
         } else {
             $sqlHead = 'INSERT IGNORE INTO ';
@@ -288,7 +288,7 @@ class ARC2_StoreTableManager extends ARC2_Store
         /*
          * Use appropriate INSERT syntax, depending on the DBS.
          */
-        if ($this->store->getDBObject() instanceof PDOSQLite) {
+        if ($this->store->getDBObject() instanceof PDOSQLiteAdapter) {
             $sqlHead = 'INSERT OR IGNORE INTO ';
         } else {
             $sqlHead = 'INSERT IGNORE INTO ';

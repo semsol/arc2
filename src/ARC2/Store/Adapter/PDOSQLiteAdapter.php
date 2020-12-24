@@ -17,7 +17,7 @@ use PDO;
 /**
  * PDO SQLite Adapter, which only supports SQLite running in memory.
  */
-class PDOSQLite extends PDOAdapter
+class PDOSQLiteAdapter extends PDOAdapter
 {
     public function checkRequirements()
     {
@@ -128,7 +128,7 @@ class PDOSQLite extends PDOAdapter
 
     public function getDBSName()
     {
-        return null;
+        return 'sqlite';
     }
 
     public function getServerInfo()

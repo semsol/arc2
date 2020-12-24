@@ -16,7 +16,7 @@ use Exception;
 /**
  * PDO Adapter - Handles database operations using PDO.
  *
- * This adapter doesn't support SQLite, please use PDOSQLite instead.
+ * This adapter doesn't support SQLite, please use PDOSQLiteAdapter instead.
  */
 class PDOAdapter extends AbstractAdapter
 {
