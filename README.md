@@ -17,6 +17,7 @@ Older versions of PHP may work, but are not longer tested.
 | MariaDB 10.3 | ![](https://github.com/semsol/arc2/workflows/MariaDB%2010.3%20Tests/badge.svg) |
 | MariaDB 10.4 | ![](https://github.com/semsol/arc2/workflows/MariaDB%2010.4%20Tests/badge.svg) |
 | MariaDB 10.5 | ![](https://github.com/semsol/arc2/workflows/MariaDB%2010.5%20Tests/badge.svg) |
+| MySQL 5.6    | ![](https://github.com/semsol/arc2/workflows/MySQL%205.6%20Tests/badge.svg)    |
 | MySQL 5.7    | ![](https://github.com/semsol/arc2/workflows/MySQL%205.7%20Tests/badge.svg)    |
 
 ## Documentation
@@ -49,9 +50,9 @@ This section is relevant, if you wanna use database related functionality.
 
 **MySQL**
 
-| 5.5  | 5.6  | 5.7  | 8.0             |
-|------|------|------|-----------------|
-| :+1: | :+1: | :+1: | :collision: (1) |
+| 5.5           | 5.6  | 5.7  | 8.0             |
+|---------------|------|------|-----------------|
+| :question:(2) | :+1: | :+1: | :collision: (1) |
 
 **MariaDB**
 
