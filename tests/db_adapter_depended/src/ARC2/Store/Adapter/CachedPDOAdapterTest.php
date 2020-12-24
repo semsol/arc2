@@ -17,7 +17,10 @@ class CachedPDOAdapterTest extends ARC2_TestCase
         parent::setUp();
 
         // stop, if pdo_db_protocol is not set in dbConfig
-        if ('mysql' != $this->dbConfig['db_pdo_protocol']) {
+        if (
+            isset($this->dbConfig['db_pdo_protocol'])
+            && 'mysql' != $this->dbConfig['db_pdo_protocol']
+        ) {
             $this->markTestSkipped('Test skipped, because db_pdo_protocol is not "mysql".');
         }
 
