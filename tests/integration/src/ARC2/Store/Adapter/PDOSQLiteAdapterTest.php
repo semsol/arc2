@@ -16,6 +16,11 @@ class PDOSQLiteAdapterTest extends AbstractAdapterTest
 
     protected function getAdapterInstance($configuration)
     {
+        if ('sqlite' != $configuration['db_pdo_protocol']) {
+            $configuration['db_pdo_protocol'] = 'sqlite';
+            unset($configuration['db_name']);
+        }
+
         return new PDOSQLiteAdapter($configuration);
     }
 
@@ -186,7 +191,7 @@ class PDOSQLiteAdapterTest extends AbstractAdapterTest
         // test, that it creates a connection itself, when calling exec
         $this->fixture->disconnect();
 
-        $db = $this->getAdapterInstance($this->dbConfig);
+        $db = $this->getAdapterInstance(['db_adapter' => 'pdo', 'db_pdo_protocol' => 'sqlite']);
         $sql = 'CREATE TABLE MyGuests (id INTEGER PRIMARY KEY AUTOINCREMENT)';
         $this->assertEquals(0, $db->exec($sql));
     }
