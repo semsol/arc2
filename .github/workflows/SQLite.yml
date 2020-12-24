@@ -5,7 +5,7 @@ on: push
 jobs:
     sqlite-in-memory:
         name: |
-            SQLite Tests - PHP ${{ matrix.php-versions }} in memory
+            SQLite Tests - PHP ${{ matrix.php }} in memory
         runs-on: ubuntu-latest
 
         env:
@@ -30,7 +30,7 @@ jobs:
             -   name: Install PHP
                 uses: shivammathur/setup-php@v2
                 with:
-                    php-version: ${{ matrix.php-versions }}
+                    php-version: ${{ matrix.php }}
                     coverage: xdebug
                     ini-values: memory_limit=1G
 

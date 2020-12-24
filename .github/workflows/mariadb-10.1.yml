@@ -4,7 +4,7 @@ on: push
 
 jobs:
     mysqli:
-        name: MariaDB 10.1 Tests - PHP ${{ matrix.php-versions }} mysqli
+        name: MariaDB 10.1 Tests - PHP ${{ matrix.php }} mysqli
         runs-on: ubuntu-latest
 
         env:
@@ -38,7 +38,7 @@ jobs:
             -   name: Install PHP
                 uses: shivammathur/setup-php@v2
                 with:
-                    php-version: ${{ matrix.php-versions }}
+                    php-version: ${{ matrix.php }}
                     coverage: xdebug
                     ini-values: memory_limit=1G
 
@@ -52,7 +52,7 @@ jobs:
                     DB_PORT: ${{ job.services.testdb.ports[3306] }}
 
     pdo-mysql-no-cache:
-        name: MariaDB 10.1 Tests - PHP ${{ matrix.php-versions }} PDO mysql no cache
+        name: MariaDB 10.1 Tests - PHP ${{ matrix.php }} PDO mysql no cache
         runs-on: ubuntu-latest
 
         env:
@@ -87,7 +87,7 @@ jobs:
             -   name: Install PHP
                 uses: shivammathur/setup-php@v2
                 with:
-                    php-version: ${{ matrix.php-versions }}
+                    php-version: ${{ matrix.php }}
                     coverage: xdebug
                     ini-values: memory_limit=1G
 
@@ -101,7 +101,7 @@ jobs:
                     DB_PORT: ${{ job.services.testdb.ports[3306] }}
 
     pdo-mysql-cache:
-        name: MariaDB 10.1 Tests - PHP ${{ matrix.php-versions }} PDO mysql cache
+        name: MariaDB 10.1 Tests - PHP ${{ matrix.php }} PDO mysql cache
         runs-on: ubuntu-latest
 
         env:
@@ -137,7 +137,7 @@ jobs:
             -   name: Install PHP
                 uses: shivammathur/setup-php@v2
                 with:
-                    php-version: ${{ matrix.php-versions }}
+                    php-version: ${{ matrix.php }}
                     coverage: xdebug
                     ini-values: memory_limit=1G
 
