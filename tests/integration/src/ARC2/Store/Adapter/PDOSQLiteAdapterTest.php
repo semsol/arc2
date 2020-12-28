@@ -16,6 +16,10 @@ class PDOSQLiteAdapterTest extends AbstractAdapterTest
 
     protected function getAdapterInstance($configuration)
     {
+        if (!isset($configuration['db_pdo_protocol'])) {
+            $configuration['db_pdo_protocol'] = 'sqlite';
+        }
+
         if ('sqlite' != $configuration['db_pdo_protocol']) {
             $configuration['db_pdo_protocol'] = 'sqlite';
             unset($configuration['db_name']);
