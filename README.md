@@ -65,12 +65,33 @@ This section is relevant, if you wanna use database related functionality.
 
 (2) Not tested anymore, because outdated version.
 
-
 ## RDF triple store
 
 ### SPARQL support
 
 Please have a look into [SPARQL-support.md](doc/SPARQL-support.md) to see which SPARQL 1.0/1.1 features are currently supported.
+
+### In-Memory store (SQLite-based)
+
+Using MySQL as database backend is the default way.
+But you don't need MySQL, SQLite is enough to get a non-persistent in-memory store.
+Use the following example code to get a ready-to-use store instance.
+
+```php
+// get a working ARC2_Store instance (with SQLite adapter)
+$store = ARC2::getStore(['db_adapter' => 'pdo', 'db_pdo_protocol' => 'sqlite']);
+
+// add 1 triple to the store
+$store->query('INSERT INTO <http://example.com/> { <http://s> <http://p1> "baz" . }');
+
+// send a SPARQL query to the store
+$result = $store->query('SELECT * FROM <http://example.com/> WHERE {<http://s> <http://p1> ?o.}');
+
+// you should get an array of array's with one entry in $result['result']['row'].
+var_dump($result);
+
+// remember, after your script finished, all data in $store is gone
+```
 
 ### Use cache
 
