@@ -50,9 +50,9 @@ This section is relevant, if you wanna use database related functionality.
 
 **MySQL**
 
-| 5.5           | 5.6  | 5.7  | 8.0             |
-|---------------|------|------|-----------------|
-| :question:(2) | :+1: | :+1: | :collision: (1) |
+| 5.5  | 5.6  | 5.7  | 8.0             |
+|------|------|------|-----------------|
+| :+1: | :+1: | :+1: | :collision: (1) |
 
 **MariaDB**
 
