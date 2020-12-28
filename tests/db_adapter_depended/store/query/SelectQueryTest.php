@@ -84,13 +84,13 @@ class SelectQueryTest extends ARC2_TestCase
     {
         // test data
         $this->fixture->query('INSERT INTO <http://example.com/> {
-            <http://s1> <http://p1> <http://s2> .
-            <http://s1> <http://p1> <http://s3> .
+            <http://a> <http://p1> <http://b> .
+            <http://a> <http://p1> <http://c> .
 
-            <http://s2> <http://p1> <http://s3> .
-            <http://s2> <http://p1> <http://s4> .
+            <http://b> <http://p1> <http://d> .
+            <http://b> <http://p1> <http://e> .
 
-            <http://s3> <http://p1> <http://s1> .
+            <http://c> <http://p1> <http://f> .
         }');
 
         $res = $this->fixture->query('
@@ -109,59 +109,35 @@ class SelectQueryTest extends ARC2_TestCase
                         's', 'o', 'o2',
                     ],
                     'rows' => [
+                        // root subject: http://a
                         [
-                            's' => 'http://s3',
-                            's type' => 'uri',
-                            'o' => 'http://s1',
-                            'o type' => 'uri',
-                            'o2' => 'http://s2',
-                            'o2 type' => 'uri',
+                            's' => 'http://a', 's type' => 'uri',
+                            'o' => 'http://b', 'o type' => 'uri',
+                            'o2' => 'http://d', 'o2 type' => 'uri',
                         ],
                         [
-                            's' => 'http://s3',
-                            's type' => 'uri',
-                            'o' => 'http://s1',
-                            'o type' => 'uri',
-                            'o2' => 'http://s3',
-                            'o2 type' => 'uri',
+                            's' => 'http://a', 's type' => 'uri',
+                            'o' => 'http://b', 'o type' => 'uri',
+                            'o2' => 'http://e', 'o2 type' => 'uri',
                         ],
                         [
-                            's' => 'http://s1',
-                            's type' => 'uri',
-                            'o' => 'http://s2',
-                            'o type' => 'uri',
-                            'o2' => 'http://s3',
-                            'o2 type' => 'uri',
+                            's' => 'http://a', 's type' => 'uri',
+                            'o' => 'http://c', 'o type' => 'uri',
+                            'o2' => 'http://f', 'o2 type' => 'uri',
+                        ],
+                        // root subject: http://b
+                        [
+                            's' => 'http://b', 's type' => 'uri',
+                            'o' => 'http://d', 'o type' => 'uri',
                         ],
                         [
-                            's' => 'http://s1',
-                            's type' => 'uri',
-                            'o' => 'http://s2',
-                            'o type' => 'uri',
-                            'o2' => 'http://s4',
-                            'o2 type' => 'uri',
+                            's' => 'http://b', 's type' => 'uri',
+                            'o' => 'http://e', 'o type' => 'uri',
                         ],
+                        // root subject: http://c
                         [
-                            's' => 'http://s1',
-                            's type' => 'uri',
-                            'o' => 'http://s3',
-                            'o type' => 'uri',
-                            'o2' => 'http://s1',
-                            'o2 type' => 'uri',
-                        ],
-                        [
-                            's' => 'http://s2',
-                            's type' => 'uri',
-                            'o' => 'http://s3',
-                            'o type' => 'uri',
-                            'o2' => 'http://s1',
-                            'o2 type' => 'uri',
-                        ],
-                        [
-                            's' => 'http://s2',
-                            's type' => 'uri',
-                            'o' => 'http://s4',
-                            'o type' => 'uri',
+                            's' => 'http://c', 's type' => 'uri',
+                            'o' => 'http://f', 'o type' => 'uri',
                         ],
                     ],
                 ],
@@ -171,7 +147,10 @@ class SelectQueryTest extends ARC2_TestCase
         );
     }
 
-    // OPTIONAL, artifical query to extend coverage for store code. (ARC2_StoreSelectQueryHandler::sameOptional)
+    /*
+     * OPTIONAL, artifical query to extend coverage for store code.
+     * (ARC2_StoreSelectQueryHandler::sameOptional)
+     */
     public function testSelectOptional()
     {
         // test data
