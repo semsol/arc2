@@ -829,7 +829,7 @@ class SelectQueryTest extends ARC2_TestCase
     }
 
     // >
-    public function testSelectFilterRelationalGreatThan()
+    public function testSelectFilterRelationalGreaterThan()
     {
         // test data
         $this->fixture->query('INSERT INTO <http://example.com/> {
@@ -893,6 +893,31 @@ class SelectQueryTest extends ARC2_TestCase
                 'query_time' => $res['query_time'],
             ],
             $res
+        );
+    }
+
+    // <
+    public function testSelectFilterRelationalSmallerThan2()
+    {
+        // test data
+        $this->fixture->query('INSERT INTO <http://example.com/> {
+            <http://container1> <http://weight> "150" .
+            <http://container2> <http://weight> "50" .
+        }');
+
+        $res = $this->fixture->query('SELECT ?c WHERE {
+            ?c <http://weight> ?w .
+
+            FILTER (?w < 100 && ?w > 10)
+        }');
+        $this->assertEquals(
+            [
+                [
+                    'c' => 'http://container2',
+                    'c type' => 'uri',
+                ],
+            ],
+            $res['result']['rows']
         );
     }
 

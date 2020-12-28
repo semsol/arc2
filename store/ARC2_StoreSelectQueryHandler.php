@@ -1179,8 +1179,8 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler
                 return '';
             } elseif (preg_match('/^T([^\s]+\.)g (.*)$/s', $r, $m)) {/* graph filter */
                 return 'G'.$m[1].'t '.$m[2];
-            } elseif (preg_match('/^\(*V[^\s]+_g\.val .*$/s', $r, $m)) {/* graph value filter, @@improveMe */
-        //return $r;
+            } elseif (preg_match('/^\(*V[^\s]+_g\.val .*$/s', $r, $m)) {
+                /* graph value filter, @@improveMe */
             } else {
                 return 'FALSE';
             }
@@ -1376,9 +1376,6 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler
         return '';
     }
 
-    /**
-     * @todo not in use, so remove?
-     */
     public function getRelationalExpressionSQL($pattern, $context, $val_type = '', $parent_type = '')
     {
         $r = '';
@@ -1392,6 +1389,22 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler
             $m = str_replace('ExpressionExpression', 'Expression', $m);
             $sub_r = method_exists($this, $m) ? $this->$m($sub_pattern, $context, $val_type, 'relational') : '';
             $r .= $r ? ' '.$op.' '.$sub_r : $sub_r;
+        }
+
+        /*
+         * SQLite related adaption for relational expressions like ?w < 100
+         *
+         * We have to cast the variable behind ?w to a number otherwise we don't get
+         * meaningful results.
+         */
+        if ($this->store->getDBObject() instanceof PDOSQLiteAdapter) {
+            // Regex to catch things like: ?w < 100, ?w > 20
+            $regex = '/([T\_0-9]+\.o_comp)\s*[<>]{1}\s*[0-9]+/si';
+            if (0 < preg_match_all($regex, $r, $matches)) {
+                foreach ($matches[1] as $variable) {
+                    $r = str_replace($variable, 'CAST ('.$variable.' as float)', $r);
+                }
+            }
         }
 
         return $r ? '('.$r.')' : $r;
