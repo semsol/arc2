@@ -78,14 +78,13 @@ class ARC2_StoreTest extends ARC2_TestCase
         return $graphs;
     }
 
-    /**
-     * @doesNotPerformAssertions
-     */
     public function testSetup()
     {
         $this->fixture->reset();
 
         $this->fixture->setup();
+
+        $this->assertTrue($this->fixture->isSetup());
     }
 
     /*
