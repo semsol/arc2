@@ -31,34 +31,12 @@ class ARC2_StoreTest extends ARC2_TestCase
      * to only returned available graphs in the current context. But that depends on the implementation
      * and can differ.
      *
-     * @return array simple array of key-value-pairs, which consists of graph URIs as key and NamedNode
-     *               instance as value
+     * @return array simple array of key-value-pairs, which consists of graph URIs as values
      */
     protected function getGraphs()
     {
-        var_dump($this->dbConfig);
-
-        // g2t table
-        if (isset($this->dbConfig['db_table_prefix'])) {
-            $g2t = $this->dbConfig['db_table_prefix'].'_';
-        } else {
-            $g2t = '';
-        }
-        if (isset($this->dbConfig['store_name'])) {
-            $g2t .= $this->dbConfig['store_name'].'_';
-        }
-        $g2t .= 'g2t';
-
-        // id2val table
-        if (isset($this->dbConfig['db_table_prefix'])) {
-            $id2val = $this->dbConfig['db_table_prefix'].'_';
-        } else {
-            $id2val = '';
-        }
-        if (isset($this->dbConfig['store_name'])) {
-            $id2val .= $this->dbConfig['store_name'].'_';
-        }
-        $id2val .= 'id2val';
+        $g2t = $this->fixture->getTablePrefix().'g2t';
+        $id2val = $this->fixture->getTablePrefix().'id2val';
 
         // collects all values which have an ID (column g) in the g2t table.
         $query = 'SELECT id2val.val AS graphUri
