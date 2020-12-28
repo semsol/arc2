@@ -237,7 +237,7 @@ abstract class AbstractAdapterTest extends ARC2_TestCase
 
     public function testGetStoreName()
     {
-        $this->assertEquals($this->dbConfig['store_name'], $this->fixture->getStoreName());
+        $this->assertEquals('arc', $this->fixture->getStoreName());
     }
 
     public function testGetStoreNameNotDefined()

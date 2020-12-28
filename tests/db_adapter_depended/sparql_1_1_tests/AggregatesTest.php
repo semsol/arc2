@@ -2,6 +2,8 @@
 
 namespace Tests\db_adapter_depended\sparql_1_1_tests;
 
+use ARC2\Store\Adapter\PDOSQLiteAdapter;
+
 /**
  * Runs W3C tests from https://www.w3.org/2009/sparql/docs/tests/.
  *
@@ -38,22 +40,27 @@ class AggregatesTest extends ComplianceTest
         // get query to test
         $testQuery = $this->getTestQuery($this->testPref.$testname);
 
-        // get expected result
-        $expectedResult = $this->getExpectedResult($this->testPref.$testname);
-
         // get actual result for given test query
         $actualResult = $this->store->query($testQuery);
         $actualResultAsXml = $this->getXmlVersionOfResult($actualResult);
 
-        $this->assertEquals(
-            '2',
-            (string) $actualResultAsXml->results->result->binding->literal[0]
-        );
+        if ($this->store->getDBObject() instanceof PDOSQLiteAdapter) {
+            // SQLite related
+            $this->assertEquals(2.22, (string) $actualResultAsXml->results->result->binding->literal[0]);
+        } else {
+            /*
+             * not SQLite
+             */
+            $this->assertEquals(
+                '2',
+                (string) $actualResultAsXml->results->result->binding->literal[0]
+            );
 
-        // remember current behavior, but skip test anyway to show developer here is still a problem.
-        $this->markTestSkipped(
-            'Rounding bug in AVG function. See https://github.com/semsol/arc2/issues/99'
-        );
+            // remember current behavior, but skip test anyway to show developer here is still a problem.
+            $this->markTestSkipped(
+                'Rounding bug in AVG function (MySQL). See https://github.com/semsol/arc2/issues/99'
+            );
+        }
     }
 
     public function testAggEmptyGroup()
