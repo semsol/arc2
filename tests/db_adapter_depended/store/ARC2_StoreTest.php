@@ -36,6 +36,8 @@ class ARC2_StoreTest extends ARC2_TestCase
      */
     protected function getGraphs()
     {
+        var_dump($this->dbConfig);
+
         // g2t table
         if (isset($this->dbConfig['db_table_prefix'])) {
             $g2t = $this->dbConfig['db_table_prefix'].'_';
