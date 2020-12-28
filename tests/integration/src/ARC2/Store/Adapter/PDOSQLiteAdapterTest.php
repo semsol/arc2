@@ -14,18 +14,18 @@ class PDOSQLiteAdapterTest extends AbstractAdapterTest
         }
     }
 
+    /**
+     * Forces SQLite in-memory.
+     */
     protected function getAdapterInstance($configuration)
     {
-        if (!isset($configuration['db_pdo_protocol'])) {
-            $configuration['db_pdo_protocol'] = 'sqlite';
-        }
+        // $configuration is being ignored for now. therefore no tests with
+        // SQLite files, only :memory:.
 
-        if ('sqlite' != $configuration['db_pdo_protocol']) {
-            $configuration['db_pdo_protocol'] = 'sqlite';
-            unset($configuration['db_name']);
-        }
-
-        return new PDOSQLiteAdapter($configuration);
+        return new PDOSQLiteAdapter([
+            'db_adapter' => 'pdo',
+            'db_pdo_protocol' => 'sqlite',
+        ]);
     }
 
     public function testConnectCreateNewConnection()
