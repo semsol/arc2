@@ -1,10 +1,10 @@
-name: MySQL 5.7 Tests
+name: MySQL 5.6 Tests
 
 on: push
 
 jobs:
     mysqli:
-        name: MySQL 5.7 Tests - PHP ${{ matrix.php }} mysqli
+        name: MySQL 5.6 Tests - PHP ${{ matrix.php }} mysqli
         runs-on: ubuntu-latest
 
         env:
@@ -22,7 +22,7 @@ jobs:
 
         services:
             testdb:
-                image: mysql:5.7
+                image: mysql:5.6
                 env:
                     MYSQL_ROOT_PASSWORD: Pass123
                     MYSQL_DATABASE: arc2_test
@@ -52,7 +52,7 @@ jobs:
                     DB_PORT: ${{ job.services.testdb.ports[3306] }}
 
     pdo-mysql-no-cache:
-        name: MySQL 5.7 Tests - PHP ${{ matrix.php }} PDO mysql no cache
+        name: MySQL 5.6 Tests - PHP ${{ matrix.php }} PDO mysql no cache
         runs-on: ubuntu-latest
 
         env:
@@ -71,7 +71,7 @@ jobs:
 
         services:
             testdb:
-                image: mysql:5.7
+                image: mysql:5.6
                 env:
                     MYSQL_ROOT_PASSWORD: Pass123
                     MYSQL_DATABASE: arc2_test
@@ -101,7 +101,7 @@ jobs:
                     DB_PORT: ${{ job.services.testdb.ports[3306] }}
 
     pdo-mysql-cache:
-        name: MySQL 5.7 Tests - PHP ${{ matrix.php }} PDO mysql cache
+        name: MySQL 5.6 Tests - PHP ${{ matrix.php }} PDO mysql cache
         runs-on: ubuntu-latest
 
         env:
@@ -121,7 +121,7 @@ jobs:
 
         services:
             testdb:
-                image: mysql:5.7
+                image: mysql:5.6
                 env:
                     MYSQL_ROOT_PASSWORD: Pass123
                     MYSQL_DATABASE: arc2_test
