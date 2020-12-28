@@ -356,6 +356,7 @@ class ARC2_Store extends ARC2_Class
         if (($force || !$this->isSetUp()) && false !== $this->getDBCon()) {
             // PDO with SQLite
             if ($this->a['db_object'] instanceof PDOSQLiteAdapter) {
+                echo PHP_EOL.'- setUp SQLite tables';
                 (new SQLite($this->a, $this))->createTables();
             } else {
                 // default way
