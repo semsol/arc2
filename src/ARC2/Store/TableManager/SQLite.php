@@ -56,8 +56,6 @@ class SQLite extends ARC2_Store
             UNIQUE (g,t)
         )';
 
-        echo PHP_EOL.'- create g2t table: '.$sql;
-
         $this->a['db_object']->exec($sql);
     }
 
