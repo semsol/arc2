@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\unit\src\ARC2\Store\Adapter;
+namespace Tests\integration\src\ARC2\Store\Adapter;
 
 use ARC2\Store\Adapter\PDOAdapter;
 
@@ -19,6 +19,10 @@ class PDOAdapterTest extends AbstractAdapterTest
                 'Test skipped, because db_pdo_protocol is not set. Its ok, if this happens in unit test environment.'
             );
         }
+
+        if ('mysql' !== $this->dbConfig['db_pdo_protocol']) {
+            $this->markTestSkipped('Skipped, because PDO protocol is not "mysql".');
+        }
     }
 
     protected function getAdapterInstance($configuration)
@@ -31,9 +35,14 @@ class PDOAdapterTest extends AbstractAdapterTest
         $this->fixture->disconnect();
 
         // create connection outside of the instance
-        $dsn = $this->dbConfig['db_pdo_protocol'].':host='. $this->dbConfig['db_host'];
+        $dsn = $this->dbConfig['db_pdo_protocol'].':host='.$this->dbConfig['db_host'];
         $dsn .= ';dbname='.$this->dbConfig['db_name'];
+
+        // port
+        $dsn .= ';port='.$this->dbConfig['db_port'];
+
         $dsn .= ';charset=utf8mb4';
+
         $connection = new \PDO(
             $dsn,
             $this->dbConfig['db_user'],
@@ -61,7 +70,7 @@ class PDOAdapterTest extends AbstractAdapterTest
         $this->fixture->simpleQuery($sql);
 
         $tables = $this->fixture->fetchList('SHOW TABLES');
-        $this->assertTrue(is_array($tables) && 0 < count($tables));
+        $this->assertTrue(\is_array($tables) && 0 < \count($tables));
     }
 
     public function testEscape()
@@ -104,5 +113,27 @@ class PDOAdapterTest extends AbstractAdapterTest
 
         // invalid query
         $this->assertFalse($this->fixture->simpleQuery('invalid query'));
+    }
+
+    /**
+     * Tests behavior when using exec and simpleQuery and the following exception araise.
+     *
+     *    SQLSTATE[HY000]: General error: 2014 Cannot execute queries while other unbuffered queries
+     *                     are active. Consider using PDOStatement::fetchAll(). Alternatively, if your
+     *                     code is only ever going to run against mysql, you may enable query buffering
+     *                     by setting the PDO::MYSQL_ATTR_USE_BUFFERED_QUERY attribute.
+     *
+     * If we use "exec" instead of "simpleQuery" here, the exception is gone sometimes.
+     * Its not clear, why it appears in the first place and why that solves it.
+     */
+    public function testUnbufferedQueryStillActiveException()
+    {
+        $msg = 'SQLSTATE[HY000]: General error: 2014 Cannot execute queries while other '
+            .'unbuffered queries are active.  Consider using PDOStatement::fetchAll().  '
+            .'Alternatively, if your code is only ever going to run against mysql, you '
+            .'may enable query buffering by setting the PDO::MYSQL_ATTR_USE_BUFFERED_QUERY attribute.';
+        $this->expectExceptionMessage($msg);
+
+        $this->fixture->simpleQuery('CHECK TABLE arc_triple;');
     }
 }

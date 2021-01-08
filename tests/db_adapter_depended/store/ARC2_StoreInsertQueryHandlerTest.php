@@ -8,7 +8,7 @@ class ARC2_StoreInsertQueryHandlerTest extends ARC2_TestCase
 {
     protected $store;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -19,7 +19,7 @@ class ARC2_StoreInsertQueryHandlerTest extends ARC2_TestCase
         $this->fixture = new \ARC2_StoreInsertQueryHandler($this->store->a, $this->store);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         $this->store->closeDBCon();
     }
@@ -28,7 +28,7 @@ class ARC2_StoreInsertQueryHandlerTest extends ARC2_TestCase
      * Tests for __init
      */
 
-    public function test__init()
+    public function testInit()
     {
         $this->fixture = new \ARC2_StoreInsertQueryHandler($this->store->a, $this->store);
         $this->fixture->__init();

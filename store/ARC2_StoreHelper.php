@@ -37,7 +37,7 @@ class ARC2_StoreHelper extends ARC2_Class
                 if (false == is_array($rows)) {
                     continue;
                 }
-                foreach($rows as $row) {
+                foreach ($rows as $row) {
                     $new_val = str_replace($old_uri, $new_uri, $row['val']);
                     $new_id = $this->store->getTermID($new_val, $id_col);
                     if (!$new_id) {/* unknown ns uri, overwrite current id value */

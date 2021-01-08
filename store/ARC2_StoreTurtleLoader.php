@@ -24,7 +24,16 @@ class ARC2_StoreTurtleLoader extends ARC2_TurtleParser
 
     public function addT($t)
     {
-        $this->caller->addT($t['s'], $t['p'], $t['o'], $t['s_type'], $t['o_type'], $t['o_datatype'], $t['o_lang']);
+        $this->caller->addT(
+            $t['s'],
+            $t['p'],
+            $t['o'],
+            $t['s_type'],
+            $t['o_type'],
+            $t['o_datatype'],
+            $t['o_lang']
+        );
+
         ++$this->t_count;
     }
 }

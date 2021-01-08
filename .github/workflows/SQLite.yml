@@ -1,0 +1,41 @@
+name: SQLite Tests
+
+on: push
+
+jobs:
+    sqlite-in-memory:
+        name: |
+            SQLite Tests - PHP ${{ matrix.php }} in memory
+        runs-on: ubuntu-latest
+
+        env:
+            DB_ADAPTER: pdo
+            DB_PDO_PROTOCOL: sqlite
+            DB_SQLITE_IN_MEMORY: true
+
+        strategy:
+            # if one of the matrix-entries break, all entries getting canceled.
+            fail-fast: true
+            matrix:
+                php:
+                    - 7.2
+                    - 7.3
+                    - 7.4
+                    - 8.0
+
+        steps:
+            -   name: Checkout
+                uses: actions/checkout@v2
+
+            -   name: Install PHP
+                uses: shivammathur/setup-php@v2
+                with:
+                    php-version: ${{ matrix.php }}
+                    coverage: xdebug
+                    ini-values: memory_limit=1G
+
+            -   name: Install Composer dependencies
+                run: composer install --no-progress --no-suggest --prefer-dist --optimize-autoloader
+
+            -   name: Tests
+                run: vendor/bin/phpunit

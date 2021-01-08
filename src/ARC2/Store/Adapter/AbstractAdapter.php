@@ -15,27 +15,56 @@ abstract class AbstractAdapter
     protected $db;
 
     /**
-     * Stores errors of failed queries.
-     *
-     * @var array
+     * @var int
      */
-    protected $errors = array();
+    protected $lastRowCount;
 
     /**
      * Sent queries.
      *
      * @var array
      */
-    protected $queries = array();
+    protected $queries = [];
 
     /**
      * @param array $configuration Default is array(). Only use, if you have your own mysqli connection.
      */
-    public function __construct(array $configuration = array())
+    public function __construct(array $configuration = [])
     {
         $this->configuration = $configuration;
+        $this->lastRowCount = 0;
 
         $this->checkRequirements();
+    }
+
+    public function deleteAllTables(): void
+    {
+        // remove all tables
+        $tables = $this->fetchList('SHOW TABLES');
+        foreach ($tables as $table) {
+            $this->exec('DROP TABLE '.$table['Tables_in_'.$this->configuration['db_name']]);
+        }
+    }
+
+    public function getAllTables(): array
+    {
+        $tables = $this->fetchList('SHOW TABLES');
+        $result = [];
+        foreach ($tables as $table) {
+            $result[] = $table['Tables_in_'.$this->configuration['db_name']];
+        }
+
+        return $result;
+    }
+
+    public function getConfiguration(): array
+    {
+        return $this->configuration;
+    }
+
+    public function getQueries(): array
+    {
+        return $this->queries;
     }
 
     abstract public function checkRequirements();

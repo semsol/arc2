@@ -9,7 +9,7 @@ use Tests\ARC2_TestCase;
  */
 class ErrorHandlingInQueriesTest extends ARC2_TestCase
 {
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -18,7 +18,7 @@ class ErrorHandlingInQueriesTest extends ARC2_TestCase
         $this->fixture->setup();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         $this->fixture->closeDBCon();
     }
@@ -39,16 +39,16 @@ class ErrorHandlingInQueriesTest extends ARC2_TestCase
                 'query_type' => 'select',
                 'result' => [
                     'variables' => [
-                        'not_used_in_query', 's'
+                        'not_used_in_query', 's',
                     ],
                     'rows' => [
                     ],
                 ],
-                'query_time' => $res['query_time']
+                'query_time' => $res['query_time'],
             ],
             $res
         );
 
-        $this->assertTrue(2 <= count($this->fixture->errors));
+        $this->assertTrue(2 <= \count($this->fixture->errors));
     }
 }

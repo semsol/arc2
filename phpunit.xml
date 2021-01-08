@@ -18,11 +18,8 @@
         <ini name="display_errors" value="On"/>
     </php>
     <testsuites>
-        <testsuite name="db_adapter_depended">
-            <directory suffix="Test.php">./tests/db_adapter_depended</directory>
-        </testsuite>
-        <testsuite name="unit">
-            <directory suffix="Test.php">./tests/unit</directory>
+        <testsuite name="all">
+            <directory suffix="Test.php">./tests</directory>
         </testsuite>
     </testsuites>
     <filter>

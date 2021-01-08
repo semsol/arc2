@@ -5,11 +5,11 @@ namespace Tests\db_adapter_depended\store\query;
 use Tests\ARC2_TestCase;
 
 /**
- * Tests for query method - focus on DELETE queries
+ * Tests for query method - focus on DELETE queries.
  */
 class DeleteQueryTest extends ARC2_TestCase
 {
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -18,7 +18,7 @@ class DeleteQueryTest extends ARC2_TestCase
         $this->fixture->setup();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         $this->fixture->closeDBCon();
     }

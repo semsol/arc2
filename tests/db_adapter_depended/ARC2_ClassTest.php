@@ -9,9 +9,13 @@ class ARC2_ClassTest extends ARC2_TestCase
     protected $dbConnection;
     protected $store;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
+
+        if ('mysqli' !== $this->dbConfig['db_adapter']) {
+            $this->markTestSkipped('Db adapter is not mysqli, therefore skip tests with queryDB.');
+        }
 
         $this->store = \ARC2::getStore($this->dbConfig);
         $this->store->createDBCon();
@@ -19,10 +23,6 @@ class ARC2_ClassTest extends ARC2_TestCase
         $this->dbConnection = $this->store->getDBCon();
 
         $this->fixture = new \ARC2_Class($this->dbConfig, $this);
-
-        if ('mysqli' !== $this->dbConfig['db_adapter']) {
-            $this->markTestSkipped('Db adapter is not mysqli, therefore skip tests with queryDB.');
-        }
     }
 
     /*
@@ -59,7 +59,7 @@ class ARC2_ClassTest extends ARC2_TestCase
         $this->assertEquals(
             [
                 'You have an error in your SQL syntax; check the manual that corresponds to your '
-                .$dbsName.' server version for the right syntax to use near \'invalid-query\' at line 1'
+                .$dbsName.' server version for the right syntax to use near \'invalid-query\' at line 1',
             ],
             $this->fixture->errors
         );

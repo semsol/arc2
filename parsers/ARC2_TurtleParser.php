@@ -682,7 +682,7 @@ class ARC2_TurtleParser extends ARC2_RDFParser
     public function xPNAME_NS($v)
     {
         list($r, $sub_v) = $this->xPN_PREFIX($v);
-        $prefix = $r ? $r : '';
+        $prefix = $r ?: '';
 
         return ($r = $this->x("\:", $sub_v)) ? [$prefix.':', $r[1]] : [0, $v];
     }
@@ -851,7 +851,7 @@ class ARC2_TurtleParser extends ARC2_RDFParser
                 }
             } while ($proceed);
             list($sub_r, $sub_v) = $this->xPN_CHARS($sub_v);
-            $r .= $sub_r ? $sub_r : '';
+            $r .= $sub_r ?: '';
         }
 
         return [$r, $sub_v];
