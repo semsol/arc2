@@ -780,7 +780,7 @@ XML;
         $this->fixture->query('INSERT INTO <http://ex/> {<http://a> <http://b> <http://c> . }');
         $this->fixture->query('INSERT INTO <http://ex/> {<http://a2> <http://b2> <http://c2> . }');
 
-        $res = $sut->query('SELECT * FROM <http://ex/> WHERE {?s ?p ?o.}');
+        $res = $this->fixture->query('SELECT * FROM <http://ex/> WHERE {?s ?p ?o.}');
         $this->assertEquals(2, \count($res['result']['rows']));
     }
 }
