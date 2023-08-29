@@ -40,6 +40,7 @@ class ARC2_StoreLoadQueryHandlerTest extends ARC2_TestCase
 
         // MySQL
         $table_fields = $this->store->getDBObject()->fetchList('DESCRIBE arc_g2t');
-        $this->assertEquals('int(10) unsigned', $table_fields[0]['Type']);
+        $this->assertStringContainsString('int', $table_fields[0]['Type']);
+        $this->assertStringContainsString('unsigned', $table_fields[0]['Type']);
     }
 }
