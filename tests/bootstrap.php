@@ -71,5 +71,3 @@ if (file_exists(__DIR__.'/config.php')) {
 } else {
     $dbConfig = require 'config.php.dist';
 }
-
-var_dump($dbConfig);

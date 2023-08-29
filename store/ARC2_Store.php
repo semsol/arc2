@@ -145,8 +145,6 @@ class ARC2_Store extends ARC2_Class
 
     /**
      * @param int $force 1 if you want to force a connection
-     *
-     * @return bool
      */
     public function getDBCon($force = 0): bool
     {
@@ -203,20 +201,15 @@ class ARC2_Store extends ARC2_Class
     public function getColumnType()
     {
         if (!$this->v('column_type')) {
-            // SQLite
-            if ($this->getDBObject() instanceof PDOSQLiteAdapter) {
-                $this->column_type = 'INTEGER';
-            } else {
-                // MySQL
-                $tbl = $this->getTablePrefix().'g2t';
+            // MySQL
+            $tbl = $this->getTablePrefix().'g2t';
 
-                $row = $this->db->fetchRow('SHOW COLUMNS FROM '.$tbl.' LIKE "t"');
-                if (null == $row) {
-                    $row = ['Type' => 'mediumint'];
-                }
-
-                $this->column_type = preg_match('/mediumint/', $row['Type']) ? 'mediumint' : 'int';
+            $row = $this->db->fetchRow('SHOW COLUMNS FROM '.$tbl.' LIKE "t"');
+            if (null == $row) {
+                $row = ['Type' => 'mediumint'];
             }
+
+            $this->column_type = preg_match('/mediumint/', $row['Type']) ? 'mediumint' : 'int';
         }
 
         return $this->column_type;
@@ -231,10 +224,8 @@ class ARC2_Store extends ARC2_Class
             $value = true;
 
             // only check if SQLite is NOT being used
-            if (false === $this->getDBObject() instanceof PDOSQLiteAdapter) {
-                $row = $this->db->fetchRow('SHOW COLUMNS FROM '.$tbl.' LIKE "val_hash"');
-                $value = null !== $row;
-            }
+            $row = $this->db->fetchRow('SHOW COLUMNS FROM '.$tbl.' LIKE "val_hash"');
+            $value = null !== $row;
 
             $this->$var_name = $value;
         }
@@ -244,10 +235,6 @@ class ARC2_Store extends ARC2_Class
 
     public function hasFulltextIndex()
     {
-        if ($this->getDBObject() instanceof PDOSQLiteAdapter) {
-            return true;
-        }
-
         if (!isset($this->has_fulltext_index)) {
             $this->has_fulltext_index = 0;
             $tbl = $this->getTablePrefix().'o2val';
@@ -270,10 +257,6 @@ class ARC2_Store extends ARC2_Class
 
     public function enableFulltextSearch()
     {
-        if ($this->getDBObject() instanceof PDOSQLiteAdapter) {
-            return;
-        }
-
         if ($this->hasFulltextIndex()) {
             return 1;
         }
@@ -283,10 +266,6 @@ class ARC2_Store extends ARC2_Class
 
     public function disableFulltextSearch()
     {
-        if ($this->getDBObject() instanceof PDOSQLiteAdapter) {
-            return;
-        }
-
         if (!$this->hasFulltextIndex()) {
             return 1;
         }
@@ -301,13 +280,7 @@ class ARC2_Store extends ARC2_Class
      */
     public function countDBProcesses(): int
     {
-        $amount = 1;
-
-        if (false === $this->getDBObject() instanceof PDOSQLiteAdapter) {
-            $amount = $this->db->getNumberOfRows('SHOW PROCESSLIST');
-        }
-
-        return $amount;
+        return $this->db->getNumberOfRows('SHOW PROCESSLIST');
     }
 
     /**

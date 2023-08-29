@@ -19,8 +19,6 @@ Older versions of PHP may work, but are not longer tested.
 | MariaDB 10.9 | ![](https://github.com/semsol/arc2/workflows/MariaDB%2010.9%20Tests/badge.svg) |
 | MariaDB 10.10 | ![](https://github.com/semsol/arc2/workflows/MariaDB%2010.10%20Tests/badge.svg) |
 | MariaDB 10.11 | ![](https://github.com/semsol/arc2/workflows/MariaDB%2010.11%20Tests/badge.svg) |
-| MariaDB 11.0 | ![](https://github.com/semsol/arc2/workflows/MariaDB%2010.0%20Tests/badge.svg) |
-| MariaDB 11.1 | ![](https://github.com/semsol/arc2/workflows/MariaDB%2010.1%20Tests/badge.svg) |
 | MySQL 5.5    | ![](https://github.com/semsol/arc2/workflows/MySQL%205.5%20Tests/badge.svg)    |
 | MySQL 5.6    | ![](https://github.com/semsol/arc2/workflows/MySQL%205.6%20Tests/badge.svg)    |
 | MySQL 5.7    | ![](https://github.com/semsol/arc2/workflows/MySQL%205.7%20Tests/badge.svg)    |
@@ -38,7 +36,7 @@ Package available on [Composer](https://packagist.org/packages/semsol/arc2).
 You should use Composer for installation:
 
 ```bash
-composer require semsol/arc2:^2
+composer require semsol/arc2:^3
 ```
 
 Further information about Composer usage can be found [here](https://getcomposer.org/doc/01-basic-usage.md#autoloading), for instance about autoloading ARC2 classes.

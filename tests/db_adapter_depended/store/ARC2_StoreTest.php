@@ -143,7 +143,7 @@ class ARC2_StoreTest extends ARC2_TestCase
 
     public function testCountDBProcesses()
     {
-        $this->assertTrue(\is_int($this->fixture->countDBProcesses()));
+        $this->assertTrue(0 < $this->fixture->countDBProcesses());
     }
 
     /*
