@@ -25,26 +25,12 @@ class AdapterFactory
     {
         if (\in_array($adapterName, $this->getSupportedAdapters())) {
             if ('pdo' == $adapterName) {
-                if (isset($configuration['cache_enabled']) && true === $configuration['cache_enabled']) {
-                    // use cache?
-                    if (false == class_exists(CachedPDOAdapter::class)) {
-                        require_once 'CachedPDOAdapter.php';
-                    }
-
-                    return new CachedPDOAdapter($configuration);
-                } elseif (
-                    isset($configuration['db_pdo_protocol'])
-                    && 'sqlite' == $configuration['db_pdo_protocol']
-                ) {
-                    return new PDOSQLiteAdapter($configuration);
-                } else {
-                    // no cache
-                    if (false == class_exists(PDOAdapter::class)) {
-                        require_once 'PDOAdapter.php';
-                    }
-
-                    return new PDOAdapter($configuration);
+                // no cache
+                if (false == class_exists(PDOAdapter::class)) {
+                    require_once 'PDOAdapter.php';
                 }
+
+                return new PDOAdapter($configuration);
             }
         }
 

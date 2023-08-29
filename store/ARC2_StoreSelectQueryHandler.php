@@ -9,9 +9,6 @@
  *
  * @version   2010-11-16
  */
-
-use ARC2\Store\Adapter\PDOSQLiteAdapter;
-
 ARC2::inc('StoreQueryHandler');
 
 class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler
@@ -108,9 +105,7 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler
             $this->analyzeIndex($this->getPattern('0'));
             $sub_r = $this->getQuerySQL();
             $r .= $r ? $nl.'UNION'.$this->getDistinctSQL().$nl : '';
-
-            $setBracket = $this->is_union_query && !$this->store->getDBObject() instanceof PDOSQLiteAdapter;
-            $r .= $setBracket ? '('.$sub_r.')' : $sub_r;
+            $r .= $this->is_union_query ? '('.$sub_r.')' : $sub_r;
 
             $this->indexes[$i] = $this->index;
         }
@@ -172,15 +167,10 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler
             $tbl = 'Q'.md5($tbl);
         }
 
-        if ($this->store->getDBObject() instanceof PDOSQLiteAdapter) {
-            $tmp_sql = 'CREATE TABLE '.$tbl.' ( ';
-            $tmp_sql .= $this->getTempTableDefForSQLite($q_sql).')';
-        } else {
-            $tmp_sql = 'CREATE TEMPORARY TABLE '.$tbl.' ( ';
-            $tmp_sql .= $this->getTempTableDefForMySQL($q_sql);
-            /* HEAP doesn't support AUTO_INCREMENT, and MySQL breaks on MEMORY sometimes */
-            $tmp_sql .= ') ENGINE='.$this->engine_type;
-        }
+        $tmp_sql = 'CREATE TEMPORARY TABLE '.$tbl.' ( ';
+        $tmp_sql .= $this->getTempTableDefForMySQL($q_sql);
+        /* HEAP doesn't support AUTO_INCREMENT, and MySQL breaks on MEMORY sometimes */
+        $tmp_sql .= ') ENGINE='.$this->engine_type;
 
         $tmpSql2 = str_replace('CREATE TEMPORARY', 'CREATE', $tmp_sql);
 
@@ -1429,22 +1419,6 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler
             $r .= $r ? ' '.$op.' '.$sub_r : $sub_r;
         }
 
-        /*
-         * SQLite related adaption for relational expressions like ?w < 100
-         *
-         * We have to cast the variable behind ?w to a number otherwise we don't get
-         * meaningful results.
-         */
-        if ($this->store->getDBObject() instanceof PDOSQLiteAdapter) {
-            // Regex to catch things like: ?w < 100, ?w > 20
-            $regex = '/([T\_0-9]+\.o_comp)\s*[<>]{1}\s*[0-9]+/si';
-            if (0 < preg_match_all($regex, $r, $matches)) {
-                foreach ($matches[1] as $variable) {
-                    $r = str_replace($variable, 'CAST ('.$variable.' as float)', $r);
-                }
-            }
-        }
-
         return $r ? '('.$r.')' : $r;
     }
 
@@ -1868,10 +1842,7 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler
                 return $sub_r_1.$op.' LIKE "'.$sub_r_2.'"';
             }
             /* REGEXP */
-            $opt = '';
-            if (!$this->store->getDBObject() instanceof PDOSQLiteAdapter) {
-                $opt = ('i' == $sub_r_3) ? '' : 'BINARY ';
-            }
+            $opt = ('i' == $sub_r_3) ? '' : 'BINARY ';
 
             return $sub_r_1.$op.' REGEXP '.$opt.$sub_r_2;
         }

@@ -10,7 +10,6 @@
 
 use ARC2\Store\Adapter\AbstractAdapter;
 use ARC2\Store\Adapter\AdapterFactory;
-use ARC2\Store\Adapter\PDOSQLiteAdapter;
 use ARC2\Store\TableManager\SQLite;
 
 ARC2::inc('Class');
@@ -347,36 +346,25 @@ class ARC2_Store extends ARC2_Class
     public function setUp($force = 0)
     {
         if (($force || !$this->isSetUp()) && false !== $this->getDBCon()) {
-            // PDO with SQLite
-            if ($this->a['db_object'] instanceof PDOSQLiteAdapter) {
-                (new SQLite($this->a, $this))->createTables();
-            } else {
-                // default way
-                ARC2::inc('StoreTableManager');
-                (new ARC2_StoreTableManager($this->a, $this))->createTables();
-            }
+            // default way
+            ARC2::inc('StoreTableManager');
+            (new ARC2_StoreTableManager($this->a, $this))->createTables();
         }
     }
 
     public function extendColumns()
     {
-        $cfg = $this->getDBObject()->getConfiguration();
-
-        if (false === $this->getDBObject() instanceof PDOSQLiteAdapter) {
-            ARC2::inc('StoreTableManager');
-            $mgr = new ARC2_StoreTableManager($this->a, $this);
-            $mgr->extendColumns();
-            $this->column_type = 'int';
-        }
+        ARC2::inc('StoreTableManager');
+        $mgr = new ARC2_StoreTableManager($this->a, $this);
+        $mgr->extendColumns();
+        $this->column_type = 'int';
     }
 
     public function splitTables()
     {
-        if (false === $this->getDBObject() instanceof PDOSQLiteAdapter) {
-            ARC2::inc('StoreTableManager');
-            $mgr = new ARC2_StoreTableManager($this->a, $this);
-            $mgr->splitTables();
-        }
+        ARC2::inc('StoreTableManager');
+        $mgr = new ARC2_StoreTableManager($this->a, $this);
+        $mgr->splitTables();
     }
 
     public function hasSetting($k)
@@ -487,11 +475,7 @@ class ARC2_Store extends ARC2_Class
             if ($keep_settings && ('setting' == $tbl)) {
                 continue;
             }
-            if ($this->getDBObject() instanceof PDOSQLiteAdapter) {
-                $this->db->simpleQuery('DELETE FROM '.$prefix.$tbl);
-            } else {
-                $this->db->simpleQuery('TRUNCATE '.$prefix.$tbl);
-            }
+            $this->db->simpleQuery('TRUNCATE '.$prefix.$tbl);
         }
     }
 
@@ -560,11 +544,7 @@ class ARC2_Store extends ARC2_Class
         $new_prefix .= $new_prefix ? '_' : '';
         $new_prefix .= $name.'_';
         foreach ($tbls as $tbl) {
-            if ($this->getDBObject() instanceof PDOSQLiteAdapter) {
-                $sql = 'ALTER TABLE '.$old_prefix.$tbl.' RENAME TO '.$new_prefix.$tbl;
-            } else {
-                $sql = 'RENAME TABLE '.$old_prefix.$tbl.' TO '.$new_prefix.$tbl;
-            }
+            $sql = 'RENAME TABLE '.$old_prefix.$tbl.' TO '.$new_prefix.$tbl;
 
             $this->db->simpleQuery($sql);
             if (!empty($this->db->getErrorMessage())) {
@@ -577,10 +557,6 @@ class ARC2_Store extends ARC2_Class
 
     public function replicateTo($name)
     {
-        if ($this->getDBObject() instanceof PDOSQLiteAdapter) {
-            throw new Exception('replicateTo not supported with SQLite as DB adapter yet.');
-        }
-
         $conf = array_merge($this->a, ['store_name' => $name]);
         $new_store = ARC2::getStore($conf);
         $new_store->setUp();
@@ -589,14 +565,7 @@ class ARC2_Store extends ARC2_Class
         $old_prefix = $this->getTablePrefix();
         $new_prefix = $new_store->getTablePrefix();
 
-        /*
-         * Use appropriate INSERT syntax, depending on the DBS.
-         */
-        if ($this->getDBObject() instanceof PDOSQLiteAdapter) {
-            $sqlHead = 'INSERT OR IGNORE INTO ';
-        } else {
-            $sqlHead = 'INSERT IGNORE INTO ';
-        }
+        $sqlHead = 'INSERT IGNORE INTO ';
 
         foreach ($tbls as $tbl) {
             $this->db->simpleQuery($sqlHead.$new_prefix.$tbl.' SELECT * FROM '.$old_prefix.$tbl);
@@ -796,17 +765,10 @@ class ARC2_Store extends ARC2_Class
         }
         /* exact match */
         else {
-            if ($this->getDBObject() instanceof PDOSQLiteAdapter) {
-                $sql = 'SELECT id
-                    FROM '.$this->getTablePrefix().$tbl."
-                    WHERE val = '".$this->db->escape($val)."'
-                    LIMIT 1";
-            } else {
-                $sql = 'SELECT id
+            $sql = 'SELECT id
                     FROM '.$this->getTablePrefix().$tbl."
                     WHERE val = BINARY '".$this->db->escape($val)."'
                     LIMIT 1";
-            }
 
             $row = $this->db->fetchRow($sql);
 
@@ -836,15 +798,6 @@ class ARC2_Store extends ARC2_Class
 
     public function getLock($t_out = 10, $t_out_init = '')
     {
-        /*
-         * We assume locks are not required when using SQLite.
-         * Either its an in memory database, which has no concurrent reads
-         * or its a file and SQLite takes care of it.
-         */
-        if ($this->getDBObject() instanceof PDOSQLiteAdapter) {
-            return 1;
-        }
-
         if (!$t_out_init) {
             $t_out_init = $t_out;
         }
@@ -872,15 +825,6 @@ class ARC2_Store extends ARC2_Class
 
     public function releaseLock()
     {
-        /*
-         * We assume locks are not required when using SQLite.
-         * Either its an in memory database, which has no concurrent reads
-         * or its a file and SQLite takes care of it.
-         */
-        if ($this->getDBObject() instanceof PDOSQLiteAdapter) {
-            return true;
-        }
-
         $sql = 'DO RELEASE_LOCK("'.$this->a['db_name'].'.'.$this->getTablePrefix().'.write_lock")';
 
         return $this->db->simpleQuery($sql);
@@ -891,11 +835,6 @@ class ARC2_Store extends ARC2_Class
      */
     public function processTables($level = 2, $operation = 'optimize')
     {
-        // no processing required when using SQLite
-        if ($this->getDBObject() instanceof PDOSQLiteAdapter) {
-            return;
-        }
-
         /*
          * level:
          *      1. triple + g2t

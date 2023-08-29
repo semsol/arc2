@@ -14,8 +14,6 @@ namespace ARC2\Store\Adapter;
 
 /**
  * PDO Adapter - Handles database operations using PDO.
- *
- * This adapter doesn't support SQLite, please use PDOSQLiteAdapter instead.
  */
 class PDOAdapter extends AbstractAdapter
 {

@@ -2,7 +2,6 @@
 
 namespace Tests\db_adapter_depended\store;
 
-use ARC2\Store\Adapter\PDOSQLiteAdapter;
 use Tests\ARC2_TestCase;
 
 class ARC2_StoreTest extends ARC2_TestCase
@@ -304,12 +303,7 @@ XML;
 
         $this->assertNull($res1);
 
-        if ($this->fixture->getDBObject() instanceof PDOSQLiteAdapter) {
-            // TODO remove that if else in the future, after ...FulltextSearch functions
-            //      got more clear return values.
-        } else {
-            $this->assertEquals(1, $res2);
-        }
+        $this->assertEquals(1, $res2);
 
         $this->assertEquals(0, $this->fixture->a['db_object']->getErrorCode());
         $this->assertEquals('', $this->fixture->a['db_object']->getErrorMessage());
@@ -322,13 +316,8 @@ XML;
     // just check pattern
     public function testGetDBVersion()
     {
-        // SQLite
-        if ($this->fixture->getDBObject() instanceof PDOSQLiteAdapter) {
-            $pattern = '/[0-9]{1,}\.[0-9]{1,}\.[0-9]{1,}/';
-        } else {
-            // MySQL
-            $pattern = '/[0-9]{2}-[0-9]{2}-[0-9]{2}/';
-        }
+        $pattern = '/[0-9]{2}-[0-9]{2}-[0-9]{2}/';
+
         $result = preg_match($pattern, $this->fixture->getDBVersion(), $match);
         $this->assertEquals(1, $result);
     }
@@ -723,13 +712,10 @@ XML;
     {
         if (
             '05-06' == substr($this->fixture->getDBVersion(), 0, 5)
-            && false === $this->fixture->getDBObject() instanceof PDOSQLiteAdapter
         ) {
             $this->markTestSkipped(
                 'With MySQL 5.6 ARC2_Store::replicateTo does not work. Tables keep their names.'
             );
-        } elseif ($this->fixture->getDBObject() instanceof PDOSQLiteAdapter) {
-            $this->markTestSkipped('replicateTo not yet implemented when using SQLite.');
         }
 
         // test data

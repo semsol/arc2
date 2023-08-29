@@ -7,9 +7,6 @@
  *
  * @version   2010-11-16
  */
-
-use ARC2\Store\Adapter\PDOSQLiteAdapter;
-
 ARC2::inc('Store');
 
 /**
@@ -260,14 +257,7 @@ class ARC2_StoreTableManager extends ARC2_Store
         $new_tbl = $this->getTablePrefix().'triple';
         $p_id = $this->getTermID($p, 'p');
 
-        /*
-         * Use appropriate INSERT syntax, depending on the DBS.
-         */
-        if ($this->store->getDBObject() instanceof PDOSQLiteAdapter) {
-            $sqlHead = 'INSERT OR IGNORE INTO ';
-        } else {
-            $sqlHead = 'INSERT IGNORE INTO ';
-        }
+        $sqlHead = 'INSERT IGNORE INTO ';
 
         $sql = $sqlHead.$new_tbl.' SELECT * FROM '.$old_tbl.' WHERE '.$old_tbl.'.p = '.$p_id;
         if ($this->a['db_object']->simpleQuery($sql)) {
@@ -287,14 +277,7 @@ class ARC2_StoreTableManager extends ARC2_Store
         $new_tbl = $this->getTablePrefix().$suffix;
         $p_id = $this->getTermID($p, 'p');
 
-        /*
-         * Use appropriate INSERT syntax, depending on the DBS.
-         */
-        if ($this->store->getDBObject() instanceof PDOSQLiteAdapter) {
-            $sqlHead = 'INSERT OR IGNORE INTO ';
-        } else {
-            $sqlHead = 'INSERT IGNORE INTO ';
-        }
+        $sqlHead = 'INSERT IGNORE INTO ';
 
         $sql = $sqlHead.$new_tbl.'SELECT * FROM '.$old_tbl.' WHERE '.$old_tbl.'.p = '.$p_id;
         if ($this->a['db_object']->simpleQuery($sql)) {
