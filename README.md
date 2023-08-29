@@ -56,7 +56,7 @@ Please have a look [here](doc/developer.md) to find information about maintainin
 
 ## MySQL
 
-### 8.1
+### 8.0+
 
 The following error occurs when using a REGEX function inside a SELECT query.
 

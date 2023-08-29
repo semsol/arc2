@@ -668,7 +668,7 @@ class SelectQueryTest extends ARC2_TestCase
     {
         if (
             'mysql' == $this->fixture->getDBSName()
-            && str_starts_with($this->fixture->getServerVersion(), '8.')
+            && str_starts_with($this->fixture->getDBVersion(), '8.')
         ) {
             $this->markTestSkipped('MySQL 8+ has problems with SELECT queries containing a regex function.');
         }
@@ -1027,9 +1027,7 @@ class SelectQueryTest extends ARC2_TestCase
         ';
 
         // mark skipped, if we have a certain MySQL version running
-        // TODO make that more flexible, currently its tight to MySQL
-        $serverVersion = $this->fixture->a['db_object']->getServerVersion();
-        if ('05-07' == substr($serverVersion, 0, 5)) {
+        if (str_starts_with($this->fixture->getDBVersion(), '5.7.')) {
             $this->markTestSkipped(
                 '[mysql 5.7] Result set is empty for query: '
                 .$query
