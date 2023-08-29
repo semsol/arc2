@@ -11,19 +11,18 @@ Older versions of PHP may work, but are not longer tested.
 
 **Test status:**
 
-| Database     | Status                                                                         |
-|--------------|--------------------------------------------------------------------------------|
-| MariaDB 10.4 | ![](https://github.com/semsol/arc2/workflows/MariaDB%2010.4%20Tests/badge.svg) |
-| MariaDB 10.5 | ![](https://github.com/semsol/arc2/workflows/MariaDB%2010.5%20Tests/badge.svg) |
-| MariaDB 10.6 | ![](https://github.com/semsol/arc2/workflows/MariaDB%2010.6%20Tests/badge.svg) |
-| MariaDB 10.9 | ![](https://github.com/semsol/arc2/workflows/MariaDB%2010.9%20Tests/badge.svg) |
+| Database      | Status                                                                          |
+|---------------|---------------------------------------------------------------------------------|
+| MariaDB 10.5  | ![](https://github.com/semsol/arc2/workflows/MariaDB%2010.5%20Tests/badge.svg)  |
+| MariaDB 10.6  | ![](https://github.com/semsol/arc2/workflows/MariaDB%2010.6%20Tests/badge.svg)  |
+| MariaDB 10.9  | ![](https://github.com/semsol/arc2/workflows/MariaDB%2010.9%20Tests/badge.svg)  |
 | MariaDB 10.10 | ![](https://github.com/semsol/arc2/workflows/MariaDB%2010.10%20Tests/badge.svg) |
 | MariaDB 10.11 | ![](https://github.com/semsol/arc2/workflows/MariaDB%2010.11%20Tests/badge.svg) |
-| MySQL 5.5    | ![](https://github.com/semsol/arc2/workflows/MySQL%205.5%20Tests/badge.svg)    |
-| MySQL 5.6    | ![](https://github.com/semsol/arc2/workflows/MySQL%205.6%20Tests/badge.svg)    |
-| MySQL 5.7    | ![](https://github.com/semsol/arc2/workflows/MySQL%205.7%20Tests/badge.svg)    |
-| MySQL 8.0    | ![](https://github.com/semsol/arc2/workflows/MySQL%208.0%20Tests/badge.svg)    |
-| MySQL 8.1    | ![](https://github.com/semsol/arc2/workflows/MySQL%208.1%20Tests/badge.svg)    |
+| MySQL 5.5     | ![](https://github.com/semsol/arc2/workflows/MySQL%205.5%20Tests/badge.svg)     |
+| MySQL 5.6     | ![](https://github.com/semsol/arc2/workflows/MySQL%205.6%20Tests/badge.svg)     |
+| MySQL 5.7     | ![](https://github.com/semsol/arc2/workflows/MySQL%205.7%20Tests/badge.svg)     |
+| MySQL 8.0     | ![](https://github.com/semsol/arc2/workflows/MySQL%208.0%20Tests/badge.svg)     |
+| MySQL 8.1     | ![](https://github.com/semsol/arc2/workflows/MySQL%208.1%20Tests/badge.svg)     |
 
 ## Documentation
 

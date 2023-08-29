@@ -1,10 +1,10 @@
-name: MariaDB 10.5 Tests
+name: MariaDB 10.11 Tests
 
 on: push
 
 jobs:
     pdo-mysql:
-        name: MariaDB 10.5 Tests - PHP ${{ matrix.php }} PDO mysql
+        name: MariaDB 10.11 Tests - PHP ${{ matrix.php }} PDO mysql
         runs-on: ubuntu-latest
 
         env:
@@ -24,7 +24,7 @@ jobs:
 
         services:
             testdb:
-                image: mariadb:10.5
+                image: mariadb:10.11
                 env:
                     MYSQL_ROOT_PASSWORD: Pass123
                     MYSQL_DATABASE: arc2_test
