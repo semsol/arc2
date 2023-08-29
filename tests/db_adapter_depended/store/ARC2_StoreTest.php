@@ -298,6 +298,10 @@ XML;
 
     public function testEnableFulltextSearch()
     {
+        if (str_starts_with($this->fixture->getDBObject()->getServerVersion(), '5.5.')) {
+            $this->markTestSkipped('InnoDB does not support fulltext in MySQL 5.5.x');
+        }
+
         $res1 = $this->fixture->enableFulltextSearch();
         $res2 = $this->fixture->disableFulltextSearch();
 
@@ -316,10 +320,10 @@ XML;
     // just check pattern
     public function testGetDBVersion()
     {
-        $pattern = '/[0-9]{2}-[0-9]{2}-[0-9]{2}/';
+        $pattern = '/[0-9]{1,}\.[0-9]{1,}\.[0-9]{2}/';
 
         $result = preg_match($pattern, $this->fixture->getDBVersion(), $match);
-        $this->assertEquals(1, $result);
+        $this->assertEquals(1, $result, $this->fixture->getDBVersion());
     }
 
     /*

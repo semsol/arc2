@@ -227,8 +227,10 @@ abstract class AbstractAdapterTest extends ARC2_TestCase
 
     public function testGetServerVersion()
     {
-        // check that server version looks like 05-00-05
-        $this->assertEquals(1, preg_match('/\d\d-\d\d-\d\d/', $this->fixture->getServerVersion()));
+        $pattern = '/[0-9]{1,}\.[0-9]{1,}\.[0-9]{2}/';
+
+        // check that server version looks like 5.5.21
+        $this->assertEquals(1, preg_match($pattern, $this->fixture->getServerVersion()));
     }
 
     /*

@@ -12,6 +12,8 @@
 
 namespace ARC2\Store\Adapter;
 
+use Exception;
+
 /**
  * PDO Adapter - Handles database operations using PDO.
  */
@@ -39,9 +41,9 @@ class PDOAdapter extends AbstractAdapter
     }
 
     /**
-     * Connect to server or storing a given connection.
+     * Connect to server.
      *
-     * @param EasyDB $existingConnection default is null
+     * @return \PDO
      */
     public function connect($existingConnection = null)
     {
@@ -231,25 +233,16 @@ class PDOAdapter extends AbstractAdapter
         return $return;
     }
 
-    public function getServerInfo()
-    {
-        return $this->db->getAttribute(\constant('PDO::ATTR_CLIENT_VERSION'));
-    }
-
     /**
-     * Returns the version of the database server like 05-00-12.
+     * Returns the version of the database server like 05.00.12
      */
-    public function getServerVersion()
+    public function getServerVersion(): string
     {
-        $res = preg_match(
-            "/([0-9]+)\.([0-9]+)\.([0-9]+)/",
-            $this->getServerInfo(),
-            $matches
-        );
+        if ($this->db instanceof \PDO) {
+            return $this->db->query('select version()')->fetchColumn();
+        }
 
-        return 1 == $res
-            ? sprintf('%02d-%02d-%02d', $matches[1], $matches[2], $matches[3])
-            : '00-00-00';
+        throw new Exception('You need to connect to DB server first. Use connect() before this function.');
     }
 
     public function getErrorCode()

@@ -28,7 +28,7 @@ abstract class AbstractAdapter
     protected $queries = [];
 
     /**
-     * @param array $configuration default is array()
+     * @param array $configuration Default is array().
      */
     public function __construct(array $configuration = [])
     {
@@ -70,6 +70,11 @@ abstract class AbstractAdapter
 
     abstract public function checkRequirements();
 
+    /**
+     * Connect to server.
+     *
+     * It returns current object for the connection, such as an instance of \PDO.
+     */
     abstract public function connect($existingConnection = null);
 
     abstract public function disconnect();
@@ -89,8 +94,6 @@ abstract class AbstractAdapter
     abstract public function getDBSName();
 
     abstract public function getLastInsertId();
-
-    abstract public function getServerInfo();
 
     abstract public function getErrorMessage();
 
