@@ -48,11 +48,9 @@ Further information about Composer usage can be found [here](https://getcomposer
 
 Please have a look into [SPARQL-support.md](doc/SPARQL-support.md) to see which SPARQL 1.0/1.1 features are currently supported.
 
-## Known database problems
+### Known database problems
 
-### MySQL
-
-#### 8.0+
+#### MySQL 8.0+
 
 The following error occurs when using a REGEX function inside a SELECT query.
 
