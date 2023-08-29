@@ -63,7 +63,7 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler
         parent::__init();
         $this->store = $this->caller;
         $this->handler_type = 'select';
-        $this->engine_type = $this->v('store_engine_type', 'MyISAM', $this->a);
+        $this->engine_type = $this->v('store_engine_type', 'InnoDB', $this->a);
         $this->cache_results = $this->v('store_cache_results', 0, $this->a);
     }
 

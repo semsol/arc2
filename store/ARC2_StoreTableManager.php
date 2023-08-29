@@ -27,7 +27,7 @@ class ARC2_StoreTableManager extends ARC2_Store
     public function __init()
     {
         parent::__init();
-        $this->engine_type = $this->v('store_engine_type', 'MyISAM', $this->a);
+        $this->engine_type = $this->v('store_engine_type', 'InnoDB', $this->a);
     }
 
     public function getTableOptionsCode()

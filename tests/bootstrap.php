@@ -16,13 +16,11 @@ $dbConfig = null;
  * Copy config.php.dist to config.php, adapt your values and run PHPUnit.
  */
 
-var_dump($_ENV);
-var_dump($_SERVER);
 if (file_exists(__DIR__.'/config.php')) {
     $dbConfig = require 'config.php';
-} elseif (1 === (int) $_ENV['IN_WORKFLOW']) {
+} elseif (isset($_SERVER['GITHUB_PATH'])) {
     /*
-     * For CI only.
+     * For CI Github workflow only.
      *
      * Parameter are set from outside using environment variables.
      * Please check YAML files in .github/workflows for details.
