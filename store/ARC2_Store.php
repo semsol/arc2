@@ -220,13 +220,14 @@ class ARC2_Store extends ARC2_Class
         if (!isset($this->$var_name)) {
             $tbl = $this->getTablePrefix().$tbl;
 
-            $value = true;
-
             // only check if SQLite is NOT being used
             $row = $this->db->fetchRow('SHOW COLUMNS FROM '.$tbl.' LIKE "val_hash"');
-            $value = null !== $row;
 
-            $this->$var_name = $value;
+            // fix: $row doesn't return 'null'
+            $this->$var_name = null;
+            if ($row) {
+                $this->$var_name = true;
+            }
         }
 
         return $this->$var_name;

@@ -306,15 +306,12 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler
                 }
             } else {
                 $binaryValue = $this->store->a['db_object']->escape($val);
-                if (false !== empty($binaryValue)) {
-                    $sql = 'SELECT id
-                            FROM '.$tbl_prefix.$sub_tbl."
-                            WHERE val = BINARY '".$binaryValue."'";
-
-                    $row = $this->store->a['db_object']->fetchRow($sql);
-                    if (is_array($row) && isset($row['id'])) {
-                        $id = $row['id'];
-                    }
+                // Updated by Craig Dietrich 19 February 2020:
+                // Always let through, even if empty since the id2val is storing empty values, too
+                $sql = 'SELECT id AS `id` FROM '.$tbl_prefix.$sub_tbl." WHERE val = BINARY '".$binaryValue."'";
+                $row = $this->store->a['db_object']->fetchRow($sql);
+                if (is_array($row) && isset($row['id'])) {
+                    $id = $row['id'];
                 }
             }
             if ($id) {
