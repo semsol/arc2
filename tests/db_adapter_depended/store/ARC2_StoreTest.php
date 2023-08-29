@@ -320,10 +320,10 @@ XML;
     // just check pattern
     public function testGetDBVersion()
     {
-        $pattern = '/[0-9]{1,}\.[0-9]{1,}\.[0-9]{2}/';
-
-        $result = preg_match($pattern, $this->fixture->getDBVersion(), $match);
-        $this->assertEquals(1, $result, $this->fixture->getDBVersion());
+        $this->assertEquals(
+            $this->fixture->getDBObject()->getConnection()->query('select version()')->fetchColumn(),
+            $this->fixture->getDBVersion()
+        );
     }
 
     /*

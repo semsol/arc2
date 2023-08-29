@@ -12,8 +12,6 @@
 
 namespace ARC2\Store\Adapter;
 
-use Exception;
-
 /**
  * PDO Adapter - Handles database operations using PDO.
  */
@@ -242,7 +240,7 @@ class PDOAdapter extends AbstractAdapter
             return $this->db->query('select version()')->fetchColumn();
         }
 
-        throw new Exception('You need to connect to DB server first. Use connect() before this function.');
+        throw new \Exception('You need to connect to DB server first. Use connect() before this function.');
     }
 
     public function getErrorCode()

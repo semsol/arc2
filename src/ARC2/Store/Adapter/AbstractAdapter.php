@@ -28,7 +28,7 @@ abstract class AbstractAdapter
     protected $queries = [];
 
     /**
-     * @param array $configuration Default is array().
+     * @param array $configuration default is array()
      */
     public function __construct(array $configuration = [])
     {
