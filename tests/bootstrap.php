@@ -15,11 +15,12 @@ $dbConfig = null;
  *
  * Copy config.php.dist to config.php, adapt your values and run PHPUnit.
  */
+
+var_dump($_ENV);
+var_dump($_SERVER);
 if (file_exists(__DIR__.'/config.php')) {
     $dbConfig = require 'config.php';
-} elseif (file_exists(__DIR__.'/config.php.dist') && false == isset($_ENV['DB_ADAPTER'])) {
-    $dbConfig = require 'config.php.dist';
-} else {
+} elseif (1 === (int) $_ENV['IN_WORKFLOW']) {
     /*
      * For CI only.
      *
@@ -69,6 +70,8 @@ if (file_exists(__DIR__.'/config.php')) {
     }
 
     $dbConfig['db_table_prefix'] = $dbConfig['db_table_prefix'] ?? null;
+} else {
+    $dbConfig = require 'config.php.dist';
 }
 
 var_dump($dbConfig);
