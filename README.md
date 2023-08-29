@@ -48,16 +48,16 @@ Further information about Composer usage can be found [here](https://getcomposer
 
 Please have a look into [SPARQL-support.md](doc/SPARQL-support.md) to see which SPARQL 1.0/1.1 features are currently supported.
 
-## Internal information for developers
-
-Please have a look [here](doc/developer.md) to find information about maintaining and extending ARC2 as well as our docker setup for local development.
-
 ## Known database problems
 
-## MySQL
+### MySQL
 
-### 8.0+
+#### 8.0+
 
 The following error occurs when using a REGEX function inside a SELECT query.
 
 >  General error: 3995 Character set 'utf8mb3_unicode_ci' cannot be used in conjunction with 'binary' in call to regexp_like.
+
+## Internal information for developers
+
+Please have a look [here](doc/developer.md) to find information about maintaining and extending ARC2 as well as our docker setup for local development.
