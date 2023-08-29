@@ -666,6 +666,13 @@ class SelectQueryTest extends ARC2_TestCase
     // regex
     public function testSelectFilterRegex()
     {
+        if (
+            'mysql' == $this->fixture->getDBSName()
+            && str_starts_with($this->fixture->getServerVersion(), '8.')
+        ) {
+            $this->markTestSkipped('MySQL 8+ has problems with SELECT queries containing a regex function.');
+        }
+
         // test data
         $this->fixture->query('INSERT INTO <http://example.com/> {
             <http://s> <http://p1> "Alice".

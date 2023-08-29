@@ -11,24 +11,26 @@ Older versions of PHP may work, but are not longer tested.
 
 **Test status:**
 
-| Database      | Status                                                                          |
-|---------------|---------------------------------------------------------------------------------|
-| MariaDB 10.5  | ![](https://github.com/semsol/arc2/workflows/MariaDB%2010.5%20Tests/badge.svg)  |
-| MariaDB 10.6  | ![](https://github.com/semsol/arc2/workflows/MariaDB%2010.6%20Tests/badge.svg)  |
-| MariaDB 10.9  | ![](https://github.com/semsol/arc2/workflows/MariaDB%2010.9%20Tests/badge.svg)  |
-| MariaDB 10.10 | ![](https://github.com/semsol/arc2/workflows/MariaDB%2010.10%20Tests/badge.svg) |
-| MariaDB 10.11 | ![](https://github.com/semsol/arc2/workflows/MariaDB%2010.11%20Tests/badge.svg) |
-| MySQL 5.5     | ![](https://github.com/semsol/arc2/workflows/MySQL%205.5%20Tests/badge.svg)     |
-| MySQL 5.6     | ![](https://github.com/semsol/arc2/workflows/MySQL%205.6%20Tests/badge.svg)     |
-| MySQL 5.7     | ![](https://github.com/semsol/arc2/workflows/MySQL%205.7%20Tests/badge.svg)     |
-| MySQL 8.0     | ![](https://github.com/semsol/arc2/workflows/MySQL%208.0%20Tests/badge.svg)     |
-| MySQL 8.1     | ![](https://github.com/semsol/arc2/workflows/MySQL%208.1%20Tests/badge.svg)     |
+| Database      | Status                                                                                              |
+|---------------|-----------------------------------------------------------------------------------------------------|
+| MariaDB 10.5  | ![](https://github.com/semsol/arc2/workflows/MariaDB%2010.5%20Tests/badge.svg)                      |
+| MariaDB 10.6  | ![](https://github.com/semsol/arc2/workflows/MariaDB%2010.6%20Tests/badge.svg)                      |
+| MariaDB 10.9  | ![](https://github.com/semsol/arc2/workflows/MariaDB%2010.9%20Tests/badge.svg)                      |
+| MariaDB 10.10 | ![](https://github.com/semsol/arc2/workflows/MariaDB%2010.10%20Tests/badge.svg)                     |
+| MariaDB 10.11 | ![](https://github.com/semsol/arc2/workflows/MariaDB%2010.11%20Tests/badge.svg)                     |
+| MySQL 5.5     | ![](https://github.com/semsol/arc2/workflows/MySQL%205.5%20Tests/badge.svg)                         |
+| MySQL 5.6     | ![](https://github.com/semsol/arc2/workflows/MySQL%205.6%20Tests/badge.svg)                         |
+| MySQL 5.7     | ![](https://github.com/semsol/arc2/workflows/MySQL%205.7%20Tests/badge.svg)                         |
+| MySQL 8.0     | ![](https://github.com/semsol/arc2/workflows/MySQL%208.0%20Tests/badge.svg) - incomplete! see below |
+| MySQL 8.1     | ![](https://github.com/semsol/arc2/workflows/MySQL%208.1%20Tests/badge.svg) - incomplete! see below |
 
 ## Documentation
 
 For the documentation, see the [Wiki](https://github.com/semsol/arc2/wiki#core-documentation). To quickly get started, see the [Getting started guide](https://github.com/semsol/arc2/wiki/Getting-started-with-ARC2).
 
 ## Installation
+
+Requires **PHP 8.0**+.
 
 Package available on [Composer](https://packagist.org/packages/semsol/arc2).
 
@@ -40,26 +42,6 @@ composer require semsol/arc2:^3
 
 Further information about Composer usage can be found [here](https://getcomposer.org/doc/01-basic-usage.md#autoloading), for instance about autoloading ARC2 classes.
 
-## Requirements
-
-**PHP:** 8.0+
-
-#### Database systems
-
-This section is relevant, if you wanna use database related functionality.
-
-**MySQL**
-
-| 5.5  | 5.6  | 5.7  | 8.0  |
-|------|------|------|------|
-| :+1: | :+1: | :+1: | :+1: |
-
-**MariaDB**
-
-| 10.1 | 10.2 | 10.3 | 10.4 | 10.5 |
-|------|------|------|------|------|
-| :+1: | :+1: | :+1: | :+1: | :+1: |
-
 ## RDF triple store
 
 ### SPARQL support
@@ -69,3 +51,13 @@ Please have a look into [SPARQL-support.md](doc/SPARQL-support.md) to see which 
 ## Internal information for developers
 
 Please have a look [here](doc/developer.md) to find information about maintaining and extending ARC2 as well as our docker setup for local development.
+
+## Known database problems
+
+## MySQL
+
+### 8.1
+
+The following error occurs when using a REGEX function inside a SELECT query.
+
+>  General error: 3995 Character set 'utf8mb3_unicode_ci' cannot be used in conjunction with 'binary' in call to regexp_like.
