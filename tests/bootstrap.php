@@ -17,7 +17,7 @@ $dbConfig = null;
  */
 if (file_exists(__DIR__.'/config.php')) {
     $dbConfig = require 'config.php';
-} elseif (file_exists(__DIR__.'/config.php.dist')) {
+} elseif (file_exists(__DIR__.'/config.php.dist') && false == isset($_ENV['DB_ADAPTER'])) {
     $dbConfig = require 'config.php.dist';
 } else {
     /*
