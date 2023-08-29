@@ -70,3 +70,5 @@ if (file_exists(__DIR__.'/config.php')) {
 
     $dbConfig['db_table_prefix'] = $dbConfig['db_table_prefix'] ?? null;
 }
+
+var_dump($dbConfig);
