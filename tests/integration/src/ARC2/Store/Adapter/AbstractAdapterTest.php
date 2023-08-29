@@ -155,7 +155,7 @@ abstract class AbstractAdapterTest extends ARC2_TestCase
         ) ENGINE=MyISAM CHARACTER SET utf8 COLLATE utf8_unicode_ci DELAY_KEY_WRITE = 1';
         $this->fixture->exec($sql);
 
-        $this->assertEquals('utf8_unicode_ci', $this->fixture->getCollation());
+        $this->assertEquals('utf8mb3_unicode_ci', $this->fixture->getCollation());
     }
 
     // setting table not there

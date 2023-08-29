@@ -100,7 +100,7 @@ class ARC2_SPARQLScriptProcessor extends ARC2_Class
             $old_val = $val;
             if (preg_match_all('/(\{(?:[^{}]+|(?R))*\})/', $val, $m)) {
                 foreach ($m[1] as $match) {
-                    if (false === strpos($val, '$'.$match)) {/* just some container brackets, recurse */
+                    if (!str_contains($val, '$'.$match)) {/* just some container brackets, recurse */
                         $val = str_replace($match, '{'.$this->replacePlaceholders(substr($match, 1, -1), $context, $return_string, $loop + 1).'}', $val);
                     } else {
                         $ph = substr($match, 1, -1);
@@ -246,6 +246,7 @@ class ARC2_SPARQLScriptProcessor extends ARC2_Class
                 return 'No rendering method found for "'.$src_format.'"';
             }
         }
+
         /* try RDF */
         return $this->getArraySerialization($val);
     }
@@ -278,6 +279,7 @@ class ARC2_SPARQLScriptProcessor extends ARC2_Class
         if (('triples' == $v_type) || ('index' == $v_type)) {
             $m = method_exists($this, 'to'.$pf) ? 'to'.$pf : ('query' == $context ? 'toNTriples' : 'toRDFXML');
         }
+
         /* else */
         return $this->$m($v);
     }
@@ -579,7 +581,7 @@ class ARC2_SPARQLScriptProcessor extends ARC2_Class
     {
         $uri = $this->replacePlaceholders($block['uri'], 'function_call');
         /* built-ins */
-        if (0 === strpos($uri, $this->a['ns']['sps'])) {
+        if (str_starts_with($uri, $this->a['ns']['sps'])) {
             return $this->processBuiltinFunctionCallBlock($block);
         }
         /* remote functions */
@@ -613,7 +615,7 @@ class ARC2_SPARQLScriptProcessor extends ARC2_Class
         if ('var' == $arg['type']) {
             $script = $this->getVarValue($arg['value']);
         }
-        //echo "\n" . $script . $arg['type'];
+        // echo "\n" . $script . $arg['type'];
         $this->processScript($script);
     }
 
@@ -675,6 +677,7 @@ class ARC2_SPARQLScriptProcessor extends ARC2_Class
 
             return 1;
         }
+
         /* no placeholders */
         return ($pattern == $input) ? 1 : 0;
     }

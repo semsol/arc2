@@ -12,6 +12,8 @@ ARC2::inc('Class');
 
 class ARC2_LegacyXMLSerializer extends ARC2_Class
 {
+    public string $content_header;
+
     public function __construct($a, &$caller)
     {
         parent::__construct($a, $caller);

@@ -18,12 +18,12 @@ function ARC2_getFormat($v, $mtype = '', $ext = '')
     $r = (!$r && preg_match('/\/sparql-results\+xml/', $mtype)) ? 'sparqlxml' : $r;
     /* xml sniffing */
     if (
-    !$r &&
-    /* starts with angle brackets */
-    preg_match('/^\s*\<[^\s]/s', $v) &&
-    /* has an xmlns:* declaration or a matching pair of tags */
-    (preg_match('/\sxmlns\:?/', $v) || preg_match('/\<([^\s]+).+\<\/\\1\>/s', $v)) // &&
-  ) {
+        !$r
+        /* starts with angle brackets */
+        && preg_match('/^\s*\<[^\s]/s', $v)
+        /* has an xmlns:* declaration or a matching pair of tags */
+        && (preg_match('/\sxmlns\:?/', $v) || preg_match('/\<([^\s]+).+\<\/\\1\>/s', $v)) // &&
+    ) {
         while (preg_match('/^\s*\<\?xml[^\r\n]+\?\>\s*/s', $v)) {
             $v = preg_replace('/^\s*\<\?xml[^\r\n]+\?\>\s*/s', '', $v);
         }

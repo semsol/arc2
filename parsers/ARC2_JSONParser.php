@@ -5,6 +5,7 @@
  *
  * @author Benjamin Nowack <bnowack@semsol.com>
  * @license W3C Software License and GPL
+ *
  * @homepage <https://github.com/semsol/arc2>
  *
  * @version 2010-11-16
@@ -135,7 +136,7 @@ class ARC2_JSONParser extends ARC2_RDFParser
                 $val = preg_replace_callback('/\\\u(.{4})/', function ($matches) {
                     return chr(hexdec($matches[1]));
                 }, $val);
-                //$val = preg_replace_callback('/\\\u00(.{2})', function($matches) { return rawurldecode("%" . $matches[1]); }, $val);
+                // $val = preg_replace_callback('/\\\u00(.{2})', function($matches) { return rawurldecode("%" . $matches[1]); }, $val);
                 /* other escaped chars */
                 $from = ['\\\\', '\r', '\t', '\n', '\"', '\b', '\f', '\/'];
                 $to = ['\\', "\r", "\t", "\n", '"', "\b", "\f", '/'];
@@ -166,7 +167,7 @@ class ARC2_JSONParser extends ARC2_RDFParser
     public function addT($s = '', $p = '', $o = '', $s_type = '', $o_type = '', $o_dt = '', $o_lang = '')
     {
         $o = $this->toUTF8($o);
-        //echo str_replace($this->base, '', "-----\n adding $s / $p / $o\n-----\n");
+        // echo str_replace($this->base, '', "-----\n adding $s / $p / $o\n-----\n");
         $t = ['s' => $s, 'p' => $p, 'o' => $o, 's_type' => $s_type, 'o_type' => $o_type, 'o_datatype' => $o_dt, 'o_lang' => $o_lang];
         if ($this->skip_dupes) {
             $h = md5(serialize($t));

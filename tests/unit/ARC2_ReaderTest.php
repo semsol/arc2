@@ -6,6 +6,8 @@ use Tests\ARC2_TestCase;
 
 class ARC2_ReaderTest extends ARC2_TestCase
 {
+    private object $reader;
+
     protected function setUp(): void
     {
         parent::setUp();

@@ -78,7 +78,7 @@ class ARC2_LegacyXMLParser extends ARC2_Class
             }
             $first = false;
         }
-        $this->target_encoding = xml_parser_get_option($this->xml_parser, XML_OPTION_TARGET_ENCODING);
+        $this->target_encoding = xml_parser_get_option($this->xml_parser, \XML_OPTION_TARGET_ENCODING);
         xml_parser_free($this->xml_parser);
         $this->reader->closeStream();
         unset($this->reader);
@@ -143,7 +143,7 @@ class ARC2_LegacyXMLParser extends ARC2_Class
 
     public function getNodeContent($n, $outer = 0, $trim = 1)
     {
-        //echo '<pre>' . htmlspecialchars(print_r($n, 1)) . '</pre>';
+        // echo '<pre>' . htmlspecialchars(print_r($n, 1)) . '</pre>';
         if ('cdata' == $n['tag']) {
             $r = $n['a']['value'];
         } else {
@@ -203,8 +203,8 @@ class ARC2_LegacyXMLParser extends ARC2_Class
         if (!isset($this->xml_parser)) {
             $enc = preg_match('/^(utf\-8|iso\-8859\-1|us\-ascii)$/i', $this->getEncoding(), $m) ? $m[1] : 'UTF-8';
             $parser = xml_parser_create_ns($enc, '');
-            xml_parser_set_option($parser, XML_OPTION_SKIP_WHITE, 0);
-            xml_parser_set_option($parser, XML_OPTION_CASE_FOLDING, 0);
+            xml_parser_set_option($parser, \XML_OPTION_SKIP_WHITE, 0);
+            xml_parser_set_option($parser, \XML_OPTION_CASE_FOLDING, 0);
             xml_set_element_handler($parser, 'open', 'close');
             xml_set_character_data_handler($parser, 'cData');
             xml_set_start_namespace_decl_handler($parser, 'nsDecl');
@@ -216,8 +216,8 @@ class ARC2_LegacyXMLParser extends ARC2_Class
     public function open($p, $t, $a)
     {
         $t_exact = $t;
-        //echo "<br />\n".'opening '.$t . ' ' . print_r($a, 1); flush();
-        //echo "<br />\n".'opening '.$t; flush();
+        // echo "<br />\n".'opening '.$t . ' ' . print_r($a, 1); flush();
+        // echo "<br />\n".'opening '.$t; flush();
         $t = strpos($t, ':') ? $t : strtolower($t);
         /* base check */
         $base = '';
@@ -234,7 +234,7 @@ class ARC2_LegacyXMLParser extends ARC2_Class
         /* ns */
         if ($a) {
             foreach ($a as $k => $v) {
-                if (0 === strpos($k, 'xmlns')) {
+                if (str_starts_with($k, 'xmlns')) {
                     $this->nsDecl($p, trim(substr($k, 5), ':'), $v);
                 }
             }
@@ -264,7 +264,7 @@ class ARC2_LegacyXMLParser extends ARC2_Class
             } elseif ($prev_node['level'] > $l) {
                 while ($prev_node['level'] > $l) {
                     if (!isset($this->nodes[$prev_node['p_id']])) {
-                        //$this->addError('nesting mismatch: tag is ' . $t . ', level is ' . $l . ', prev_level is ' . $prev_node['level'] . ', prev_node p_id is ' . $prev_node['p_id']);
+                        // $this->addError('nesting mismatch: tag is ' . $t . ', level is ' . $l . ', prev_level is ' . $prev_node['level'] . ', prev_node p_id is ' . $prev_node['p_id']);
                         break;
                     }
                     $prev_node = $this->nodes[$prev_node['p_id']];
@@ -281,7 +281,7 @@ class ARC2_LegacyXMLParser extends ARC2_Class
 
     public function close($p, $t, $empty = 0)
     {
-        //echo "<br />\n".'closing '.$t; flush();
+        // echo "<br />\n".'closing '.$t; flush();
         $node = $this->getCurNode($t);
         $node['state'] = 'closed';
         $node['empty'] = $empty;
@@ -291,7 +291,7 @@ class ARC2_LegacyXMLParser extends ARC2_Class
 
     public function cData($p, $d)
     {
-        //echo trim($d) ? "<br />\n".'cdata: ' . $d : ''; flush();
+        // echo trim($d) ? "<br />\n".'cdata: ' . $d : ''; flush();
         $node = $this->getCurNode();
         if ('open' == $node['state']) {
             $node['cdata'] .= $d;

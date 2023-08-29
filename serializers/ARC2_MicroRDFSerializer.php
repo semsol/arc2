@@ -4,6 +4,7 @@
  *
  * @author Benjamin Nowack
  * @license W3C Software License and GPL
+ *
  * @homepage <https://github.com/semsol/arc2>
  *
  * @version 2010-11-16
@@ -12,6 +13,9 @@ ARC2::inc('RDFSerializer');
 
 class ARC2_MicroRDFSerializer extends ARC2_RDFSerializer
 {
+    public string $content_header;
+    public $label_store;
+
     public function __construct($a, &$caller)
     {
         parent::__construct($a, $caller);
@@ -50,7 +54,7 @@ class ARC2_MicroRDFSerializer extends ARC2_RDFSerializer
         if ($res) {
             $index = [$res => $index[$res]];
         }
-        //return Trice::dump($index);
+        // return Trice::dump($index);
         $types = $this->v($this->expandPName('rdf:type'), [], $index);
         $main_type = $types ? $types[0]['value'] : '';
         foreach ($index as $s => $ps) {
@@ -128,8 +132,8 @@ class ARC2_MicroRDFSerializer extends ARC2_RDFSerializer
         }
 
         return '<a class="rdf-value" itemprop="'.$p.'" href="'.$id.'">'.$label.'</a>';
-        //$label = $o['value'];
-    //$label = preg_replace('/^https?\:\/\/(www\.)?/', '', $label);
+        // $label = $o['value'];
+        // $label = preg_replace('/^https?\:\/\/(www\.)?/', '', $label);
     }
 
     public function getBNodeObjectValue($o, $p)

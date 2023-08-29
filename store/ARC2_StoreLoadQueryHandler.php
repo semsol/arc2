@@ -4,6 +4,7 @@
  *
  * @author Benjamin Nowack
  * @license W3C Software License and GPL
+ *
  * @homepage <https://github.com/semsol/arc2>
  */
 
@@ -13,6 +14,67 @@ ARC2::inc('StoreQueryHandler');
 
 class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler
 {
+    public string $column_type;
+    public string $fixed_target_graph;
+    public int $has_lock;
+    public int $keep_bnode_ids;
+    public int $log_inserts;
+
+    /**
+     * @var array<mixed>
+     */
+    public array $inserts;
+
+    /**
+     * @var array<mixed>
+     */
+    public array $insert_times;
+
+    /**
+     * @var int
+     */
+    public $max_term_id;
+
+    /**
+     * @var int
+     */
+    public $max_triple_id;
+
+    public int $split_threshold;
+
+    /**
+     * @var array<mixed>
+     */
+    public array $sql_buffers;
+
+    public int $strip_mb_comp_str;
+    public string $target_graph;
+
+    /**
+     * @var array<mixed>
+     */
+    public array $term_ids;
+
+    /**
+     * @var array<mixed>
+     */
+    public array $triple_ids;
+
+    public int $t_count;
+    public int $t_count_prev;
+
+    /**
+     * @var string|float
+     */
+    public $t_prev;
+
+    /**
+     * @var string|float
+     */
+    public $t_start;
+
+    public int $write_buffer_size;
+
     public function __construct($a, &$caller)
     {
         /* caller has to be a store */
@@ -105,7 +167,7 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler
         }
         $this->store->releaseLock();
 
-        if ((1 == rand(1, 100))) {
+        if (1 == rand(1, 100)) {
             $this->store->optimizeTables();
         }
 

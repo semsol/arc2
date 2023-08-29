@@ -8,3 +8,4 @@ triggers/*
 tests/coverage/*
 tests/config.php
 vendor/
+/.php-cs-fixer.cache

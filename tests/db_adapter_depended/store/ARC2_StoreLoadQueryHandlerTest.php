@@ -3,7 +3,6 @@
 namespace Tests\db_adapter_depended\store\ARC2_StoreLoadQueryHandler;
 
 use ARC2\Store\Adapter\PDOSQLiteAdapter;
-use ARC2_StoreLoadQueryHandler;
 use PDO;
 use Tests\ARC2_TestCase;
 
@@ -22,7 +21,7 @@ class ARC2_StoreLoadQueryHandlerTest extends ARC2_TestCase
         $this->store->getDBObject()->deleteAllTables();
         $this->store->setUp();
 
-        $this->fixture = new ARC2_StoreLoadQueryHandler($this->store, $this);
+        $this->fixture = new \ARC2_StoreLoadQueryHandler($this->store, $this);
     }
 
     protected function tearDown(): void

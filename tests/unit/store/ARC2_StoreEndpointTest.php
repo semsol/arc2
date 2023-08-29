@@ -4,9 +4,11 @@ namespace Tests\unit\store;
 
 use Tests\ARC2_TestCase;
 
-//Tests ARC2_StoreEndpoint functions
+// Tests ARC2_StoreEndpoint functions
 class ARC2_StoreEndpointTest extends ARC2_TestCase
 {
+    private object $endpoint;
+
     protected function setUp(): void
     {
         parent::setUp();

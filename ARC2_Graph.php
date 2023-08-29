@@ -4,6 +4,7 @@
  *
  * @author Benjamin Nowack <mail@bnowack.de>
  * @license W3C Software License
+ *
  * @homepage <https://github.com/semsol/arc2>
  */
 ARC2::inc('Class');

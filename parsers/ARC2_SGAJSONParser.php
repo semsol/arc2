@@ -12,6 +12,13 @@ ARC2::inc('JSONParser');
 
 class ARC2_SGAJSONParser extends ARC2_JSONParser
 {
+    public string $rdf;
+
+    /**
+     * @var array<mixed>
+     */
+    public array $struct;
+
     public function __construct($a, &$caller)
     {
         parent::__construct($a, $caller);

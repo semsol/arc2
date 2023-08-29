@@ -12,6 +12,8 @@ ARC2::inc('Class');
 
 class ARC2_LegacyHTMLSerializer extends ARC2_Class
 {
+    public string $content_header;
+
     public function __construct($a, &$caller)
     {
         parent::__construct($a, $caller);
@@ -87,7 +89,7 @@ class ARC2_LegacyHTMLSerializer extends ARC2_Class
                     $r .= $this->getSerializedNode($index, $sub_node, $level + 1, 1);
                 }
                 /* close tag */
-                //$r .= str_pad("\n", $level + 1, "  ") . '</' . $tag . '>';
+                // $r .= str_pad("\n", $level + 1, "  ") . '</' . $tag . '>';
                 $r .= '</'.$tag.'>';
                 if (preg_match('/^(div|form|p|section)$/', $tag)) {
                     $r .= str_pad("\n", $level + 1, '  ');

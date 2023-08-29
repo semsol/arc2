@@ -100,9 +100,9 @@ class ARC2_SPARQLScriptParser extends ARC2_SPARQLPlusParser
                 'type' => 'query',
                 'query_type' => $r['type'],
                 'query' => $q,
-                //'prefixes' => $this->prefixes,
+                // 'prefixes' => $this->prefixes,
                 'base' => $this->base,
-                //'infos' => $r
+                // 'infos' => $r
             ]);
 
             return [$r, $v];
@@ -235,7 +235,7 @@ class ARC2_SPARQLScriptParser extends ARC2_SPARQLPlusParser
         return [0, $v];
     }
 
-    /* s4 'IF' BrackettedExpression '{' Script '}' ( 'ELSE' '{' Script '}')?  */
+    /* s4 'IF' BrackettedExpression '{' Script '}' ( 'ELSE' '{' Script '}')? */
 
     public function xIFBlock($v)
     {

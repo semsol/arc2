@@ -2,6 +2,8 @@
 
 class ARC2_ClassTest extends PHPUnit\Framework\TestCase
 {
+    public ARC2_Class $arc2;
+
     protected function setUp(): void
     {
         $array = [];
@@ -39,7 +41,7 @@ class ARC2_ClassTest extends PHPUnit\Framework\TestCase
         $this->assertFalse($this->arc2->v('cats', false, []));
         $this->assertTrue($this->arc2->v('cats', false, ['cats' => true]));
 
-        $o = new stdclass();
+        $o = new stdClass();
         $o->cats = true;
         $this->assertTrue($this->arc2->v('cats', false, $o));
     }
@@ -51,11 +53,11 @@ class ARC2_ClassTest extends PHPUnit\Framework\TestCase
         $this->assertTrue($this->arc2->v1('cats', false, ['cats' => true]));
         $this->assertSame('blackjack', $this->arc2->v1('cats', 'blackjack', ['cats' => null]));
 
-        $o = new stdclass();
+        $o = new stdClass();
         $o->cats = true;
         $this->assertTrue($this->arc2->v1('cats', false, $o));
 
-        $o = new stdclass();
+        $o = new stdClass();
         $o->cats = 0;
         $this->assertSame('blackjack', $this->arc2->v1('cats', 'blackjack', $o));
     }

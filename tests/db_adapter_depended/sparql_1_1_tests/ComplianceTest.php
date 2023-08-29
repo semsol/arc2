@@ -183,9 +183,9 @@ abstract class ComplianceTest extends ARC2_TestCase
 
         // add data graph information as FROM clause, because ARC2 can't handle default graph
         // queries. for more information see https://github.com/semsol/arc2/issues/72.
-        if (false !== strpos($query, 'ASK')
-            || false !== strpos($query, 'CONSTRUCT')
-            || false !== strpos($query, 'SELECT')) {
+        if (str_contains($query, 'ASK')
+            || str_contains($query, 'CONSTRUCT')
+            || str_contains($query, 'SELECT')) {
             $query = str_replace('WHERE', 'FROM <'.$this->dataGraphUri.'> WHERE', $query);
         }
 
@@ -277,7 +277,7 @@ abstract class ComplianceTest extends ARC2_TestCase
                         $w->startElement('literal');
 
                         // its not part of the ARC2 result set, but expected later on
-                        if (true === ctype_digit($row[$var])) {
+                        if (true === ctype_digit((string) $row[$var])) {
                             $w->writeAttribute('datatype', 'http://www.w3.org/2001/XMLSchema#integer');
                         }
 

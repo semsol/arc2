@@ -12,6 +12,8 @@ ARC2::inc('TurtleParser');
 
 class ARC2_StoreTurtleLoader extends ARC2_TurtleParser
 {
+    public int $t_count = 0;
+
     public function __construct($a, &$caller)
     {
         parent::__construct($a, $caller);

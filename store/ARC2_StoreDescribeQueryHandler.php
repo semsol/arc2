@@ -12,6 +12,28 @@ ARC2::inc('StoreSelectQueryHandler');
 
 class ARC2_StoreDescribeQueryHandler extends ARC2_StoreSelectQueryHandler
 {
+    /**
+     * @var array<mixed>
+     */
+    public array $added_triples;
+
+    /**
+     * @var array<mixed>
+     */
+    public array $described_ids;
+
+    public int $detect_labels;
+
+    /**
+     * @var array<mixed>
+     */
+    public array $ids;
+
+    /**
+     * @var array<mixed>
+     */
+    public array $r;
+
     public function __construct($a, &$caller)
     {/* caller has to be a store */
         parent::__construct($a, $caller);

@@ -12,6 +12,8 @@ ARC2::inc('RSSParser');
 
 class ARC2_StoreRSSLoader extends ARC2_RSSParser
 {
+    public int $t_count = 0;
+
     public function __construct($a, &$caller)
     {
         parent::__construct($a, $caller);

@@ -24,12 +24,12 @@ class ARC2_RdfaExtractor extends ARC2_RDFExtractor
 
     public function extractRDF()
     {
-        //echo '<pre>' . htmlspecialchars(print_r($this->nodes, 1)) . '</pre>';
+        // echo '<pre>' . htmlspecialchars(print_r($this->nodes, 1)) . '</pre>';
         if (!isset($this->caller->detected_formats['rdfa'])) {
             return 0;
         }
         $root_node = $this->getRootNode();
-        //$base = $this->v('xml:base', $this->getDocBase(), $root_node['a']);
+        // $base = $this->v('xml:base', $this->getDocBase(), $root_node['a']);
         $base = $this->getDocBase();
         $context = [
             'base' => $base,
@@ -68,7 +68,7 @@ class ARC2_RdfaExtractor extends ARC2_RDFExtractor
         $lct['cur_o_res'] = '';
         $lct['inco_ts'] = [];
         $lct['base'] = $ct['base'];
-        //$lct['base'] = $this->v('xml:base', $ct['base'], $n['a']);
+        // $lct['base'] = $this->v('xml:base', $ct['base'], $n['a']);
         /* step 2 */
         $lct['ns'] = array_merge($ct['ns'], $this->v('xmlns', [], $n['a']));
         /* step 3 */
@@ -90,7 +90,7 @@ class ARC2_RdfaExtractor extends ARC2_RDFExtractor
                     $lct['new_s'] = $this->createBnodeID();
                 } elseif ($ct['p_o']) {
                     $lct['new_s'] = $ct['p_o'];
-                    //$lct['skip'] = 1;
+                    // $lct['skip'] = 1;
                     if (!isset($n['a']['property'])) {
                         $lct['skip'] = 1;
                     } /* patch by masaka */
@@ -183,7 +183,7 @@ class ARC2_RdfaExtractor extends ARC2_RDFExtractor
         }
         /* step 10 */
         if (!$lct['skip'] && ($new_s = $lct['new_s'])) {
-            //if ($new_s = $lct['new_s']) {
+            // if ($new_s = $lct['new_s']) {
             if ($uris = $this->getAttributeURIs($n, $ct, $lct, 'property')) {
                 foreach ($uris as $uri) {
                     $lct['cur_o_lit'] = $this->getCurrentObjectLiteral($n, $lct, $ct);
@@ -228,7 +228,7 @@ class ARC2_RdfaExtractor extends ARC2_RDFExtractor
         /* step 12 (11) */
         $other = 0;
         if ($ts_added || $complete_triples || ($lct['new_s'] && !preg_match('/^\_\:/', $lct['new_s'])) || (1 == $other)) {
-            //if (!$lct['skip'] && ($complete_triples || ($lct['new_s'] && !preg_match('/^\_\:/', $lct['new_s'])))) {
+            // if (!$lct['skip'] && ($complete_triples || ($lct['new_s'] && !preg_match('/^\_\:/', $lct['new_s'])))) {
             foreach ($ct['inco_ts'] as $inco_t) {
                 if ('fwd' == $inco_t['dir']) {
                     $this->addT([
@@ -288,7 +288,7 @@ class ARC2_RdfaExtractor extends ARC2_RDFExtractor
         $xml_val = $this->getContent($n);
         $plain_val = $this->getPlainContent($n, 0, 0);
         if (function_exists('html_entity_decode')) {
-            $plain_val = html_entity_decode($plain_val, ENT_QUOTES);
+            $plain_val = html_entity_decode($plain_val, \ENT_QUOTES);
         }
         $dt = $this->v('datatype', '', $n['a']);
         list($dt_uri, $sub_v) = $this->xURI($dt, $lct['base'], $lct['ns'], '', $lct);
@@ -297,7 +297,7 @@ class ARC2_RdfaExtractor extends ARC2_RDFExtractor
         if (isset($n['a']['content'])) {
             $r['value'] = $n['a']['content'];
             if (function_exists('html_entity_decode')) {
-                $r['value'] = html_entity_decode($r['value'], ENT_QUOTES);
+                $r['value'] = html_entity_decode($r['value'], \ENT_QUOTES);
             }
         } elseif ($xml_val == $plain_val) {
             $r['value'] = $plain_val;
@@ -314,7 +314,7 @@ class ARC2_RdfaExtractor extends ARC2_RDFExtractor
     }
 
     public function injectXMLDeclarations($val, $ns, $lang)
-    {//@@todo proper node rebuilding */
+    {// @@todo proper node rebuilding */
         $lang_code = $lang ? ' xml:lang="'.$lang.'"' : '';
         /* ns */
         $val = preg_replace('/<([a-z0-9]+)([\>\s])/is', '<\\1 xmlns="http://www.w3.org/1999/xhtml"'.$lang_code.'\\2', $val);

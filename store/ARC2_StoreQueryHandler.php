@@ -4,6 +4,7 @@
  *
  * @author Benjamin Nowack
  * @license W3C Software License and GPL
+ *
  * @homepage <https://github.com/semsol/arc2>
  *
  * @version 2010-11-16
@@ -12,6 +13,13 @@ ARC2::inc('Class');
 
 class ARC2_StoreQueryHandler extends ARC2_Class
 {
+    public int $allow_extension_functions;
+    public int $keep_time_limit;
+    public string $handler_type;
+    public string $mrg_table_id;
+    public object $store;
+    public string $xsd;
+
     public function __construct($a, &$caller)
     {
         parent::__construct($a, $caller);
@@ -80,10 +88,11 @@ class ARC2_StoreQueryHandler extends ARC2_Class
             $sql .= ','.$prefix.'triple_'.abs(crc32($p));
         }
         $sql .= ')';
+
         // TODO whats about that?
-        //$sql .= ($v >= '04-00-00') ? " CHARACTER SET utf8" : "";
-        //$sql .= ($v >= '04-01-00') ? " COLLATE utf8_unicode_ci" : "";
-        //echo $sql;
+        // $sql .= ($v >= '04-00-00') ? " CHARACTER SET utf8" : "";
+        // $sql .= ($v >= '04-01-00') ? " COLLATE utf8_unicode_ci" : "";
+        // echo $sql;
         return $this->getDBObject()->query($sql);
     }
 
@@ -92,7 +101,7 @@ class ARC2_StoreQueryHandler extends ARC2_Class
         return 1;
         // TODO triple_all table seems not used anymore, therefore this function can be removed?
         $sql = 'DROP TABLE IF EXISTS '.$this->store->getTablePrefix().'triple_all';
-        //echo $sql;
-        //return $this->queryDB($sql, $this->store->getDBCon());
+        // echo $sql;
+        // return $this->queryDB($sql, $this->store->getDBCon());
     }
 }

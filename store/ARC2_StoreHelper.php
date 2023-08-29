@@ -12,6 +12,8 @@ ARC2::inc('Class');
 
 class ARC2_StoreHelper extends ARC2_Class
 {
+    public $store;
+
     public function __construct($a, &$caller)
     {
         parent::__construct($a, $caller);

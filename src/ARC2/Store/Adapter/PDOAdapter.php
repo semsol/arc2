@@ -6,12 +6,11 @@
  * @author Benjamin Nowack <bnowack@semsol.com>
  * @author Konrad Abicht <konrad.abicht@pier-and-peer.com>
  * @license W3C Software License and GPL
+ *
  * @homepage <https://github.com/semsol/arc2>
  */
 
 namespace ARC2\Store\Adapter;
-
-use Exception;
 
 /**
  * PDO Adapter - Handles database operations using PDO.
@@ -23,11 +22,11 @@ class PDOAdapter extends AbstractAdapter
     public function checkRequirements()
     {
         if (false == \extension_loaded('pdo_mysql')) {
-            throw new Exception('Extension pdo_mysql is not loaded.');
+            throw new \Exception('Extension pdo_mysql is not loaded.');
         }
 
         if ('mysql' != $this->configuration['db_pdo_protocol']) {
-            throw new Exception('Only "mysql" protocol is supported at the moment.');
+            throw new \Exception('Only "mysql" protocol is supported at the moment.');
         }
     }
 
@@ -53,7 +52,7 @@ class PDOAdapter extends AbstractAdapter
         if (null !== $existingConnection) {
             $this->db = $existingConnection;
 
-        // create your own connection
+            // create your own connection
         } elseif (false === $this->db instanceof \PDO) {
             /*
              * build connection string
@@ -84,8 +83,7 @@ class PDOAdapter extends AbstractAdapter
             $this->db->setAttribute(\PDO::ATTR_EMULATE_PREPARES, false);
 
             // errors DONT lead to exceptions
-            // set to false for compatibility reasons with mysqli. ARC2 using mysqli does not throw any
-            // exceptions, instead collects errors in a hidden array.
+            // ARC2 does not throw any exceptions, instead collects errors in a hidden array.
             $this->db->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
 
             // default fetch mode is associative
@@ -224,9 +222,9 @@ class PDOAdapter extends AbstractAdapter
 
         $clientVersion = strtolower($this->db->getAttribute(\PDO::ATTR_CLIENT_VERSION));
         $serverVersion = strtolower($this->db->getAttribute(\PDO::ATTR_SERVER_VERSION));
-        if (false !== strpos($clientVersion, 'mariadb') || false !== strpos($serverVersion, 'mariadb')) {
+        if (str_contains($clientVersion, 'mariadb') || str_contains($serverVersion, 'mariadb')) {
             $return = 'mariadb';
-        } elseif (false !== strpos($clientVersion, 'mysql') || false !== strpos($serverVersion, 'mysql')) {
+        } elseif (str_contains($clientVersion, 'mysql') || str_contains($serverVersion, 'mysql')) {
             $return = 'mysql';
         } else {
             $return = null;

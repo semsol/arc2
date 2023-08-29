@@ -4,6 +4,7 @@
  *
  * @author Benjamin Nowack
  * @license W3C Software License and GPL
+ *
  * @homepage <https://github.com/semsol/arc2>
  *
  * @version 2010-11-16
@@ -12,6 +13,23 @@ ARC2::inc('RDFParser');
 
 class ARC2_SPOGParser extends ARC2_RDFParser
 {
+    public string $binding;
+    public $encoding;
+    public int $prev_state;
+    public string $rdf;
+    public int $state;
+
+    /**
+     * @var array<mixed>
+     */
+    public array $t;
+    public string $target_encoding;
+    public string $tmp_error;
+    public $x_base;
+    public string $xml;
+    public $xml_parser;
+    public string $xsd;
+
     public function __construct($a, &$caller)
     {
         parent::__construct($a, $caller);
@@ -67,7 +85,7 @@ class ARC2_SPOGParser extends ARC2_RDFParser
                 }
             }
         }
-        $this->target_encoding = xml_parser_get_option($this->xml_parser, XML_OPTION_TARGET_ENCODING);
+        $this->target_encoding = xml_parser_get_option($this->xml_parser, \XML_OPTION_TARGET_ENCODING);
         xml_parser_free($this->xml_parser);
         $this->reader->closeStream();
         unset($this->reader);
@@ -80,8 +98,8 @@ class ARC2_SPOGParser extends ARC2_RDFParser
         if (!isset($this->xml_parser)) {
             $enc = preg_match('/^(utf\-8|iso\-8859\-1|us\-ascii)$/i', $this->getEncoding(), $m) ? $m[1] : 'UTF-8';
             $parser = xml_parser_create($enc);
-            xml_parser_set_option($parser, XML_OPTION_SKIP_WHITE, 0);
-            xml_parser_set_option($parser, XML_OPTION_CASE_FOLDING, 0);
+            xml_parser_set_option($parser, \XML_OPTION_SKIP_WHITE, 0);
+            xml_parser_set_option($parser, \XML_OPTION_CASE_FOLDING, 0);
             xml_set_element_handler($parser, 'open', 'close');
             xml_set_character_data_handler($parser, 'cdata');
             xml_set_start_namespace_decl_handler($parser, 'nsDecl');
@@ -118,7 +136,7 @@ class ARC2_SPOGParser extends ARC2_RDFParser
         if (!($s && $p && $o)) {
             return 0;
         }
-        //echo "-----\nadding $s / $p / $o\n-----\n";
+        // echo "-----\nadding $s / $p / $o\n-----\n";
         $t = ['s' => $s, 'p' => $p, 'o' => $o, 's_type' => $s_type, 'o_type' => $o_type, 'o_datatype' => $o_dt, 'o_lang' => $o_lang, 'g' => $g];
         if ($this->skip_dupes) {
             $h = md5(serialize($t));
@@ -159,15 +177,15 @@ class ARC2_SPOGParser extends ARC2_RDFParser
         $this->state = '';
         if ('result' == $t) {
             $this->addT(
-        $this->v('s', '', $this->t),
-        $this->v('p', '', $this->t),
-        $this->v('o', '', $this->t),
-        $this->v('s_type', '', $this->t),
-        $this->v('o_type', '', $this->t),
-        $this->v('o_dt', '', $this->t),
-        $this->v('o_lang', '', $this->t),
-        $this->v('g', '', $this->t)
-      );
+                $this->v('s', '', $this->t),
+                $this->v('p', '', $this->t),
+                $this->v('o', '', $this->t),
+                $this->v('s_type', '', $this->t),
+                $this->v('o_type', '', $this->t),
+                $this->v('o_dt', '', $this->t),
+                $this->v('o_lang', '', $this->t),
+                $this->v('g', '', $this->t)
+            );
         }
     }
 

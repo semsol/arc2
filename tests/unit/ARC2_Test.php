@@ -9,7 +9,7 @@ class ARC2_Test extends ARC2_TestCase
     public function testGetVersion()
     {
         $actual = \ARC2::getVersion();
-        $this->assertRegExp('/^[0-9]{4}-[0-9]{2}-[0-9]{2}/', $actual, 'should start with date');
+        $this->assertMatchesRegularExpression('/^[0-9]{4}-[0-9]{2}-[0-9]{2}/', $actual, 'should start with date');
     }
 
     public function testGetIncPath()
@@ -99,7 +99,7 @@ class ARC2_Test extends ARC2_TestCase
         $actual = \ARC2::toUTF8('foo');
         $this->assertEquals('foo', $actual);
 
-        $actual = \ARC2::toUTF8(utf8_encode('Iñtërnâtiônàlizætiøn'));
+        $actual = \ARC2::toUTF8(mb_convert_encoding('Iñtërnâtiônàlizætiøn', 'UTF-8', mb_list_encodings()));
         $this->assertEquals('Iñtërnâtiônàlizætiøn', $actual);
     }
 

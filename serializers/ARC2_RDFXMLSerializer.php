@@ -4,6 +4,7 @@
  *
  * @author    Benjamin Nowack
  * @license   W3C Software License and GPL
+ *
  * @homepage  <https://github.com/semsol/arc2>
  *
  * @version   2010-11-16
@@ -12,6 +13,11 @@ ARC2::inc('RDFSerializer');
 
 class ARC2_RDFXMLSerializer extends ARC2_RDFSerializer
 {
+    public string $content_header;
+    public string $default_ns;
+    public string $pp_containers;
+    public int $type_nodes;
+
     public function __construct($a, &$caller)
     {
         parent::__construct($a, $caller);
@@ -76,7 +82,7 @@ class ARC2_RDFXMLSerializer extends ARC2_RDFSerializer
 
     public function getPName($v, $connector = ':')
     {
-        if ($this->default_ns && (0 === strpos($v, $this->default_ns))) {
+        if ($this->default_ns && str_starts_with($v, $this->default_ns)) {
             $pname = substr($v, strlen($this->default_ns));
             if (!preg_match('/\//', $pname)) {
                 return $pname;

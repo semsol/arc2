@@ -4,6 +4,7 @@
  *
  * @author Benjamin Nowack <bnowack@semsol.com>
  * @license W3C Software License and GPL
+ *
  * @homepage <https://github.com/semsol/arc2>
  */
 
@@ -13,6 +14,13 @@ ARC2::inc('StoreQueryHandler');
 
 class ARC2_StoreDeleteQueryHandler extends ARC2_StoreQueryHandler
 {
+    /**
+     * @var array<mixed>
+     */
+    public array $infos;
+
+    public $refs_deleted;
+
     public function __construct($a, &$caller)
     {/* caller has to be a store */
         parent::__construct($a, $caller);
@@ -103,7 +111,7 @@ class ARC2_StoreDeleteQueryHandler extends ARC2_StoreQueryHandler
             $skip = 0;
             foreach (['s', 'p', 'o'] as $term) {
                 if (isset($t[$term.'_type']) && preg_match('/(var)/', $t[$term.'_type'])) {
-                    //$skip = 1;
+                    // $skip = 1;
                 } else {
                     $term_id = $this->getTermID($t[$term], $term);
                     $q .= ($q ? ' AND ' : '').'T.'.$term.'='.$term_id;
@@ -203,7 +211,7 @@ class ARC2_StoreDeleteQueryHandler extends ARC2_StoreQueryHandler
             $this->store->a['db_object']->simpleQuery($sql);
         }
         /* check for unconnected graph refs */
-        if ((1 == rand(1, 10))) {
+        if (1 == rand(1, 10)) {
             $sql = '
                 SELECT G.g FROM '.$tbl_prefix.'g2t G LEFT JOIN '.$tbl_prefix.'triple T ON ( T.t = G.t )
                 WHERE T.t IS NULL LIMIT 1

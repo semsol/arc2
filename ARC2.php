@@ -3,6 +3,7 @@
  * ARC2 core class (static, not instantiated).
  *
  * @author Benjamin Nowack
+ *
  * @homepage <https://github.com/semsol/arc2>
  */
 
@@ -128,8 +129,9 @@ class ARC2
         if (urlencode($v) === $v) {
             return $v;
         }
-        //if (utf8_decode($v) == $v) return $v;
-        $v = (false === strpos(utf8_decode(str_replace('?', '', $v)), '?')) ? utf8_decode($v) : $v;
+        $str = mb_convert_encoding(str_replace('?', '', $v), 'ISO-8859-1', 'UTF-8');
+        $v = false === str_contains($str, '?') ? mb_convert_encoding($v, 'ISO-8859-1', 'UTF-8') : $v;
+
         /* custom hacks, mainly caused by bugs in PHP's json_decode */
         $mappings = [
             '%18' => '‘',
@@ -149,6 +151,7 @@ class ARC2
             $froms[$i] = urldecode($from);
         }
         $v = str_replace($froms, $tos, $v);
+
         /* utf8 tweaks */
         return preg_replace_callback('/([\x00-\xdf][\x80-\xbf]|[\xe0-\xef][\x80-\xbf]{2}|[\xf0-\xf7][\x80-\xbf]{3}|[\xf8-\xfb][\x80-\xbf]{4}|[\xfc-\xfd][\x80-\xbf]{5}|[^\x00-\x7f])/', ['ARC2', 'getUTF8Char'], $v);
     }
@@ -157,7 +160,7 @@ class ARC2
     {
         $val = $v[1];
         if (1 === strlen(trim($val))) {
-            return utf8_encode($val);
+            return mb_convert_encoding($val, 'UTF-8', mb_list_encodings());
         }
         if (preg_match('/^([\x00-\x7f])(.+)/', $val, $m)) {
             return $m[1].self::toUTF8($m[2]);
@@ -178,7 +181,7 @@ class ARC2
                 'http://www.w3.org/1999/xhtml',
             ];
             foreach ($specials as $ns) {
-                if (0 === strpos($v, $ns)) {
+                if (str_starts_with($v, $ns)) {
                     $local_part = substr($v, strlen($ns));
                     if (!preg_match('/^[\/\#]/', $local_part)) {
                         return [$ns, $local_part];
@@ -187,7 +190,7 @@ class ARC2
             }
         }
         /* auto-splitting on / or # */
-        //$re = '^(.*?)([A-Z_a-z][-A-Z_a-z0-9.]*)$';
+        // $re = '^(.*?)([A-Z_a-z][-A-Z_a-z0-9.]*)$';
         if (preg_match('/^(.*[\/\#])([^\/\#]+)$/', $v, $m)) {
             return [$m[1], $m[2]];
         }
@@ -362,7 +365,7 @@ class ARC2
                 return 'array';
             }
             /* triples */
-            //if (isset($v[0]) && isset($v[0]['s']) && isset($v[0]['p'])) return 'triples';
+            // if (isset($v[0]) && isset($v[0]['s']) && isset($v[0]['p'])) return 'triples';
             if (in_array('p', array_keys($v[0]))) {
                 return 'triples';
             }
@@ -384,6 +387,7 @@ class ARC2
                 }
             }
         }
+
         /* array */
         return 'array';
     }

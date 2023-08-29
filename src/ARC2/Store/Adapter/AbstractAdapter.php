@@ -4,6 +4,7 @@
  * @author Benjamin Nowack <bnowack@semsol.com>
  * @author Konrad Abicht <konrad.abicht@pier-and-peer.com>
  * @license W3C Software License and GPL
+ *
  * @homepage <https://github.com/semsol/arc2>
  */
 
@@ -27,7 +28,7 @@ abstract class AbstractAdapter
     protected $queries = [];
 
     /**
-     * @param array $configuration Default is array(). Only use, if you have your own mysqli connection.
+     * @param array $configuration default is array()
      */
     public function __construct(array $configuration = [])
     {

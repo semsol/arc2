@@ -12,6 +12,15 @@ ARC2::inc('LegacyXMLParser');
 
 class ARC2_SPARQLXMLResultParser extends ARC2_LegacyXMLParser
 {
+    public int $allowCDataNodes;
+
+    /**
+     * @var array<mixed>
+     */
+    public array $nodes;
+    public string $srx;
+    public string $xml;
+
     public function __construct($a, &$caller)
     {
         parent::__construct($a, $caller);

@@ -4,12 +4,18 @@
  *
  * @author Benjamin Nowack <bnowack@semsol.com>
  * @license W3C Software License and GPL
+ *
  * @homepage <https://github.com/semsol/arc2>
  */
 ARC2::inc('StoreQueryHandler');
 
 class ARC2_StoreInsertQueryHandler extends ARC2_StoreQueryHandler
 {
+    /**
+     * @var array<mixed>
+     */
+    public array $infos;
+
     public function __construct($a, &$caller)
     {/* caller has to be a store */
         parent::__construct($a, $caller);

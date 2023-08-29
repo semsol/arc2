@@ -8,7 +8,7 @@ return array(
     'db_name' => 'arc2_test',
     'db_user' => 'root',
     'db_pwd' => 'Pass123',
-    'db_host' => '127.0.0.1',
+    'db_host' => 'db',
     'db_port' => 3306,
     'db_adapter' => 'pdo',
     'db_pdo_protocol' => 'mysql',

@@ -209,7 +209,7 @@ class SyntaxUpdate1Test extends ComplianceTest
         // check result
         $this->markTestSkipped(
             'Query has to fail, but ARC2 returns an array as if query is considered valid. Query: '
-            .PHP_EOL
+            .\PHP_EOL
             .$this->makeQueryA1Liner($query)
         );
     }

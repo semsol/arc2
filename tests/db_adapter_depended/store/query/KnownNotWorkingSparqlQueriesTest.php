@@ -109,15 +109,15 @@ class KnownNotWorkingSparqlQueriesTest extends ARC2_TestCase
                             'c2 type' => 'uri',
                         ],
                         [
-                            'c1' => 'http://container2',
-                            'c1 type' => 'uri',
-                            'c2' => 'http://container1',
-                            'c2 type' => 'uri',
-                        ],
-                        [
                             'c1' => 'http://container1',
                             'c1 type' => 'uri',
                             'c2' => 'http://container2',
+                            'c2 type' => 'uri',
+                        ],
+                        [
+                            'c1' => 'http://container2',
+                            'c1 type' => 'uri',
+                            'c2' => 'http://container1',
                             'c2 type' => 'uri',
                         ],
                         [
@@ -139,7 +139,7 @@ class KnownNotWorkingSparqlQueriesTest extends ARC2_TestCase
 
         $this->markTestSkipped(
             'ARC2: solving sameterm does not work properly. The result contains elements multiple times. '
-            .PHP_EOL.'Expected behavior is described here: https://www.w3.org/TR/rdf-sparql-query/#func-sameTerm'
+            .\PHP_EOL.'Expected behavior is described here: https://www.w3.org/TR/rdf-sparql-query/#func-sameTerm'
         );
     }
 

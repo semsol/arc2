@@ -4,6 +4,7 @@
  *
  * @author Benjamin Nowack <bnowack@semsol.com>
  * @license W3C Software License and GPL
+ *
  * @homepage <https://github.com/semsol/arc2>
  *
  * @version 2010-11-16
@@ -12,6 +13,26 @@ ARC2::inc('Class');
 
 class ARC2_RDFParser extends ARC2_Class
 {
+    /**
+     * @var array<mixed>
+     */
+    public array $added_triples;
+
+    public int $bnode_id;
+    public string $bnode_prefix;
+
+    public string $format;
+    public int $keep_time_limit;
+    public object $parser;
+    public object $reader;
+    public $skip_dupes;
+    public int $t_count;
+
+    /**
+     * @var array<mixed>
+     */
+    public array $triples;
+
     public function __construct($a, &$caller)
     {
         parent::__construct($a, $caller);

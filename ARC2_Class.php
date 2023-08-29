@@ -4,11 +4,56 @@
  *
  * @author Benjamin Nowack
  * @license W3C Software License and GPL
+ *
  * @homepage <https://github.com/semsol/arc2>
  */
 class ARC2_Class
 {
-    protected $db_object;
+    /**
+     * @var array<mixed>
+     */
+    public array $a = [];
+
+    public int $adjust_utf8;
+
+    public string $base;
+
+    public $caller;
+
+    public $db_object;
+
+    /**
+     * @var array<mixed>
+     */
+    public array $errors = [];
+
+    public $has_pcre_unicode;
+
+    public string $inc_path;
+
+    public int $max_errors;
+
+    /**
+     * @var array<mixed>
+     */
+    public array $ns;
+
+    public int $ns_count;
+
+    /**
+     * @var array<mixed>
+     */
+    public array $nsp;
+
+    /**
+     * @var array<string>
+     */
+    public array $used_ns = [];
+
+    /**
+     * @var array<string>
+     */
+    public array $warnings = [];
 
     public function __construct($a, &$caller)
     {
@@ -34,7 +79,7 @@ class ARC2_Class
         $this->warnings = [];
         $this->adjust_utf8 = $this->v('adjust_utf8', 0, $this->a);
         $this->max_errors = $this->v('max_errors', 25, $this->a);
-        $this->has_pcre_unicode = @preg_match('/\pL/u', 'test'); /* \pL = block/point which is a Letter */
+        $this->has_pcre_unicode = preg_match('/\pL/u', 'test'); /* \pL = block/point which is a Letter */
     }
 
     public function v($name, $default = false, $o = false)
@@ -146,7 +191,7 @@ class ARC2_Class
             $this->errors[] = $v;
         }
         if ($this->caller && method_exists($this->caller, 'addError')) {
-            $glue = strpos($v, ' in ') ? ' via ' : ' in ';
+            $glue = str_contains((string) $v, ' in ') ? ' via ' : ' in ';
             $this->caller->addError($v.$glue.static::class);
         }
         if (count($this->errors) > $this->max_errors) {
@@ -595,7 +640,8 @@ class ARC2_Class
                 require __DIR__.'/src/ARC2/Store/Adapter/AdapterFactory.php';
             }
             if (false == isset($this->a['db_adapter'])) {
-                $this->a['db_adapter'] = 'mysqli';
+                $this->a['db_adapter'] = 'pdo';
+                $this->a['db_pdo_protocol'] = 'mysql';
             }
             $factory = new \ARC2\Store\Adapter\AdapterFactory();
             $this->db_object = $factory->getInstanceFor($this->a['db_adapter'], $this->a);
@@ -607,45 +653,6 @@ class ARC2_Class
         }
 
         return $this->db_object;
-    }
-
-    /**
-     * Dont use this function to directly query the database. It currently works only with mysqli DB adapter.
-     *
-     * @param string $sql        SQL query
-     * @param mysqli $con        Connection
-     * @param int    $log_errors 1 if you want to log errors. Default is 0
-     *
-     * @return mysqli Result
-     *
-     * @deprecated since 2.4.0
-     */
-    public function queryDB($sql, $con, $log_errors = 0)
-    {
-        $t1 = ARC2::mtime();
-
-        // create connection using an adapter, if not available yet
-        $this->getDBObjectFromARC2Class($con);
-
-        $r = $this->db_object->mysqliQuery($sql);
-
-        // TODO check if this is ever called. it seems not and therefore could be removed.
-        if (0) {
-            $t2 = ARC2::mtime() - $t1;
-            $call_obj = $this;
-            $call_path = '';
-            while ($call_obj) {
-                $call_path = get_class($call_obj).' / '.$call_path;
-                $call_obj = isset($call_obj->caller) ? $call_obj->caller : false;
-            }
-            echo "\n".$call_path.' needed '.$t2.' secs for '.str_replace("\n", ' ', $sql);
-        }
-
-        if ($log_errors && !empty($this->db_object->getErrorMessage())) {
-            $this->addError($this->db_object->getErrorMessage());
-        }
-
-        return $r;
     }
 
     /**

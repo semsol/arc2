@@ -4,6 +4,7 @@
  *
  * @author    Benjamin Nowack
  * @license   W3C Software License and GPL
+ *
  * @homepage  <https://github.com/semsol/arc2>
  *
  * @version   2010-11-16
@@ -15,6 +16,43 @@ ARC2::inc('StoreQueryHandler');
 
 class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler
 {
+    public int $cache_results;
+
+    /**
+     * @var array<mixed>
+     */
+    public array $dependency_log;
+
+    public string $engine_type;
+
+    /**
+     * @var array<miyed>
+     */
+    public array $index;
+
+    /**
+     * @var array<miyed>
+     */
+    public array $indexes;
+
+    /**
+     * @var array<miyed>
+     */
+    public array $initial_index;
+
+    public int $is_union_query;
+
+    /**
+     * @var array<miyed>
+     */
+    public array $infos;
+
+    public $opt_sql;
+
+    public int $opt_sql_pd_count;
+
+    public int $pattern_order_offset;
+
     public function __construct($a, &$caller)
     {/* caller has to be a store */
         parent::__construct($a, $caller);
@@ -267,7 +305,7 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler
                                 in_array($var, $aggregate_vars)
                                     ? 'literal'
                                     : 'uri'
-                              );
+                            );
                         if (isset($pre_row[$var.' lang_dt']) && ($lang_dt = $pre_row[$var.' lang_dt'])) {
                             if (preg_match('/^([a-z]+(\-[a-z0-9]+)*)$/i', $lang_dt)) {
                                 $row[$var.' lang'] = $lang_dt;
@@ -807,7 +845,7 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler
         }
         /* filters etc */
         if ($sub_r = $this->getPatternSQL($pattern, 'join__T_'.$id)) {
-            $r .= $r ? $nl.'  AND '.$sub_r : $nl.'  '.'('.$sub_r.')';
+            $r .= $r ? $nl.'  AND '.$sub_r : $nl.'  ('.$sub_r.')';
         }
 
         return $r;
@@ -860,7 +898,7 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler
             return 1;
         }
         $d_tbls = $this->getDependentJoins($id2);
-        //echo $id . ' :: ' . $id2 . '=>' . print_r($d_tbls, 1);
+        // echo $id . ' :: ' . $id2 . '=>' . print_r($d_tbls, 1);
         foreach ($d_tbls as $d_tbl) {
             if (preg_match('/^T_'.$id.'\./', $d_tbl)) {
                 return 1;
@@ -1080,7 +1118,7 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler
             } elseif ('var' == $type) {
                 $val = $pattern[$term];
                 if (isset($vars[$val])) {/* repeated var in pattern */
-                    $sub_r = '(T_'.$id.'.'.$term.'='.'T_'.$id.'.'.$vars[$val].')';
+                    $sub_r = '(T_'.$id.'.'.$term.'=T_'.$id.'.'.$vars[$val].')';
                 }
                 $vars[$val] = $term;
                 if ($infos = $this->v($val, 0, $this->index['graph_vars'])) {/* graph var in triple pattern */
@@ -1477,7 +1515,7 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler
         } elseif (
             ('relational' == $parent_type)
             && 'o' == $col
-            && (preg_match('/[\<\>]/', $this->v('parent_op', '', $pattern)))) {
+            && preg_match('/[\<\>]/', $this->v('parent_op', '', $pattern))) {
             $tbl_alias = 'T_'.$tbl.'.o_comp';
         } else {
             $tbl_alias = 'V_'.$tbl.'_'.$col.'.val';
@@ -1615,7 +1653,7 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler
             /* any other: ignore */
         }
         /* simple type conversions */
-        if (0 === strpos($fnc_uri, 'http://www.w3.org/2001/XMLSchema#')) {
+        if (str_starts_with($fnc_uri, 'http://www.w3.org/2001/XMLSchema#')) {
             return $op.$this->getExpressionSQL($pattern['args'][0], $context, $val_type, $parent_type);
         }
 
@@ -1761,8 +1799,7 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler
             if (preg_match('/^([\"\'])([^\'\"]+)/', $sub_r_2, $m)) {
                 if ('*' == $m[2]) {
                     $r = '!' == $op
-                        ? 'NOT ('.$sub_r_1.' REGEXP "^[a-zA-Z\-]+$"'.')'
-                        : $sub_r_1.' REGEXP "^[a-zA-Z\-]+$"';
+                        ? 'NOT ('.$sub_r_1.' REGEXP "^[a-zA-Z\-]+$")' : $sub_r_1.' REGEXP "^[a-zA-Z\-]+$"';
                 } else {
                     $r = ('!' == $op) ? $sub_r_1.' NOT LIKE '.$m[1].$m[2].'%'.$m[1] : $sub_r_1.' LIKE '.$m[1].$m[2].'%'.$m[1];
                 }
@@ -1814,7 +1851,7 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler
             /* fulltext search (may have "|") */
             if ($is_simple_search && $is_o_search && !$op && (strlen($m[2]) > 8) && $this->store->hasFulltextIndex()) {
                 /* MATCH variations */
-                if (($val_parts = preg_split('/\|/', $m[2]))) {
+                if ($val_parts = preg_split('/\|/', $m[2])) {
                     return 'MATCH('.trim($sub_r_1, '()').') AGAINST("'.implode(' ', $val_parts).'")';
                 } else {
                     return 'MATCH('.trim($sub_r_1, '()').') AGAINST("'.$m[2].'")';
@@ -1938,7 +1975,7 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler
                 if (in_array($col, ['s', 'o'])) {
                     if (strpos($q_sql, '`'.$var_name.' type`')) {
                         $r .= ', '.$nl.'    TMP.`'.$var_name.' type` AS `'.$var_name.' type`';
-                    //$r .= ', ' . $nl . '    CASE TMP.`' . $var_name . ' type` WHEN 2 THEN "literal" WHEN 1 THEN "bnode" ELSE "uri" END AS `' . $var_name . ' type`';
+                        // $r .= ', ' . $nl . '    CASE TMP.`' . $var_name . ' type` WHEN 2 THEN "literal" WHEN 1 THEN "bnode" ELSE "uri" END AS `' . $var_name . ' type`';
                     } else {
                         $r .= ', '.$nl.'    NULL AS `'.$var_name.' type`';
                     }

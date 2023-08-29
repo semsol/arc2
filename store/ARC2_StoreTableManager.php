@@ -17,6 +17,8 @@ ARC2::inc('Store');
  */
 class ARC2_StoreTableManager extends ARC2_Store
 {
+    protected string $engine_type;
+
     public function __construct($a, &$caller)
     {
         parent::__construct($a, $caller);
@@ -152,7 +154,7 @@ class ARC2_StoreTableManager extends ARC2_Store
 
     public function createS2ValTable()
     {
-        //$indexes = 'UNIQUE KEY (id), KEY vh (val_hash), KEY v (val(64))';
+        // $indexes = 'UNIQUE KEY (id), KEY vh (val_hash), KEY v (val(64))';
         $indexes = 'UNIQUE KEY (id), KEY vh (val_hash)';
         $sql = '
       CREATE TABLE IF NOT EXISTS '.$this->getTablePrefix().'s2val (

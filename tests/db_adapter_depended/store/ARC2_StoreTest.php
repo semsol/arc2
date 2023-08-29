@@ -260,7 +260,7 @@ XML;
         ob_start();
         $this->fixture->dump();
         $dumpContent = ob_get_clean();
-        error_reporting(E_ALL);
+        error_reporting(\E_ALL);
 
         $expectedXML = <<<XML
 <?xml version="1.0"?>
@@ -584,7 +584,7 @@ XML;
     {
         $this->markTestSkipped(
             'Adding the same triple into two graphs does not work.'
-            .PHP_EOL.'Bug report: https://github.com/semsol/arc2/issues/114'
+            .\PHP_EOL.'Bug report: https://github.com/semsol/arc2/issues/114'
         );
 
         /*
@@ -639,7 +639,7 @@ XML;
 
         if (isset($this->dbConfig['db_table_prefix'])) {
             foreach ($this->fixture->getDBObject()->getAllTables() as $table) {
-                $this->assertTrue(false !== strpos($table, $this->dbConfig['db_table_prefix'].'_'));
+                $this->assertTrue(str_contains($table, $this->dbConfig['db_table_prefix'].'_'));
             }
         }
 
@@ -657,7 +657,7 @@ XML;
             if ('sqlite_sequence' == $table) {
                 continue;
             }
-            $this->assertTrue(false !== strpos($table, $prefix), 'Renaming failed for '.$table);
+            $this->assertTrue(str_contains($table, $prefix), 'Renaming failed for '.$table);
         }
     }
 
@@ -749,10 +749,10 @@ XML;
         $foundArcPrefix = $foundReplicatePrefix = false;
         foreach ($tables as $table) {
             // check for original table
-            if (false !== strpos($table['Tables_in_'.$this->dbConfig['db_name']], $this->dbConfig['store_name'].'_')) {
+            if (str_contains($table['Tables_in_'.$this->dbConfig['db_name']], $this->dbConfig['store_name'].'_')) {
                 $foundArcPrefix = true;
-            // check for replicated table
-            } elseif (false !== strpos($table['Tables_in_'.$this->dbConfig['db_name']], 'replicate_')) {
+                // check for replicated table
+            } elseif (str_contains($table['Tables_in_'.$this->dbConfig['db_name']], 'replicate_')) {
                 $foundReplicatePrefix = true;
             }
         }

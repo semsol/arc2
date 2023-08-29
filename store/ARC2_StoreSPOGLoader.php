@@ -12,6 +12,8 @@ ARC2::inc('SPOGParser');
 
 class ARC2_StoreSPOGLoader extends ARC2_SPOGParser
 {
+    public int $t_count = 0;
+
     public function __construct($a, &$caller)
     {
         parent::__construct($a, $caller);

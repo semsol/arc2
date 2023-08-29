@@ -6,6 +6,23 @@ use Tests\ARC2_TestCase;
 
 class ARC2_GraphTest extends ARC2_TestCase
 {
+    private object $obj;
+
+    /**
+     * @var array<mixed>
+     */
+    private array $res1;
+
+    /**
+     * @var array<mixed>
+     */
+    private array $res2;
+
+    /**
+     * @var array<mixed>
+     */
+    private array $res3;
+
     protected function setUp(): void
     {
         parent::setUp();
