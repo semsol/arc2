@@ -8,7 +8,6 @@ jobs:
         runs-on: ubuntu-latest
 
         env:
-            IN_WORKFLOW: 1
             DB_ADAPTER: pdo
             DB_PDO_PROTOCOL: mysql
 
