@@ -15,8 +15,6 @@ class ARC2_TestCase extends TestCase
 
     /**
      * Subject under test.
-     *
-     * @var mixed
      */
     protected $fixture;
 
