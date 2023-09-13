@@ -12,6 +12,58 @@ ARC2::inc('LegacyXMLParser');
 
 class ARC2_SemHTMLParser extends ARC2_LegacyXMLParser
 {
+    /**
+     * @var array<mixed>
+     */
+    public array $added_triples;
+    public int $auto_extract;
+    public int $bnode_id;
+    public string $bnode_prefix;
+
+    /**
+     * @var array<mixed>
+     */
+    public array $cache;
+
+    public string $cur_tag;
+
+    public string $default_sem_html_formats;
+
+    /**
+     * @var array<mixed>
+     */
+    public array $detected_formats;
+
+    public string $doc_url;
+
+    /**
+     * @var array<mixed>
+     */
+    public array $extracted_formats;
+
+    public int $keep_cdata_ws;
+
+    public int $level;
+    public int $node_count;
+    public $node_index;
+
+    /**
+     * @var array<mixed>
+     */
+    public array $nodes;
+
+    public $reader;
+    public $skip_dupes;
+    public int $t_count;
+    public string $target_encoding;
+
+    /**
+     * @var array<mixed>
+     */
+    public array $triples;
+
+    public string $x_base;
+
     public function __construct($a, &$caller)
     {
         parent::__construct($a, $caller);

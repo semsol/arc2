@@ -11,6 +11,14 @@ ARC2::inc('Class');
 
 class ARC2_RemoteStore extends ARC2_Class
 {
+    public int $is_remote;
+    public $reader;
+
+    /**
+     * @var array<mixed>
+     */
+    public array $resource_labels;
+
     public function __construct($a, &$caller)
     {
         parent::__construct($a, $caller);
@@ -149,7 +157,7 @@ class ARC2_RemoteStore extends ARC2_Class
         $mappings = ['rdfxml' => 'RDFXML', 'sparqlxml' => 'SPARQLXMLResult', 'turtle' => 'Turtle'];
         if (!$format || !isset($mappings[$format])) {
             return $resp;
-            //return $this->addError('No parser available for "' . $format . '" SPARQL result');
+            // return $this->addError('No parser available for "' . $format . '" SPARQL result');
         }
         /* format parser */
         $suffix = $mappings[$format].'Parser';

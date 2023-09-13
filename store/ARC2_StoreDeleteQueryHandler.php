@@ -4,15 +4,20 @@
  *
  * @author Benjamin Nowack <bnowack@semsol.com>
  * @license W3C Software License and GPL
+ *
  * @homepage <https://github.com/semsol/arc2>
  */
-
-use ARC2\Store\Adapter\PDOSQLiteAdapter;
-
 ARC2::inc('StoreQueryHandler');
 
 class ARC2_StoreDeleteQueryHandler extends ARC2_StoreQueryHandler
 {
+    /**
+     * @var array<mixed>
+     */
+    public array $infos;
+
+    public $refs_deleted;
+
     public function __construct($a, &$caller)
     {/* caller has to be a store */
         parent::__construct($a, $caller);
@@ -103,7 +108,7 @@ class ARC2_StoreDeleteQueryHandler extends ARC2_StoreQueryHandler
             $skip = 0;
             foreach (['s', 'p', 'o'] as $term) {
                 if (isset($t[$term.'_type']) && preg_match('/(var)/', $t[$term.'_type'])) {
-                    //$skip = 1;
+                    // $skip = 1;
                 } else {
                     $term_id = $this->getTermID($t[$term], $term);
                     $q .= ($q ? ' AND ' : '').'T.'.$term.'='.$term_id;
@@ -121,32 +126,16 @@ class ARC2_StoreDeleteQueryHandler extends ARC2_StoreQueryHandler
                 continue;
             }
             if ($gq) {
-                if ($this->store->getDBObject() instanceof PDOSQLiteAdapter) {
-                    $sql = 'DELETE FROM '.$tbl_prefix.'g2t WHERE t IN (';
-                    $sql .= '   SELECT G.t
-                                  FROM '.$tbl_prefix.'g2t G
-                                  JOIN '.$this->getTripleTable().' T ON T.t = G.t'.$gq.'
-                                  WHERE '.$q;
-                    $sql .= ')';
-                } else {
-                    $sql = ($dbv < '04-01') ? 'DELETE '.$tbl_prefix.'g2t' : 'DELETE G';
-                    $sql .= '
-                        FROM '.$tbl_prefix.'g2t G
-                        JOIN '.$this->getTripleTable().' T ON (T.t = G.t'.$gq.')
-                        WHERE '.$q.'
-                        ';
-                    $this->refs_deleted = 1;
-                }
+                $sql = ($dbv < '04-01') ? 'DELETE '.$tbl_prefix.'g2t' : 'DELETE G';
+                $sql .= '
+                    FROM '.$tbl_prefix.'g2t G
+                    JOIN '.$this->getTripleTable().' T ON (T.t = G.t'.$gq.')
+                    WHERE '.$q.'
+                    ';
+                $this->refs_deleted = 1;
             } else {/* triples only */
-                if ($this->store->getDBObject() instanceof PDOSQLiteAdapter) {
-                    // it contains things like "T.s", but we can't use a table alias
-                    // with SQLite when running DELETE queries.
-                    $q = str_replace('T.', '', $q);
-                    $sql = 'DELETE FROM '.$this->getTripleTable().' WHERE '.$q;
-                } else {
-                    $sql = ($dbv < '04-01') ? 'DELETE '.$this->getTripleTable() : 'DELETE T';
-                    $sql .= ' FROM '.$this->getTripleTable().' T WHERE '.$q;
-                }
+                $sql = ($dbv < '04-01') ? 'DELETE '.$this->getTripleTable() : 'DELETE T';
+                $sql .= ' FROM '.$this->getTripleTable().' T WHERE '.$q;
             }
             $r += $this->store->a['db_object']->exec($sql);
             if (!empty($this->store->a['db_object']->getErrorMessage())) {
@@ -185,25 +174,15 @@ class ARC2_StoreDeleteQueryHandler extends ARC2_StoreQueryHandler
         $numRows = $this->store->a['db_object']->getNumberOfRows($sql);
         if (0 < $numRows) {
             /* delete unconnected triples */
-            if ($this->store->getDBObject() instanceof PDOSQLiteAdapter) {
-                $sql = 'DELETE FROM '.$tbl_prefix.'triple WHERE t IN (';
-                $sql .= '   SELECT T.t
-                              FROM '.$tbl_prefix.'triple T
-                                   LEFT JOIN '.$tbl_prefix.'g2t G ON G.t = T.t
-                             WHERE G.t IS NULL';
-                $sql .= ')';
-            } else {
-                $sql = ($dbv < '04-01') ? 'DELETE '.$tbl_prefix.'triple' : 'DELETE T';
-                $sql .= '
-                    FROM '.$tbl_prefix.'triple T
-                    LEFT JOIN '.$tbl_prefix.'g2t G ON (G.t = T.t)
-                    WHERE G.t IS NULL
-                ';
-            }
+            $sql = 'DELETE T
+                FROM '.$tbl_prefix.'triple T
+                LEFT JOIN '.$tbl_prefix.'g2t G ON (G.t = T.t)
+                WHERE G.t IS NULL
+            ';
             $this->store->a['db_object']->simpleQuery($sql);
         }
         /* check for unconnected graph refs */
-        if ((1 == rand(1, 10))) {
+        if (1 == rand(1, 10)) {
             $sql = '
                 SELECT G.g FROM '.$tbl_prefix.'g2t G LEFT JOIN '.$tbl_prefix.'triple T ON ( T.t = G.t )
                 WHERE T.t IS NULL LIMIT 1

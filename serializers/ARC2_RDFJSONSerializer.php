@@ -4,12 +4,15 @@
  *
  * @author Benjamin Nowack <bnowack@semsol.com>
  * @license W3C Software License and GPL
+ *
  * @homepage <https://github.com/semsol/arc2>
  */
 ARC2::inc('RDFSerializer');
 
 class ARC2_RDFJSONSerializer extends ARC2_RDFSerializer
 {
+    public string $content_header;
+
     public function __construct($a, &$caller)
     {
         parent::__construct($a, $caller);

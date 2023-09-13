@@ -4,20 +4,49 @@
  *
  * @author Benjamin Nowack <bnowack@semsol.com>
  * @license W3C Software License and GPL
+ *
  * @homepage <https://github.com/semsol/arc2>
  */
 
 use ARC2\Store\Adapter\AbstractAdapter;
 use ARC2\Store\Adapter\AdapterFactory;
-use ARC2\Store\Adapter\PDOSQLiteAdapter;
 use ARC2\Store\TableManager\SQLite;
 
 ARC2::inc('Class');
 
+#[AllowDynamicProperties]
 class ARC2_Store extends ARC2_Class
 {
-    protected $cache;
-    protected $db;
+    public $cache;
+    public string $column_type;
+    public $db;
+    public string $db_version;
+    public int $has_fulltext_index;
+    public $is_win;
+    public int $max_split_tables;
+    public int $queue_queries;
+
+    /**
+     * @var array<string>
+     */
+    public array $resource_labels;
+
+    /**
+     * @var array<mixed>
+     */
+    public array $split_predicates;
+    public int $table_lock;
+    public string $tbl_prefix;
+
+    /**
+     * @var array<mixed>
+     */
+    public array $term_id_cache;
+
+    /**
+     * @var array<mixed>
+     */
+    public array $triggers;
 
     public function __construct($a, &$caller)
     {
@@ -30,7 +59,7 @@ class ARC2_Store extends ARC2_Class
         $this->table_lock = 0;
         $this->triggers = $this->v('store_triggers', [], $this->a);
         $this->queue_queries = $this->v('store_queue_queries', 0, $this->a);
-        $this->is_win = ('win' == strtolower(substr(PHP_OS, 0, 3))) ? true : false;
+        $this->is_win = ('win' == strtolower(substr(\PHP_OS, 0, 3))) ? true : false;
         $this->max_split_tables = $this->v('store_max_split_tables', 10, $this->a);
         $this->split_predicates = $this->v('store_split_predicates', [], $this->a);
 
@@ -43,7 +72,7 @@ class ARC2_Store extends ARC2_Class
                 && $this->a['cache_instance'] instanceof \Psr\SimpleCache\CacheInterface) {
                 $this->cache = $this->a['cache_instance'];
 
-            // create new cache instance
+                // create new cache instance
             } else {
                 // FYI: https://symfony.com/doc/current/components/cache/adapters/filesystem_adapter.html
                 $this->cache = new \Symfony\Component\Cache\Simple\FilesystemCache('arc2', 0, null);
@@ -89,7 +118,8 @@ class ARC2_Store extends ARC2_Class
                 require __DIR__.'/../src/ARC2/Store/Adapter/AdapterFactory.php';
             }
             if (false == isset($this->a['db_adapter'])) {
-                $this->a['db_adapter'] = 'mysqli';
+                $this->a['db_adapter'] = 'pdo';
+                $this->a['db_pdo_protocol'] = 'mysql';
             }
             $factory = new AdapterFactory();
             $this->db = $factory->getInstanceFor($this->a['db_adapter'], $this->a);
@@ -100,10 +130,6 @@ class ARC2_Store extends ARC2_Class
             }
         } catch (Exception $e) {
             return $this->addError($e->getMessage());
-        }
-
-        if ('mysqli' == $this->db->getAdapterName()) {
-            $this->a['db_con'] = $this->db->getConnection();
         }
 
         $this->a['db_object'] = $this->db;
@@ -118,25 +144,16 @@ class ARC2_Store extends ARC2_Class
 
     /**
      * @param int $force 1 if you want to force a connection
-     *
-     * @return mysqli mysqli-connection, only if mysqli adapter was selected. null otherwise,
-     *                because direct access to DB connection is not recommended.
      */
-    public function getDBCon($force = 0)
+    public function getDBCon($force = 0): bool
     {
         if ($force || !isset($this->a['db_object'])) {
-            if (!$this->createDBCon()) {
+            if (false === $this->createDBCon()) {
                 return false;
             }
         }
 
-        if ('mysqli' == $this->a['db_adapter']) {
-            // for backward compatibility reasons only.
-            // TODO remove that in 3.x
-            return $this->a['db_con'];
-        } else {
-            return true;
-        }
+        return true;
     }
 
     /**
@@ -183,20 +200,15 @@ class ARC2_Store extends ARC2_Class
     public function getColumnType()
     {
         if (!$this->v('column_type')) {
-            // SQLite
-            if ($this->getDBObject() instanceof PDOSQLiteAdapter) {
-                $this->column_type = 'INTEGER';
-            } else {
-                // MySQL
-                $tbl = $this->getTablePrefix().'g2t';
+            // MySQL
+            $tbl = $this->getTablePrefix().'g2t';
 
-                $row = $this->db->fetchRow('SHOW COLUMNS FROM '.$tbl.' LIKE "t"');
-                if (null == $row) {
-                    $row = ['Type' => 'mediumint'];
-                }
-
-                $this->column_type = preg_match('/mediumint/', $row['Type']) ? 'mediumint' : 'int';
+            $row = $this->db->fetchRow('SHOW COLUMNS FROM '.$tbl.' LIKE "t"');
+            if (null == $row) {
+                $row = ['Type' => 'mediumint'];
             }
+
+            $this->column_type = preg_match('/mediumint/', $row['Type']) ? 'mediumint' : 'int';
         }
 
         return $this->column_type;
@@ -208,15 +220,14 @@ class ARC2_Store extends ARC2_Class
         if (!isset($this->$var_name)) {
             $tbl = $this->getTablePrefix().$tbl;
 
-            $value = true;
-
             // only check if SQLite is NOT being used
-            if (false === $this->getDBObject() instanceof PDOSQLiteAdapter) {
-                $row = $this->db->fetchRow('SHOW COLUMNS FROM '.$tbl.' LIKE "val_hash"');
-                $value = null !== $row;
-            }
+            $row = $this->db->fetchRow('SHOW COLUMNS FROM '.$tbl.' LIKE "val_hash"');
 
-            $this->$var_name = $value;
+            // fix: $row doesn't return 'null'
+            $this->$var_name = null;
+            if ($row) {
+                $this->$var_name = true;
+            }
         }
 
         return $this->$var_name;
@@ -224,10 +235,6 @@ class ARC2_Store extends ARC2_Class
 
     public function hasFulltextIndex()
     {
-        if ($this->getDBObject() instanceof PDOSQLiteAdapter) {
-            return true;
-        }
-
         if (!isset($this->has_fulltext_index)) {
             $this->has_fulltext_index = 0;
             $tbl = $this->getTablePrefix().'o2val';
@@ -250,10 +257,6 @@ class ARC2_Store extends ARC2_Class
 
     public function enableFulltextSearch()
     {
-        if ($this->getDBObject() instanceof PDOSQLiteAdapter) {
-            return;
-        }
-
         if ($this->hasFulltextIndex()) {
             return 1;
         }
@@ -263,10 +266,6 @@ class ARC2_Store extends ARC2_Class
 
     public function disableFulltextSearch()
     {
-        if ($this->getDBObject() instanceof PDOSQLiteAdapter) {
-            return;
-        }
-
         if (!$this->hasFulltextIndex()) {
             return 1;
         }
@@ -281,13 +280,7 @@ class ARC2_Store extends ARC2_Class
      */
     public function countDBProcesses(): int
     {
-        $amount = 1;
-
-        if (false === $this->getDBObject() instanceof PDOSQLiteAdapter) {
-            $amount = $this->db->getNumberOfRows('SHOW PROCESSLIST');
-        }
-
-        return $amount;
+        return $this->db->getNumberOfRows('SHOW PROCESSLIST');
     }
 
     /**
@@ -315,7 +308,7 @@ class ARC2_Store extends ARC2_Class
                 continue;
             } /* only from this store */
             $kill = 0;
-            if ($needle && (false !== strpos($row['Info'], $needle))) {
+            if ($needle && str_contains($row['Info'], $needle)) {
                 $kill = 1;
             }
             if (!$needle) {
@@ -354,36 +347,25 @@ class ARC2_Store extends ARC2_Class
     public function setUp($force = 0)
     {
         if (($force || !$this->isSetUp()) && false !== $this->getDBCon()) {
-            // PDO with SQLite
-            if ($this->a['db_object'] instanceof PDOSQLiteAdapter) {
-                (new SQLite($this->a, $this))->createTables();
-            } else {
-                // default way
-                ARC2::inc('StoreTableManager');
-                (new ARC2_StoreTableManager($this->a, $this))->createTables();
-            }
+            // default way
+            ARC2::inc('StoreTableManager');
+            (new ARC2_StoreTableManager($this->a, $this))->createTables();
         }
     }
 
     public function extendColumns()
     {
-        $cfg = $this->getDBObject()->getConfiguration();
-
-        if (false === $this->getDBObject() instanceof PDOSQLiteAdapter) {
-            ARC2::inc('StoreTableManager');
-            $mgr = new ARC2_StoreTableManager($this->a, $this);
-            $mgr->extendColumns();
-            $this->column_type = 'int';
-        }
+        ARC2::inc('StoreTableManager');
+        $mgr = new ARC2_StoreTableManager($this->a, $this);
+        $mgr->extendColumns();
+        $this->column_type = 'int';
     }
 
     public function splitTables()
     {
-        if (false === $this->getDBObject() instanceof PDOSQLiteAdapter) {
-            ARC2::inc('StoreTableManager');
-            $mgr = new ARC2_StoreTableManager($this->a, $this);
-            $mgr->splitTables();
-        }
+        ARC2::inc('StoreTableManager');
+        $mgr = new ARC2_StoreTableManager($this->a, $this);
+        $mgr->splitTables();
     }
 
     public function hasSetting($k)
@@ -494,11 +476,7 @@ class ARC2_Store extends ARC2_Class
             if ($keep_settings && ('setting' == $tbl)) {
                 continue;
             }
-            if ($this->getDBObject() instanceof PDOSQLiteAdapter) {
-                $this->db->simpleQuery('DELETE FROM '.$prefix.$tbl);
-            } else {
-                $this->db->simpleQuery('TRUNCATE '.$prefix.$tbl);
-            }
+            $this->db->simpleQuery('TRUNCATE '.$prefix.$tbl);
         }
     }
 
@@ -567,11 +545,7 @@ class ARC2_Store extends ARC2_Class
         $new_prefix .= $new_prefix ? '_' : '';
         $new_prefix .= $name.'_';
         foreach ($tbls as $tbl) {
-            if ($this->getDBObject() instanceof PDOSQLiteAdapter) {
-                $sql = 'ALTER TABLE '.$old_prefix.$tbl.' RENAME TO '.$new_prefix.$tbl;
-            } else {
-                $sql = 'RENAME TABLE '.$old_prefix.$tbl.' TO '.$new_prefix.$tbl;
-            }
+            $sql = 'RENAME TABLE '.$old_prefix.$tbl.' TO '.$new_prefix.$tbl;
 
             $this->db->simpleQuery($sql);
             if (!empty($this->db->getErrorMessage())) {
@@ -584,10 +558,6 @@ class ARC2_Store extends ARC2_Class
 
     public function replicateTo($name)
     {
-        if ($this->getDBObject() instanceof PDOSQLiteAdapter) {
-            throw new Exception('replicateTo not supported with SQLite as DB adapter yet.');
-        }
-
         $conf = array_merge($this->a, ['store_name' => $name]);
         $new_store = ARC2::getStore($conf);
         $new_store->setUp();
@@ -596,14 +566,7 @@ class ARC2_Store extends ARC2_Class
         $old_prefix = $this->getTablePrefix();
         $new_prefix = $new_store->getTablePrefix();
 
-        /*
-         * Use appropriate INSERT syntax, depending on the DBS.
-         */
-        if ($this->getDBObject() instanceof PDOSQLiteAdapter) {
-            $sqlHead = 'INSERT OR IGNORE INTO ';
-        } else {
-            $sqlHead = 'INSERT IGNORE INTO ';
-        }
+        $sqlHead = 'INSERT IGNORE INTO ';
 
         foreach ($tbls as $tbl) {
             $this->db->simpleQuery($sqlHead.$new_prefix.$tbl.' SELECT * FROM '.$old_prefix.$tbl);
@@ -639,7 +602,7 @@ class ARC2_Store extends ARC2_Class
             if ($this->cacheEnabled() && $this->cache->has($key.'_infos')) {
                 $infos = $this->cache->get($key.'_infos');
                 $errors = $this->cache->get($key.'_errors');
-            // no entry found
+                // no entry found
             } else {
                 ARC2::inc('SPARQLPlusParser');
                 $p = new ARC2_SPARQLPlusParser($this->a, $this);
@@ -803,17 +766,10 @@ class ARC2_Store extends ARC2_Class
         }
         /* exact match */
         else {
-            if ($this->getDBObject() instanceof PDOSQLiteAdapter) {
-                $sql = 'SELECT id
-                    FROM '.$this->getTablePrefix().$tbl."
-                    WHERE val = '".$this->db->escape($val)."'
-                    LIMIT 1";
-            } else {
-                $sql = 'SELECT id
+            $sql = 'SELECT id
                     FROM '.$this->getTablePrefix().$tbl."
                     WHERE val = BINARY '".$this->db->escape($val)."'
                     LIMIT 1";
-            }
 
             $row = $this->db->fetchRow($sql);
 
@@ -843,15 +799,6 @@ class ARC2_Store extends ARC2_Class
 
     public function getLock($t_out = 10, $t_out_init = '')
     {
-        /*
-         * We assume locks are not required when using SQLite.
-         * Either its an in memory database, which has no concurrent reads
-         * or its a file and SQLite takes care of it.
-         */
-        if ($this->getDBObject() instanceof PDOSQLiteAdapter) {
-            return 1;
-        }
-
         if (!$t_out_init) {
             $t_out_init = $t_out;
         }
@@ -879,15 +826,6 @@ class ARC2_Store extends ARC2_Class
 
     public function releaseLock()
     {
-        /*
-         * We assume locks are not required when using SQLite.
-         * Either its an in memory database, which has no concurrent reads
-         * or its a file and SQLite takes care of it.
-         */
-        if ($this->getDBObject() instanceof PDOSQLiteAdapter) {
-            return true;
-        }
-
         $sql = 'DO RELEASE_LOCK("'.$this->a['db_name'].'.'.$this->getTablePrefix().'.write_lock")';
 
         return $this->db->simpleQuery($sql);
@@ -898,11 +836,6 @@ class ARC2_Store extends ARC2_Class
      */
     public function processTables($level = 2, $operation = 'optimize')
     {
-        // no processing required when using SQLite
-        if ($this->getDBObject() instanceof PDOSQLiteAdapter) {
-            return;
-        }
-
         /*
          * level:
          *      1. triple + g2t

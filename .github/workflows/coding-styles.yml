@@ -1,27 +1,17 @@
-name: SQLite Tests
+name: "Coding Styles"
 
-on: push
+on: [push, pull_request]
 
 jobs:
-    sqlite-in-memory:
-        name: |
-            SQLite Tests - PHP ${{ matrix.php }} in memory
+    tests:
+        name: Coding Styles
         runs-on: ubuntu-latest
 
-        env:
-            DB_ADAPTER: pdo
-            DB_PDO_PROTOCOL: sqlite
-            DB_SQLITE_IN_MEMORY: true
-
         strategy:
-            # if one of the matrix-entries break, all entries getting canceled.
             fail-fast: true
             matrix:
                 php:
-                    - 7.2
-                    - 7.3
-                    - 7.4
-                    - 8.0
+                    - 8.2
 
         steps:
             -   name: Checkout
@@ -33,9 +23,13 @@ jobs:
                     php-version: ${{ matrix.php }}
                     coverage: xdebug
                     ini-values: memory_limit=1G
+                    tools: cs2pr
+
+            -   name: Validate Composer files
+                run: composer validate --no-check-all --strict
 
             -   name: Install Composer dependencies
                 run: composer install --no-progress --no-suggest --prefer-dist --optimize-autoloader
 
-            -   name: Tests
-                run: vendor/bin/phpunit
+            -   name: Coding styles
+                run: php vendor/bin/php-cs-fixer fix --verbose --dry-run --format=checkstyle | cs2pr

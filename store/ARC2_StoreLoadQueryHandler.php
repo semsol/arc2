@@ -4,15 +4,74 @@
  *
  * @author Benjamin Nowack
  * @license W3C Software License and GPL
+ *
  * @homepage <https://github.com/semsol/arc2>
  */
-
-use ARC2\Store\Adapter\PDOSQLiteAdapter;
-
 ARC2::inc('StoreQueryHandler');
 
 class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler
 {
+    public string $column_type;
+    public string $fixed_target_graph;
+    public int $has_lock;
+    public int $keep_bnode_ids;
+    public int $log_inserts;
+
+    /**
+     * @var array<mixed>
+     */
+    public array $inserts;
+
+    /**
+     * @var array<mixed>
+     */
+    public array $insert_times;
+
+    /**
+     * @var int
+     */
+    public $max_term_id;
+
+    /**
+     * @var int
+     */
+    public $max_triple_id;
+
+    public int $split_threshold;
+
+    /**
+     * @var array<mixed>
+     */
+    public array $sql_buffers;
+
+    public int $strip_mb_comp_str;
+    public string $target_graph;
+
+    /**
+     * @var array<mixed>
+     */
+    public array $term_ids;
+
+    /**
+     * @var array<mixed>
+     */
+    public array $triple_ids;
+
+    public int $t_count;
+    public int $t_count_prev;
+
+    /**
+     * @var string|float
+     */
+    public $t_prev;
+
+    /**
+     * @var string|float
+     */
+    public $t_start;
+
+    public int $write_buffer_size;
+
     public function __construct($a, &$caller)
     {
         /* caller has to be a store */
@@ -105,7 +164,7 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler
         }
         $this->store->releaseLock();
 
-        if ((1 == rand(1, 100))) {
+        if (1 == rand(1, 100)) {
             $this->store->optimizeTables();
         }
 
@@ -171,18 +230,7 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler
         $sql = '';
         foreach (['id2val', 's2val', 'o2val'] as $tbl) {
             $sql .= $sql ? ' UNION ' : '';
-
-            // if its NOT SQLite add ( and ) around each SELECT ... FROM ... part
-            if (false === $this->store->getDBObject() instanceof PDOSQLiteAdapter) {
-                $sql .= '(';
-            }
-
-            $sql .= 'SELECT MAX(id) as id FROM '.$this->store->getTablePrefix().$tbl;
-
-            // if its NOT SQLite add ( and ) around each SELECT ... FROM ... part
-            if (false === $this->store->getDBObject() instanceof PDOSQLiteAdapter) {
-                $sql .= ')';
-            }
+            $sql .= '(SELECT MAX(id) as id FROM '.$this->store->getTablePrefix().$tbl.')';
         }
         $r = 0;
 
@@ -243,15 +291,9 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler
             $id = 0;
             /* via hash */
             if (preg_match('/^(s2val|o2val)$/', $sub_tbl) && $this->hasHashColumn($sub_tbl)) {
-                if ($this->store->getDBObject() instanceof PDOSQLiteAdapter) {
-                    $sql = 'SELECT id, val
-                       FROM '.$tbl_prefix.$sub_tbl.'
-                      WHERE val_hash = "'.$this->getValueHash($val).'"';
-                } else {
-                    $sql = 'SELECT id, val
+                $sql = 'SELECT id, val
                        FROM '.$tbl_prefix.$sub_tbl."
                       WHERE val_hash = BINARY '".$this->getValueHash($val)."'";
-                }
 
                 $rows = $this->store->a['db_object']->fetchList($sql);
                 if (is_array($rows)) {
@@ -264,21 +306,12 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler
                 }
             } else {
                 $binaryValue = $this->store->a['db_object']->escape($val);
-                if (false !== empty($binaryValue)) {
-                    if ($this->store->getDBObject() instanceof PDOSQLiteAdapter) {
-                        $sql = 'SELECT id
-                            FROM '.$tbl_prefix.$sub_tbl."
-                            WHERE val = '".$binaryValue."'";
-                    } else {
-                        $sql = 'SELECT id
-                            FROM '.$tbl_prefix.$sub_tbl."
-                            WHERE val = BINARY '".$binaryValue."'";
-                    }
-
-                    $row = $this->store->a['db_object']->fetchRow($sql);
-                    if (is_array($row) && isset($row['id'])) {
-                        $id = $row['id'];
-                    }
+                // Updated by Craig Dietrich 19 February 2020:
+                // Always let through, even if empty since the id2val is storing empty values, too
+                $sql = 'SELECT id AS `id` FROM '.$tbl_prefix.$sub_tbl." WHERE val = BINARY '".$binaryValue."'";
+                $row = $this->store->a['db_object']->fetchRow($sql);
+                if (is_array($row) && isset($row['id'])) {
+                    $id = $row['id'];
                 }
             }
             if ($id) {
@@ -399,14 +432,7 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler
         $tbl = 'triple';
         $sql = ', ';
 
-        /*
-         * Use appropriate INSERT syntax, depending on the DBS.
-         */
-        if ($this->store->getDBObject() instanceof PDOSQLiteAdapter) {
-            $sqlHead = 'INSERT OR IGNORE INTO ';
-        } else {
-            $sqlHead = 'INSERT IGNORE INTO ';
-        }
+        $sqlHead = 'INSERT IGNORE INTO ';
 
         if (!isset($this->sql_buffers[$tbl])) {
             $this->sql_buffers[$tbl] = $sqlHead;
@@ -427,14 +453,7 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler
         $tbl = 'g2t';
         $sql = ', ';
 
-        /*
-         * Use appropriate INSERT syntax, depending on the DBS.
-         */
-        if ($this->store->getDBObject() instanceof PDOSQLiteAdapter) {
-            $sqlHead = 'INSERT OR IGNORE INTO ';
-        } else {
-            $sqlHead = 'INSERT IGNORE INTO ';
-        }
+        $sqlHead = 'INSERT IGNORE INTO ';
 
         if (!isset($this->sql_buffers[$tbl])) {
             $this->sql_buffers[$tbl] = $sqlHead.$this->store->getTablePrefix().$tbl.' (g, t) VALUES';
@@ -459,15 +478,7 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler
         if (!isset($this->sql_buffers[$tbl])) {
             $this->sql_buffers[$tbl] = '';
 
-            /*
-             * Use appropriate INSERT syntax, depending on the DBS.
-             */
-            if ($this->store->getDBObject() instanceof PDOSQLiteAdapter) {
-                $sqlHead = 'INSERT OR IGNORE INTO ';
-            } else {
-                $sqlHead = 'INSERT IGNORE INTO ';
-            }
-
+            $sqlHead = 'INSERT IGNORE INTO ';
             $sql = $sqlHead.$this->store->getTablePrefix().$tbl.'('.$cols.') VALUES ';
         } else {
             $sql = ', ';

@@ -7,30 +7,29 @@ This document contains information about ARC2 internals which are relevant for m
 To run test environment execute:
 
 ```bash
-make test
+vendor/bin/phpunit
 ```
 
-Tests are split into different groups, currently:
+Tests are split into different groups currently:
 * unit
 * db_adapter_depended
 
 You can run the `unit` group directly, but you need to set some environment variables for `db_adapter_depended`.
-For more information please have a look into our `Makefile`.
 
 #### config.php
 
-Currently, we use the following standard db credentials to connect with the database:
+Currently, we use the following standard database credentials to connect with the database:
 
 ```php
 $dbConfig = array(
     'db_name' => 'arc2_test',
     'db_user' => 'root',
-    'db_pwd'  => '',
+    'db_pwd'  => 'Pass123',
     'db_host' => '127.0.0.1',
 );
 ```
 
-The is used in the travis environment. If you have different credentials, copy the `tests/config.php.dist` to `tests/config.php` and set your credentials.
+If you have different credentials, copy the `tests/config.php.dist` to `tests/config.php` and set your credentials.
 
 ## Editor
 
@@ -48,6 +47,9 @@ In your terminal go to `docker` folder and run `make`. It will build and start t
 
 ### Docker and Travis
 
-We use a very wide range of software-combinations to test ARC2 ([Travis](https://travis-ci.org/semsol/arc2)). Currently, all combinations of supported versions of PHP and database systems (currently MySQL and MariaDB only) are checked.
+We use a very wide range of software-combinations to test ARC2.
+Currently, all combinations of supported versions of PHP and database systems (currently MySQL and MariaDB only) are checked.
 
-Using a Docker setup for local development allows to switch the backend very easily. So, if a test with a certain DBS/PHP version combination fails on travis, its very likely that you can reproduce it locally. Dont forget to run `composer update` after a switch to make sure appropriate software is used.
+Using a Docker setup for local development allows to switch the backend very easily.
+So, if a test with a certain DBS/PHP version combination fails, its very likely that you can reproduce it locally.
+Dont forget to run `composer update` after a switch to make sure appropriate software is used.

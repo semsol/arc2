@@ -1,10 +1,7 @@
 <?php
 
-namespace Tests\db_adapter_depended\store\ARC2_StoreLoadQueryHandler;
+namespace Tests\db_adapter_depended\store;
 
-use ARC2\Store\Adapter\PDOSQLiteAdapter;
-use ARC2_StoreLoadQueryHandler;
-use PDO;
 use Tests\ARC2_TestCase;
 
 class ARC2_StoreLoadQueryHandlerTest extends ARC2_TestCase
@@ -22,7 +19,7 @@ class ARC2_StoreLoadQueryHandlerTest extends ARC2_TestCase
         $this->store->getDBObject()->deleteAllTables();
         $this->store->setUp();
 
-        $this->fixture = new ARC2_StoreLoadQueryHandler($this->store, $this);
+        $this->fixture = new \ARC2_StoreLoadQueryHandler($this->store, $this);
     }
 
     protected function tearDown(): void
@@ -41,12 +38,9 @@ class ARC2_StoreLoadQueryHandlerTest extends ARC2_TestCase
 
         $this->assertEquals(16750001, $this->fixture->getStoredTermID('', '', ''));
 
-        // PDO + SQLite
-        if ($this->store->getDBObject() instanceof PDOSQLiteAdapter) {
-        } else {
-            // MySQL
-            $table_fields = $this->store->getDBObject()->fetchList('DESCRIBE arc_g2t');
-            $this->assertEquals('int(10) unsigned', $table_fields[0]['Type']);
-        }
+        // MySQL
+        $table_fields = $this->store->getDBObject()->fetchList('DESCRIBE arc_g2t');
+        $this->assertStringContainsString('int', $table_fields[0]['Type']);
+        $this->assertStringContainsString('unsigned', $table_fields[0]['Type']);
     }
 }

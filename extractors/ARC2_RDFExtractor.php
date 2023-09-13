@@ -178,7 +178,7 @@ class ARC2_RDFExtractor extends ARC2_Class
 
     public function getContent($n, $outer = 0, $trim = 1)
     {
-        //echo '<pre>' . htmlspecialchars(print_r($n, 1)) . '</pre>';
+        // echo '<pre>' . htmlspecialchars(print_r($n, 1)) . '</pre>';
         if ('comment' == $n['tag']) {
             $r = '<!-- '.$n['a']['value'].' -->';
         } elseif ('cdata' == $n['tag']) {
@@ -235,7 +235,7 @@ class ARC2_RDFExtractor extends ARC2_Class
         $v = preg_replace('/[\W\s]+/is', '_', strip_tags(strtolower($v)));
         $v = preg_replace('/http/', '', $v);
         $v = preg_replace('/[\_]+/', '_', $v);
-        //$v = substr($v, 0, 30);
+        // $v = substr($v, 0, 30);
         $v = trim($v, '_');
 
         return $v;

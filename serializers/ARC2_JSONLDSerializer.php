@@ -4,12 +4,15 @@
  *
  * @author John Walker <john.walker@semaku.com>
  * @license W3C Software License and GPL
+ *
  * @homepage <https://github.com/semsol/arc2>
  */
 ARC2::inc('RDFSerializer');
 
 class ARC2_JSONLDSerializer extends ARC2_RDFSerializer
 {
+    public string $content_header;
+
     public function __construct($a, &$caller)
     {
         parent::__construct($a, $caller);
@@ -64,7 +67,7 @@ class ARC2_JSONLDSerializer extends ARC2_RDFSerializer
         foreach ($index as $s => $ps) {
             $r .= $r ? ','.$nl.$nl : '';
             $r .= '  { '.$nl.'    "@id" : '.$this->getTerm($s);
-            //$first_p = 1;
+            // $first_p = 1;
             foreach ($ps as $p => $os) {
                 $r .= ','.$nl;
                 $r .= '    '.$this->getTerm($p).' : [';

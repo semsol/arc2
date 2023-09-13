@@ -12,6 +12,10 @@ ARC2::inc('Class');
 
 class ARC2_TestHandler extends ARC2_Class
 {
+    public $data_store;
+    public $reader;
+    public $store;
+
     public function __construct($a, &$caller, &$data_store)
     {/* caller has to be a store */
         parent::__construct($a, $caller);
@@ -175,7 +179,7 @@ class ARC2_TestHandler extends ARC2_Class
                 ${$var.'_value'} = $infos[$var.'_value'][0];
             }
             if ($$var && ('-result' != $var)) {
-                //echo '<pre>' . $$var . $nl . $nl . htmlspecialchars(${$var . '_value'}) . '</pre><hr />';
+                // echo '<pre>' . $$var . $nl . $nl . htmlspecialchars(${$var . '_value'}) . '</pre><hr />';
             }
         }
         /* query infos */
@@ -224,7 +228,7 @@ class ARC2_TestHandler extends ARC2_Class
                 $qr_result = $ser->getSerializedIndex($qr_result);
             }
         }
-        //echo '<pre>query result: ' . $nl . htmlspecialchars(print_r($qr_result, 1)) . '</pre>';
+        // echo '<pre>query result: ' . $nl . htmlspecialchars(print_r($qr_result, 1)) . '</pre>';
         if (!$query || $errors || $rest) {
             return ['pass' => 0, 'info' => 'query could not be parsed'.htmlspecialchars($query_value)];
         }
@@ -251,7 +255,7 @@ class ARC2_TestHandler extends ARC2_Class
         $info .= $pass ? '' : print_r($graph_data, 1).$nl.htmlspecialchars(print_r($graph_data_value, 1)).'<hr />';
         $info .= $pass ? '' : print_r($data, 1).$nl.htmlspecialchars(print_r($data_value, 1)).'<hr />';
         $info .= $pass ? '' : $query.$nl.htmlspecialchars($query_value).'<hr />';
-        $info .= $pass ? '' : '<pre>query result: '.$nl.htmlspecialchars(print_r($qr_result, 1)).'</pre>'.'<hr />';
+        $info .= $pass ? '' : '<pre>query result: '.$nl.htmlspecialchars(print_r($qr_result, 1)).'</pre><hr />';
         $info .= $pass ? '' : print_r($infos, 1);
 
         return ['pass' => $pass, 'info' => $info];
@@ -263,7 +267,7 @@ class ARC2_TestHandler extends ARC2_Class
             $parser = ARC2::getRDFParser($this->a);
             $parser->parse($result_base, $result);
             $index = $parser->getSimpleIndex(0);
-            //echo '<pre>' . print_r($index, 1) .'</pre>';
+            // echo '<pre>' . print_r($index, 1) .'</pre>';
             $valid_qr = $this->buildTurtleSelectQueryResult($index);
         } else {
             $parser = ARC2::getSPARQLXMLResultParser($this->a);
@@ -293,7 +297,7 @@ class ARC2_TestHandler extends ARC2_Class
                 $valid_index = $this->buildArrayHashIndex($valid_qr['rows']);
                 if (($diff = array_diff($index, $valid_index)) || ($diff = array_diff($valid_index, $index))) {
                     $pass = 0;
-                    //echo '<pre>' . print_r($diff, 1) . '</pre>';
+                    // echo '<pre>' . print_r($diff, 1) . '</pre>';
                 }
             }
         }
@@ -312,7 +316,7 @@ class ARC2_TestHandler extends ARC2_Class
         $info = '<pre>'.print_r($valid_triples, 1).'</pre>';
         $info = '';
 
-        //echo '<pre>' . print_r($index, 1) .'</pre>';
+        // echo '<pre>' . print_r($index, 1) .'</pre>';
         $pass = 0;
         if (in_array($test, [/* manually checked 2007-09-21 */
             'http://www.w3.org/2001/sw/DataAccess/tests/data-r2/construct/manifest#construct-1',
@@ -363,7 +367,7 @@ class ARC2_TestHandler extends ARC2_Class
                     $var = $index[$binding_id][$rs.'variable'][0]['value'];
                     $val = $index[$binding_id][$rs.'value'][0]['value'];
                     $val_type = $index[$binding_id][$rs.'value'][0]['type'];
-                    //$val_type = preg_match('/literal/', $val_type) ? 'literal' : $val_type;
+                    // $val_type = preg_match('/literal/', $val_type) ? 'literal' : $val_type;
                     $row[$var] = $val;
                     $row[$var.' type'] = $val_type;
                     if ($dt = $this->v('datatype', 0, $index[$binding_id][$rs.'value'][0])) {

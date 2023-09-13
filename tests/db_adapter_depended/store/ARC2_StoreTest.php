@@ -2,7 +2,6 @@
 
 namespace Tests\db_adapter_depended\store;
 
-use ARC2\Store\Adapter\PDOSQLiteAdapter;
 use Tests\ARC2_TestCase;
 
 class ARC2_StoreTest extends ARC2_TestCase
@@ -143,7 +142,7 @@ class ARC2_StoreTest extends ARC2_TestCase
 
     public function testCountDBProcesses()
     {
-        $this->assertTrue(\is_int($this->fixture->countDBProcesses()));
+        $this->assertTrue(0 < $this->fixture->countDBProcesses());
     }
 
     /*
@@ -260,7 +259,7 @@ XML;
         ob_start();
         $this->fixture->dump();
         $dumpContent = ob_get_clean();
-        error_reporting(E_ALL);
+        error_reporting(\E_ALL);
 
         $expectedXML = <<<XML
 <?xml version="1.0"?>
@@ -299,17 +298,16 @@ XML;
 
     public function testEnableFulltextSearch()
     {
+        if (str_starts_with($this->fixture->getDBObject()->getServerVersion(), '5.5.')) {
+            $this->markTestSkipped('InnoDB does not support fulltext in MySQL 5.5.x');
+        }
+
         $res1 = $this->fixture->enableFulltextSearch();
         $res2 = $this->fixture->disableFulltextSearch();
 
         $this->assertNull($res1);
 
-        if ($this->fixture->getDBObject() instanceof PDOSQLiteAdapter) {
-            // TODO remove that if else in the future, after ...FulltextSearch functions
-            //      got more clear return values.
-        } else {
-            $this->assertEquals(1, $res2);
-        }
+        $this->assertEquals(1, $res2);
 
         $this->assertEquals(0, $this->fixture->a['db_object']->getErrorCode());
         $this->assertEquals('', $this->fixture->a['db_object']->getErrorMessage());
@@ -322,15 +320,10 @@ XML;
     // just check pattern
     public function testGetDBVersion()
     {
-        // SQLite
-        if ($this->fixture->getDBObject() instanceof PDOSQLiteAdapter) {
-            $pattern = '/[0-9]{1,}\.[0-9]{1,}\.[0-9]{1,}/';
-        } else {
-            // MySQL
-            $pattern = '/[0-9]{2}-[0-9]{2}-[0-9]{2}/';
-        }
-        $result = preg_match($pattern, $this->fixture->getDBVersion(), $match);
-        $this->assertEquals(1, $result);
+        $this->assertEquals(
+            $this->fixture->getDBObject()->getConnection()->query('select version()')->fetchColumn(),
+            $this->fixture->getDBVersion()
+        );
     }
 
     /*
@@ -584,7 +577,7 @@ XML;
     {
         $this->markTestSkipped(
             'Adding the same triple into two graphs does not work.'
-            .PHP_EOL.'Bug report: https://github.com/semsol/arc2/issues/114'
+            .\PHP_EOL.'Bug report: https://github.com/semsol/arc2/issues/114'
         );
 
         /*
@@ -639,7 +632,7 @@ XML;
 
         if (isset($this->dbConfig['db_table_prefix'])) {
             foreach ($this->fixture->getDBObject()->getAllTables() as $table) {
-                $this->assertTrue(false !== strpos($table, $this->dbConfig['db_table_prefix'].'_'));
+                $this->assertTrue(str_contains($table, $this->dbConfig['db_table_prefix'].'_'));
             }
         }
 
@@ -657,7 +650,7 @@ XML;
             if ('sqlite_sequence' == $table) {
                 continue;
             }
-            $this->assertTrue(false !== strpos($table, $prefix), 'Renaming failed for '.$table);
+            $this->assertTrue(str_contains($table, $prefix), 'Renaming failed for '.$table);
         }
     }
 
@@ -723,13 +716,10 @@ XML;
     {
         if (
             '05-06' == substr($this->fixture->getDBVersion(), 0, 5)
-            && false === $this->fixture->getDBObject() instanceof PDOSQLiteAdapter
         ) {
             $this->markTestSkipped(
                 'With MySQL 5.6 ARC2_Store::replicateTo does not work. Tables keep their names.'
             );
-        } elseif ($this->fixture->getDBObject() instanceof PDOSQLiteAdapter) {
-            $this->markTestSkipped('replicateTo not yet implemented when using SQLite.');
         }
 
         // test data
@@ -749,10 +739,10 @@ XML;
         $foundArcPrefix = $foundReplicatePrefix = false;
         foreach ($tables as $table) {
             // check for original table
-            if (false !== strpos($table['Tables_in_'.$this->dbConfig['db_name']], $this->dbConfig['store_name'].'_')) {
+            if (str_contains($table['Tables_in_'.$this->dbConfig['db_name']], $this->dbConfig['store_name'].'_')) {
                 $foundArcPrefix = true;
-            // check for replicated table
-            } elseif (false !== strpos($table['Tables_in_'.$this->dbConfig['db_name']], 'replicate_')) {
+                // check for replicated table
+            } elseif (str_contains($table['Tables_in_'.$this->dbConfig['db_name']], 'replicate_')) {
                 $foundReplicatePrefix = true;
             }
         }
@@ -773,5 +763,14 @@ XML;
         $this->fixture->reset(1);
 
         $this->assertEquals(1, $this->fixture->hasSetting('foo'));
+    }
+
+    public function testMultipleInsertsSameStore()
+    {
+        $this->fixture->query('INSERT INTO <http://ex/> {<http://a> <http://b> <http://c> . }');
+        $this->fixture->query('INSERT INTO <http://ex/> {<http://a2> <http://b2> <http://c2> . }');
+
+        $res = $this->fixture->query('SELECT * FROM <http://ex/> WHERE {?s ?p ?o.}');
+        $this->assertEquals(2, \count($res['result']['rows']));
     }
 }

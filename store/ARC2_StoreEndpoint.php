@@ -4,6 +4,7 @@
  *
  * @author Benjamin Nowack
  * @license W3C Software License and GPL
+ *
  * @homepage <https://github.com/semsol/arc2>
  *
  * @version 2010-11-16
@@ -12,6 +13,20 @@ ARC2::inc('Store');
 
 class ARC2_StoreEndpoint extends ARC2_Store
 {
+    public int $allow_sql;
+
+    /**
+     * @var array<mixed>
+     */
+    public array $headers;
+
+    public int $is_dump;
+    public string $query_result;
+    public string $read_key;
+    public string $result;
+    public int $timeout;
+    public string $write_key;
+
     public function __construct($a, &$caller)
     {
         parent::__construct($a, $caller);
@@ -98,9 +113,9 @@ class ARC2_StoreEndpoint extends ARC2_Store
                 $this->setHeader('content-type', 'Content-type: text/plain; charset=utf-8');
                 $this->result = 'Missing configuration or the endpoint store was not set up yet.';
             }
-        } elseif (($img = $this->p('img'))) {
+        } elseif ($img = $this->p('img')) {
             $this->handleImgRequest($img);
-        } elseif (($q = $this->p('query'))) {
+        } elseif ($q = $this->p('query')) {
             $this->checkProcesses();
             $this->handleQueryRequest($q);
             if ($this->p('show_inline')) {

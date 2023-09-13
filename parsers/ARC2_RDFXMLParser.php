@@ -4,12 +4,38 @@
  *
  * @author Benjamin Nowack <bnowack@semsol.com>
  * @license W3C Software License and GPL
+ *
  * @homepage <https://github.com/semsol/arc2>
  */
 ARC2::inc('RDFParser');
 
 class ARC2_RDFXMLParser extends ARC2_RDFParser
 {
+    /**
+     * @var string|false
+     */
+    public $encoding;
+    public string $rdf;
+
+    public int $s_count = 0;
+
+    /**
+     * @var array<mixed>
+     */
+    public array $s_stack;
+
+    public int $state;
+
+    /**
+     * @var string|false
+     */
+    public $target_encoding;
+    public string $tmp_error;
+    public string $x_base;
+    public string $x_lang;
+    public string $xml;
+    public object $xml_parser;
+
     public function __construct($a, &$caller)
     {
         parent::__construct($a, $caller);
@@ -46,7 +72,7 @@ class ARC2_RDFXMLParser extends ARC2_RDFParser
         $first = true;
         while ($d = $this->reader->readStream()) {
             if (!$this->keep_time_limit) {
-                @set_time_limit($this->v('time_limit', 60, $this->a));
+                set_time_limit($this->v('time_limit', 60, $this->a));
             }
             if ($iso_fallback && $first) {
                 $d = '<?xml version="1.0" encoding="ISO-8859-1"?>'."\n".preg_replace('/^\<\?xml [^\>]+\?\>\s*/s', '', $d);
@@ -71,7 +97,7 @@ class ARC2_RDFXMLParser extends ARC2_RDFParser
                 }
             }
         }
-        $this->target_encoding = xml_parser_get_option($this->xml_parser, XML_OPTION_TARGET_ENCODING);
+        $this->target_encoding = xml_parser_get_option($this->xml_parser, \XML_OPTION_TARGET_ENCODING);
         xml_parser_free($this->xml_parser);
         $this->reader->closeStream();
         unset($this->reader);
@@ -84,8 +110,8 @@ class ARC2_RDFXMLParser extends ARC2_RDFParser
         if (!isset($this->xml_parser)) {
             $enc = preg_match('/^(utf\-8|iso\-8859\-1|us\-ascii)$/i', $this->getEncoding(), $m) ? $m[1] : 'UTF-8';
             $parser = xml_parser_create_ns($enc, '');
-            xml_parser_set_option($parser, XML_OPTION_SKIP_WHITE, 0);
-            xml_parser_set_option($parser, XML_OPTION_CASE_FOLDING, 0);
+            xml_parser_set_option($parser, \XML_OPTION_SKIP_WHITE, 0);
+            xml_parser_set_option($parser, \XML_OPTION_CASE_FOLDING, 0);
             xml_set_element_handler($parser, 'open', 'close');
             xml_set_character_data_handler($parser, 'cdata');
             xml_set_start_namespace_decl_handler($parser, 'nsDecl');
@@ -162,7 +188,7 @@ class ARC2_RDFXMLParser extends ARC2_RDFParser
 
     public function addT($s, $p, $o, $s_type, $o_type, $o_dt = '', $o_lang = '')
     {
-        //echo "-----\nadding $s / $p / $o\n-----\n";
+        // echo "-----\nadding $s / $p / $o\n-----\n";
         $t = ['s' => $s, 'p' => $p, 'o' => $o, 's_type' => $s_type, 'o_type' => $o_type, 'o_datatype' => $o_dt, 'o_lang' => $o_lang];
         if ($this->skip_dupes) {
             $h = md5(serialize($t));
@@ -187,43 +213,43 @@ class ARC2_RDFXMLParser extends ARC2_RDFParser
 
     public function open($p, $t, $a)
     {
-        //echo "state is $this->state\n";
-        //echo "opening $t\n";
+        // echo "state is $this->state\n";
+        // echo "opening $t\n";
         switch ($this->state) {
-      case 0: return $this->h0Open($t, $a);
-      case 1: return $this->h1Open($t, $a);
-      case 2: return $this->h2Open($t, $a);
-      case 4: return $this->h4Open($t, $a);
-      case 5: return $this->h5Open($t, $a);
-      case 6: return $this->h6Open($t, $a);
-      default: $this->addError('open() called at state '.$this->state.' in '.$t);
-    }
+            case 0: return $this->h0Open($t, $a);
+            case 1: return $this->h1Open($t, $a);
+            case 2: return $this->h2Open($t, $a);
+            case 4: return $this->h4Open($t, $a);
+            case 5: return $this->h5Open($t, $a);
+            case 6: return $this->h6Open($t, $a);
+            default: $this->addError('open() called at state '.$this->state.' in '.$t);
+        }
     }
 
     public function close($p, $t)
     {
-        //echo "state is $this->state\n";
-        //echo "closing $t\n";
+        // echo "state is $this->state\n";
+        // echo "closing $t\n";
         switch ($this->state) {
-      case 1: return $this->h1Close($t);
-      case 2: return $this->h2Close($t);
-      case 3: return $this->h3Close($t);
-      case 4: return $this->h4Close($t);
-      case 5: return $this->h5Close($t);
-      case 6: return $this->h6Close($t);
-      default: $this->addError('close() called at state '.$this->state.' in '.$t);
-    }
+            case 1: return $this->h1Close($t);
+            case 2: return $this->h2Close($t);
+            case 3: return $this->h3Close($t);
+            case 4: return $this->h4Close($t);
+            case 5: return $this->h5Close($t);
+            case 6: return $this->h6Close($t);
+            default: $this->addError('close() called at state '.$this->state.' in '.$t);
+        }
     }
 
     public function cdata($p, $d)
     {
-        //echo "state is $this->state\n";
-        //echo "cdata\n";
+        // echo "state is $this->state\n";
+        // echo "cdata\n";
         switch ($this->state) {
-      case 4: return $this->h4Cdata($d);
-      case 6: return $this->h6Cdata($d);
-      default: return false;
-    }
+            case 4: return $this->h4Cdata($d);
+            case 6: return $this->h6Cdata($d);
+            default: return false;
+        }
     }
 
     public function nsDecl($p, $prf, $uri)
@@ -303,7 +329,7 @@ class ARC2_RDFXMLParser extends ARC2_RDFParser
         }
         /* any other attrs (skip rdf and xml, except rdf:_, rdf:value, rdf:Seq) */
         foreach ($a as $k => $v) {
-            if (((false === strpos($k, $this->xml)) && (false === strpos($k, $this->rdf))) || preg_match('/(\_[0-9]+|value|Seq|Bag|Alt|Statement|Property|List)$/', $k)) {
+            if (((!str_contains($k, $this->xml)) && (!str_contains($k, $this->rdf))) || preg_match('/(\_[0-9]+|value|Seq|Bag|Alt|Statement|Property|List)$/', $k)) {
                 if (strpos($k, ':')) {
                     $this->addT($s['value'], $k, $v, $s['type'], 'literal', '', $s['x_lang']);
                 }
@@ -407,7 +433,7 @@ class ARC2_RDFXMLParser extends ARC2_RDFParser
         }
         /* any other attrs (skip rdf and xml) */
         foreach ($a as $k => $v) {
-            if (((false === strpos($k, $this->xml)) && (false === strpos($k, $this->rdf))) || preg_match('/(\_[0-9]+|value)$/', $k)) {
+            if (((!str_contains($k, $this->xml)) && (!str_contains($k, $this->rdf))) || preg_match('/(\_[0-9]+|value)$/', $k)) {
                 if (strpos($k, ':')) {
                     if (!$o['value']) {
                         $o['value'] = $this->createBnodeID();
@@ -452,7 +478,7 @@ class ARC2_RDFXMLParser extends ARC2_RDFParser
             $name = $parts[1];
             if (!isset($this->nsp[$ns_uri])) {
                 foreach ($this->nsp as $tmp1 => $tmp2) {
-                    if (0 === strpos($t, $tmp1)) {
+                    if (str_starts_with($t, $tmp1)) {
                         $ns_uri = $tmp1;
                         $name = substr($t, strlen($tmp1));
                         break;
@@ -524,7 +550,7 @@ class ARC2_RDFXMLParser extends ARC2_RDFParser
             if (isset($s['is_coll']) && $s['is_coll']) {
                 $this->addT($s['value'], $this->rdf.'rest', $this->rdf.'nil', $s['type'], 'uri');
                 /* back to collection start */
-                while ((!isset($s['p']) || ($s['p'] != $t))) {
+                while (!isset($s['p']) || ($s['p'] != $t)) {
                     $sub_s = $s;
                     $this->popS();
                     $s = $this->getParentS();
@@ -581,7 +607,7 @@ class ARC2_RDFXMLParser extends ARC2_RDFParser
                     $name = $parts[1];
                     if (!isset($this->nsp[$ns_uri])) {
                         foreach ($this->nsp as $tmp1 => $tmp2) {
-                            if (0 === strpos($t, $tmp1)) {
+                            if (str_starts_with($t, $tmp1)) {
                                 $ns_uri = $tmp1;
                                 $name = substr($t, strlen($tmp1));
                                 break;
@@ -613,7 +639,7 @@ class ARC2_RDFXMLParser extends ARC2_RDFParser
     {
         if ($s = $this->getParentS()) {
             if (isset($s['o_xml_data']) || preg_match("/[\n\r]/", $d) || trim($d)) {
-                $d = htmlspecialchars($d, ENT_NOQUOTES);
+                $d = htmlspecialchars($d, \ENT_NOQUOTES);
                 $s['o_xml_data'] = isset($s['o_xml_data']) ? $s['o_xml_data'].$d : $d;
             }
             $this->updateS($s);

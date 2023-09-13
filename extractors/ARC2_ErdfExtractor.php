@@ -69,7 +69,7 @@ class ARC2_ErdfExtractor extends ARC2_RDFExtractor
     public function processNode($n, $ct)
     {
         /* context */
-        //$ct['lang'] = $this->v('xml:lang', $ct['lang'], $n['a']);
+        // $ct['lang'] = $this->v('xml:lang', $ct['lang'], $n['a']);
         $ct['lang'] = '';
         $ct['prop_uris'] = $this->getPropertyURIs($n, $ct);
         $ct['prev_res'] = $ct['cur_res'];

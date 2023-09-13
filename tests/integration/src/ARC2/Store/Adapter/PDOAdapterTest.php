@@ -114,26 +114,4 @@ class PDOAdapterTest extends AbstractAdapterTest
         // invalid query
         $this->assertFalse($this->fixture->simpleQuery('invalid query'));
     }
-
-    /**
-     * Tests behavior when using exec and simpleQuery and the following exception araise.
-     *
-     *    SQLSTATE[HY000]: General error: 2014 Cannot execute queries while other unbuffered queries
-     *                     are active. Consider using PDOStatement::fetchAll(). Alternatively, if your
-     *                     code is only ever going to run against mysql, you may enable query buffering
-     *                     by setting the PDO::MYSQL_ATTR_USE_BUFFERED_QUERY attribute.
-     *
-     * If we use "exec" instead of "simpleQuery" here, the exception is gone sometimes.
-     * Its not clear, why it appears in the first place and why that solves it.
-     */
-    public function testUnbufferedQueryStillActiveException()
-    {
-        $msg = 'SQLSTATE[HY000]: General error: 2014 Cannot execute queries while other '
-            .'unbuffered queries are active.  Consider using PDOStatement::fetchAll().  '
-            .'Alternatively, if your code is only ever going to run against mysql, you '
-            .'may enable query buffering by setting the PDO::MYSQL_ATTR_USE_BUFFERED_QUERY attribute.';
-        $this->expectExceptionMessage($msg);
-
-        $this->fixture->simpleQuery('CHECK TABLE arc_triple;');
-    }
 }

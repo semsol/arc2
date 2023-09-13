@@ -4,6 +4,7 @@
  *
  * @author Benjamin Nowack
  * @license W3C Software License and GPL
+ *
  * @homepage <https://github.com/semsol/arc2>
  *
  * @version 2010-11-16
@@ -12,6 +13,24 @@ ARC2::inc('RDFParser');
 
 class ARC2_TurtleParser extends ARC2_RDFParser
 {
+    public int $max_parsing_loops;
+
+    /**
+     * @var array<string,string>
+     */
+    public array $prefixes;
+
+    /**
+     * @var array<mixed>
+     */
+    public array $r;
+
+    public string $rdf;
+    public int $state;
+    public string $unparsed_code;
+    public string $xml;
+    public string $xsd;
+
     public function __construct($a, &$caller)
     {
         parent::__construct($a, $caller);
@@ -37,7 +56,7 @@ class ARC2_TurtleParser extends ARC2_RDFParser
         }
 
         return ARC2::x($re, $v, $options);
-        //$this->unparsed_code = ($sub_r && count($sub_r)) ? $sub_r[count($sub_r) - 1] : '';
+        // $this->unparsed_code = ($sub_r && count($sub_r)) ? $sub_r[count($sub_r) - 1] : '';
     }
 
     public function createBnodeID()
@@ -647,7 +666,7 @@ class ARC2_TurtleParser extends ARC2_RDFParser
         return [0, $v];
     }
 
-    /* 69.., 73.., 93, 94..  */
+    /* 69.., 73.., 93, 94.. */
 
     public function xBlankNode($v)
     {
@@ -665,7 +684,7 @@ class ARC2_TurtleParser extends ARC2_RDFParser
 
     public function xIRI_REF($v)
     {
-        //if ($r = $this->x('\<([^\<\>\"\{\}\|\^\'[:space:]]*)\>', $v)) {
+        // if ($r = $this->x('\<([^\<\>\"\{\}\|\^\'[:space:]]*)\>', $v)) {
         if (($r = $this->x('\<(\$\{[^\>]*\})\>', $v)) && ($sub_r = $this->xPlaceholder($r[1]))) {
             return [$r[1], $r[2]];
         } elseif ($r = $this->x('\<\>', $v)) {
@@ -895,14 +914,14 @@ class ARC2_TurtleParser extends ARC2_RDFParser
 
     public function unescapeNtripleUTF($v)
     {
-        if (false === strpos($v, '\\')) {
+        if (!str_contains($v, '\\')) {
             return $v;
         }
         $mappings = ['t' => "\t", 'n' => "\n", 'r' => "\r", '\"' => '"', '\'' => "'"];
         foreach ($mappings as $in => $out) {
             $v = preg_replace('/\x5c(['.$in.'])/', $out, $v);
         }
-        if (false === strpos(strtolower($v), '\u')) {
+        if (!str_contains(strtolower($v), '\u')) {
             return $v;
         }
         while (preg_match('/\\\(U)([0-9A-F]{8})/', $v, $m) || preg_match('/\\\(u)([0-9A-F]{4})/', $v, $m)) {
@@ -926,9 +945,9 @@ class ARC2_TurtleParser extends ARC2_RDFParser
 
     public function xPlaceholder($v)
     {
-        //if ($r = $this->x('(\?|\$)\{([^\}]+)\}', $v)) {
+        // if ($r = $this->x('(\?|\$)\{([^\}]+)\}', $v)) {
         if ($r = $this->x('(\?|\$)', $v)) {
-            if (preg_match('/(\{(?:[^{}]+|(?R))*\})/', $r[2], $m) && 0 === strpos(trim($r[2]), $m[1])) {
+            if (preg_match('/(\{(?:[^{}]+|(?R))*\})/', $r[2], $m) && str_starts_with(trim($r[2]), $m[1])) {
                 $ph = substr($m[1], 1, -1);
                 $rest = substr(trim($r[2]), strlen($m[1]));
                 if (!isset($this->r['placeholders'])) {

@@ -4,6 +4,7 @@
  *
  * @author Benjamin Nowack
  * @license W3C Software License and GPL
+ *
  * @homepage <https://github.com/semsol/arc2>
  *
  * @version 2010-11-16
@@ -12,6 +13,35 @@ ARC2::inc('Class');
 
 class ARC2_Reader extends ARC2_Class
 {
+    /**
+     * @var array<mixed>
+     */
+    public array $auth_infos;
+    public int $digest_auth;
+    public $format;
+    public string $http_accept_header;
+    public string $http_custom_headers;
+    public string $http_method;
+    public string $http_user_agent_header;
+    public int $max_redirects;
+    public string $message_body;
+    public int $ping_only;
+
+    /**
+     * @var array<mixed>
+     */
+    public array $redirects;
+
+    /**
+     * @var array<mixed>
+     */
+    public array $response_headers;
+
+    public $stream;
+    public string $stream_id;
+    public int $timeout;
+    public string $uri;
+
     public function __construct($a, &$caller)
     {
         parent::__construct($a, $caller);
@@ -132,7 +162,7 @@ class ARC2_Reader extends ARC2_Class
         $auth = 'Basic '.base64_encode($creds['user'].':'.$creds['pass']);
         $h = in_array('proxy', $creds) ? 'Proxy-Authorization' : 'Authorization';
         $this->addCustomHeaders($h.': '.$auth);
-        //echo $h . ': ' . $auth . print_r($creds, 1);
+        // echo $h . ': ' . $auth . print_r($creds, 1);
     }
 
     public function setDigestAuthCredentials($creds, $url)
@@ -190,7 +220,7 @@ class ARC2_Reader extends ARC2_Class
         }
         $skips = $this->v1('proxy_skip', [], $this->a);
         foreach ($skips as $skip) {
-            if (false !== strpos($url, $skip)) {
+            if (str_contains($url, $skip)) {
                 return false;
             }
         }
@@ -272,7 +302,7 @@ class ARC2_Reader extends ARC2_Class
                     stream_context_set_option($context, 'ssl', $m[1], $v);
                 }
             }
-            $s = stream_socket_client('ssl://'.$parts['host'].':'.$parts['port'], $errno, $errstr, $this->timeout, STREAM_CLIENT_CONNECT, $context);
+            $s = stream_socket_client('ssl://'.$parts['host'].':'.$parts['port'], $errno, $errstr, $this->timeout, \STREAM_CLIENT_CONNECT, $context);
         } elseif ('https' == $parts['scheme']) {
             $s = @fsockopen('ssl://'.$parts['host'], $parts['port'], $errno, $errstr, $this->timeout);
         } elseif ('http' == $parts['scheme']) {
@@ -285,7 +315,7 @@ class ARC2_Reader extends ARC2_Class
         fwrite($s, $h_code);
         /* timeout */
         if ($this->timeout) {
-            //stream_set_blocking($s, false);
+            // stream_set_blocking($s, false);
             stream_set_timeout($s, $this->timeout);
         }
         /* response headers */
@@ -380,7 +410,7 @@ class ARC2_Reader extends ARC2_Class
 
     public function readStream($buffer_xml = true, $d_size = 1024)
     {
-        //if (!$s = $this->v('stream')) return '';
+        // if (!$s = $this->v('stream')) return '';
         if (!$s = $this->v('stream')) {
             return $this->addError('missing stream in "readStream" '.$this->uri);
         }

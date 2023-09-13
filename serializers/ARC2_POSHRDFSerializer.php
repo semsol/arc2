@@ -12,6 +12,8 @@ ARC2::inc('RDFSerializer');
 
 class ARC2_POSHRDFSerializer extends ARC2_RDFSerializer
 {
+    public string $content_header;
+
     public function __construct($a, &$caller)
     {
         parent::__construct($a, $caller);
@@ -47,7 +49,7 @@ class ARC2_POSHRDFSerializer extends ARC2_RDFSerializer
         if ($res) {
             $index = [$res => $index[$res]];
         }
-        //return Trice::dump($index);
+        // return Trice::dump($index);
         foreach ($index as $s => $ps) {
             /* node */
             $r .= '

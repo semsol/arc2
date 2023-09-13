@@ -2,7 +2,6 @@
 
 namespace Tests\unit\store;
 
-use ARC2_StoreLoadQueryHandler;
 use Tests\ARC2_TestCase;
 
 class ARC2_StoreLoadQueryHandlerTest extends ARC2_TestCase
@@ -16,7 +15,7 @@ class ARC2_StoreLoadQueryHandlerTest extends ARC2_TestCase
         $this->store = \ARC2::getStore($this->dbConfig);
         $this->store->createDBCon();
 
-        $this->fixture = new ARC2_StoreLoadQueryHandler($this->store, $this);
+        $this->fixture = new \ARC2_StoreLoadQueryHandler($this->store, $this);
 
         // fresh setup of ARC2
         $this->store->setup();

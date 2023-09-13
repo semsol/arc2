@@ -12,6 +12,8 @@ ARC2::inc('SemHTMLParser');
 
 class ARC2_StoreSemHTMLLoader extends ARC2_SemHTMLParser
 {
+    public int $t_count = 0;
+
     public function __construct($a, &$caller)
     {
         parent::__construct($a, $caller);

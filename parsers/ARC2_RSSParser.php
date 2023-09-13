@@ -50,7 +50,7 @@ class ARC2_RSSParser extends ARC2_LegacyXMLParser
 
     public function addT($t)
     {
-        //if (!isset($t['o_datatype']))
+        // if (!isset($t['o_datatype']))
         if ($this->skip_dupes) {
             $h = md5(serialize($t));
             if (!isset($this->added_triples[$h])) {

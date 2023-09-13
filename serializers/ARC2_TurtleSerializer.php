@@ -4,6 +4,7 @@
  *
  * @author    Benjamin Nowack
  * @license   W3C Software License and GPL
+ *
  * @homepage <https://github.com/semsol/arc2>
  *
  * @version   2010-11-16
@@ -12,6 +13,8 @@ ARC2::inc('RDFSerializer');
 
 class ARC2_TurtleSerializer extends ARC2_RDFSerializer
 {
+    public string $content_header;
+
     public function __construct($a, &$caller)
     {
         parent::__construct($a, $caller);
@@ -33,10 +36,10 @@ class ARC2_TurtleSerializer extends ARC2_RDFSerializer
                 return $pn;
             }
             if (
-        ('o' === $term) &&
-        in_array($qualifier, ['rdf:type', 'rdfs:domain', 'rdfs:range', 'rdfs:subClassOf']) &&
-        ($pn = $this->getPName($v))
-      ) {
+                ('o' === $term)
+                && in_array($qualifier, ['rdf:type', 'rdfs:domain', 'rdfs:range', 'rdfs:subClassOf'])
+                && ($pn = $this->getPName($v))
+            ) {
                 return $pn;
             }
             if (preg_match('/^[a-z0-9]+\:[^\s]*$/is'.($this->has_pcre_unicode ? 'u' : ''), $v)) {

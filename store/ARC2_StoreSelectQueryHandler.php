@@ -4,17 +4,52 @@
  *
  * @author    Benjamin Nowack
  * @license   W3C Software License and GPL
+ *
  * @homepage  <https://github.com/semsol/arc2>
  *
  * @version   2010-11-16
  */
-
-use ARC2\Store\Adapter\PDOSQLiteAdapter;
-
 ARC2::inc('StoreQueryHandler');
 
 class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler
 {
+    public int $cache_results;
+
+    /**
+     * @var array<mixed>
+     */
+    public array $dependency_log;
+
+    public string $engine_type;
+
+    /**
+     * @var array<miyed>
+     */
+    public array $index;
+
+    /**
+     * @var array<miyed>
+     */
+    public array $indexes;
+
+    /**
+     * @var array<miyed>
+     */
+    public array $initial_index;
+
+    public int $is_union_query;
+
+    /**
+     * @var array<miyed>
+     */
+    public array $infos;
+
+    public $opt_sql;
+
+    public int $opt_sql_pd_count;
+
+    public int $pattern_order_offset;
+
     public function __construct($a, &$caller)
     {/* caller has to be a store */
         parent::__construct($a, $caller);
@@ -25,7 +60,7 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler
         parent::__init();
         $this->store = $this->caller;
         $this->handler_type = 'select';
-        $this->engine_type = $this->v('store_engine_type', 'MyISAM', $this->a);
+        $this->engine_type = $this->v('store_engine_type', 'InnoDB', $this->a);
         $this->cache_results = $this->v('store_cache_results', 0, $this->a);
     }
 
@@ -70,9 +105,7 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler
             $this->analyzeIndex($this->getPattern('0'));
             $sub_r = $this->getQuerySQL();
             $r .= $r ? $nl.'UNION'.$this->getDistinctSQL().$nl : '';
-
-            $setBracket = $this->is_union_query && !$this->store->getDBObject() instanceof PDOSQLiteAdapter;
-            $r .= $setBracket ? '('.$sub_r.')' : $sub_r;
+            $r .= $this->is_union_query ? '('.$sub_r.')' : $sub_r;
 
             $this->indexes[$i] = $this->index;
         }
@@ -134,15 +167,10 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler
             $tbl = 'Q'.md5($tbl);
         }
 
-        if ($this->store->getDBObject() instanceof PDOSQLiteAdapter) {
-            $tmp_sql = 'CREATE TABLE '.$tbl.' ( ';
-            $tmp_sql .= $this->getTempTableDefForSQLite($q_sql).')';
-        } else {
-            $tmp_sql = 'CREATE TEMPORARY TABLE '.$tbl.' ( ';
-            $tmp_sql .= $this->getTempTableDefForMySQL($q_sql);
-            /* HEAP doesn't support AUTO_INCREMENT, and MySQL breaks on MEMORY sometimes */
-            $tmp_sql .= ') ENGINE='.$this->engine_type;
-        }
+        $tmp_sql = 'CREATE TEMPORARY TABLE '.$tbl.' ( ';
+        $tmp_sql .= $this->getTempTableDefForMySQL($q_sql);
+        /* HEAP doesn't support AUTO_INCREMENT, and MySQL breaks on MEMORY sometimes */
+        $tmp_sql .= ') ENGINE='.$this->engine_type;
 
         $tmpSql2 = str_replace('CREATE TEMPORARY', 'CREATE', $tmp_sql);
 
@@ -267,7 +295,7 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler
                                 in_array($var, $aggregate_vars)
                                     ? 'literal'
                                     : 'uri'
-                              );
+                            );
                         if (isset($pre_row[$var.' lang_dt']) && ($lang_dt = $pre_row[$var.' lang_dt'])) {
                             if (preg_match('/^([a-z]+(\-[a-z0-9]+)*)$/i', $lang_dt)) {
                                 $row[$var.' lang'] = $lang_dt;
@@ -807,7 +835,7 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler
         }
         /* filters etc */
         if ($sub_r = $this->getPatternSQL($pattern, 'join__T_'.$id)) {
-            $r .= $r ? $nl.'  AND '.$sub_r : $nl.'  '.'('.$sub_r.')';
+            $r .= $r ? $nl.'  AND '.$sub_r : $nl.'  ('.$sub_r.')';
         }
 
         return $r;
@@ -860,7 +888,7 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler
             return 1;
         }
         $d_tbls = $this->getDependentJoins($id2);
-        //echo $id . ' :: ' . $id2 . '=>' . print_r($d_tbls, 1);
+        // echo $id . ' :: ' . $id2 . '=>' . print_r($d_tbls, 1);
         foreach ($d_tbls as $d_tbl) {
             if (preg_match('/^T_'.$id.'\./', $d_tbl)) {
                 return 1;
@@ -1080,7 +1108,7 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler
             } elseif ('var' == $type) {
                 $val = $pattern[$term];
                 if (isset($vars[$val])) {/* repeated var in pattern */
-                    $sub_r = '(T_'.$id.'.'.$term.'='.'T_'.$id.'.'.$vars[$val].')';
+                    $sub_r = '(T_'.$id.'.'.$term.'=T_'.$id.'.'.$vars[$val].')';
                 }
                 $vars[$val] = $term;
                 if ($infos = $this->v($val, 0, $this->index['graph_vars'])) {/* graph var in triple pattern */
@@ -1391,22 +1419,6 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler
             $r .= $r ? ' '.$op.' '.$sub_r : $sub_r;
         }
 
-        /*
-         * SQLite related adaption for relational expressions like ?w < 100
-         *
-         * We have to cast the variable behind ?w to a number otherwise we don't get
-         * meaningful results.
-         */
-        if ($this->store->getDBObject() instanceof PDOSQLiteAdapter) {
-            // Regex to catch things like: ?w < 100, ?w > 20
-            $regex = '/([T\_0-9]+\.o_comp)\s*[<>]{1}\s*[0-9]+/si';
-            if (0 < preg_match_all($regex, $r, $matches)) {
-                foreach ($matches[1] as $variable) {
-                    $r = str_replace($variable, 'CAST ('.$variable.' as float)', $r);
-                }
-            }
-        }
-
         return $r ? '('.$r.')' : $r;
     }
 
@@ -1477,7 +1489,7 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler
         } elseif (
             ('relational' == $parent_type)
             && 'o' == $col
-            && (preg_match('/[\<\>]/', $this->v('parent_op', '', $pattern)))) {
+            && preg_match('/[\<\>]/', $this->v('parent_op', '', $pattern))) {
             $tbl_alias = 'T_'.$tbl.'.o_comp';
         } else {
             $tbl_alias = 'V_'.$tbl.'_'.$col.'.val';
@@ -1615,7 +1627,7 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler
             /* any other: ignore */
         }
         /* simple type conversions */
-        if (0 === strpos($fnc_uri, 'http://www.w3.org/2001/XMLSchema#')) {
+        if (str_starts_with($fnc_uri, 'http://www.w3.org/2001/XMLSchema#')) {
             return $op.$this->getExpressionSQL($pattern['args'][0], $context, $val_type, $parent_type);
         }
 
@@ -1761,8 +1773,7 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler
             if (preg_match('/^([\"\'])([^\'\"]+)/', $sub_r_2, $m)) {
                 if ('*' == $m[2]) {
                     $r = '!' == $op
-                        ? 'NOT ('.$sub_r_1.' REGEXP "^[a-zA-Z\-]+$"'.')'
-                        : $sub_r_1.' REGEXP "^[a-zA-Z\-]+$"';
+                        ? 'NOT ('.$sub_r_1.' REGEXP "^[a-zA-Z\-]+$")' : $sub_r_1.' REGEXP "^[a-zA-Z\-]+$"';
                 } else {
                     $r = ('!' == $op) ? $sub_r_1.' NOT LIKE '.$m[1].$m[2].'%'.$m[1] : $sub_r_1.' LIKE '.$m[1].$m[2].'%'.$m[1];
                 }
@@ -1814,7 +1825,7 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler
             /* fulltext search (may have "|") */
             if ($is_simple_search && $is_o_search && !$op && (strlen($m[2]) > 8) && $this->store->hasFulltextIndex()) {
                 /* MATCH variations */
-                if (($val_parts = preg_split('/\|/', $m[2]))) {
+                if ($val_parts = preg_split('/\|/', $m[2])) {
                     return 'MATCH('.trim($sub_r_1, '()').') AGAINST("'.implode(' ', $val_parts).'")';
                 } else {
                     return 'MATCH('.trim($sub_r_1, '()').') AGAINST("'.$m[2].'")';
@@ -1831,10 +1842,7 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler
                 return $sub_r_1.$op.' LIKE "'.$sub_r_2.'"';
             }
             /* REGEXP */
-            $opt = '';
-            if (!$this->store->getDBObject() instanceof PDOSQLiteAdapter) {
-                $opt = ('i' == $sub_r_3) ? '' : 'BINARY ';
-            }
+            $opt = ('i' == $sub_r_3) ? '' : 'BINARY ';
 
             return $sub_r_1.$op.' REGEXP '.$opt.$sub_r_2;
         }
@@ -1938,7 +1946,7 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler
                 if (in_array($col, ['s', 'o'])) {
                     if (strpos($q_sql, '`'.$var_name.' type`')) {
                         $r .= ', '.$nl.'    TMP.`'.$var_name.' type` AS `'.$var_name.' type`';
-                    //$r .= ', ' . $nl . '    CASE TMP.`' . $var_name . ' type` WHEN 2 THEN "literal" WHEN 1 THEN "bnode" ELSE "uri" END AS `' . $var_name . ' type`';
+                        // $r .= ', ' . $nl . '    CASE TMP.`' . $var_name . ' type` WHEN 2 THEN "literal" WHEN 1 THEN "bnode" ELSE "uri" END AS `' . $var_name . ' type`';
                     } else {
                         $r .= ', '.$nl.'    NULL AS `'.$var_name.' type`';
                     }

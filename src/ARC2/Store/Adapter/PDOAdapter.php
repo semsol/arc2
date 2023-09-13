@@ -6,28 +6,25 @@
  * @author Benjamin Nowack <bnowack@semsol.com>
  * @author Konrad Abicht <konrad.abicht@pier-and-peer.com>
  * @license W3C Software License and GPL
+ *
  * @homepage <https://github.com/semsol/arc2>
  */
 
 namespace ARC2\Store\Adapter;
 
-use Exception;
-
 /**
  * PDO Adapter - Handles database operations using PDO.
- *
- * This adapter doesn't support SQLite, please use PDOSQLiteAdapter instead.
  */
 class PDOAdapter extends AbstractAdapter
 {
     public function checkRequirements()
     {
         if (false == \extension_loaded('pdo_mysql')) {
-            throw new Exception('Extension pdo_mysql is not loaded.');
+            throw new \Exception('Extension pdo_mysql is not loaded.');
         }
 
         if ('mysql' != $this->configuration['db_pdo_protocol']) {
-            throw new Exception('Only "mysql" protocol is supported at the moment.');
+            throw new \Exception('Only "mysql" protocol is supported at the moment.');
         }
     }
 
@@ -42,9 +39,9 @@ class PDOAdapter extends AbstractAdapter
     }
 
     /**
-     * Connect to server or storing a given connection.
+     * Connect to server.
      *
-     * @param EasyDB $existingConnection default is null
+     * @return \PDO
      */
     public function connect($existingConnection = null)
     {
@@ -53,7 +50,7 @@ class PDOAdapter extends AbstractAdapter
         if (null !== $existingConnection) {
             $this->db = $existingConnection;
 
-        // create your own connection
+            // create your own connection
         } elseif (false === $this->db instanceof \PDO) {
             /*
              * build connection string
@@ -84,8 +81,7 @@ class PDOAdapter extends AbstractAdapter
             $this->db->setAttribute(\PDO::ATTR_EMULATE_PREPARES, false);
 
             // errors DONT lead to exceptions
-            // set to false for compatibility reasons with mysqli. ARC2 using mysqli does not throw any
-            // exceptions, instead collects errors in a hidden array.
+            // ARC2 does not throw any exceptions, instead collects errors in a hidden array.
             $this->db->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
 
             // default fetch mode is associative
@@ -224,9 +220,9 @@ class PDOAdapter extends AbstractAdapter
 
         $clientVersion = strtolower($this->db->getAttribute(\PDO::ATTR_CLIENT_VERSION));
         $serverVersion = strtolower($this->db->getAttribute(\PDO::ATTR_SERVER_VERSION));
-        if (false !== strpos($clientVersion, 'mariadb') || false !== strpos($serverVersion, 'mariadb')) {
+        if (str_contains($clientVersion, 'mariadb') || str_contains($serverVersion, 'mariadb')) {
             $return = 'mariadb';
-        } elseif (false !== strpos($clientVersion, 'mysql') || false !== strpos($serverVersion, 'mysql')) {
+        } elseif (str_contains($clientVersion, 'mysql') || str_contains($serverVersion, 'mysql')) {
             $return = 'mysql';
         } else {
             $return = null;
@@ -235,25 +231,16 @@ class PDOAdapter extends AbstractAdapter
         return $return;
     }
 
-    public function getServerInfo()
-    {
-        return $this->db->getAttribute(\constant('PDO::ATTR_CLIENT_VERSION'));
-    }
-
     /**
-     * Returns the version of the database server like 05-00-12.
+     * Returns the version of the database server like 05.00.12
      */
-    public function getServerVersion()
+    public function getServerVersion(): string
     {
-        $res = preg_match(
-            "/([0-9]+)\.([0-9]+)\.([0-9]+)/",
-            $this->getServerInfo(),
-            $matches
-        );
+        if ($this->db instanceof \PDO) {
+            return $this->db->query('select version()')->fetchColumn();
+        }
 
-        return 1 == $res
-            ? sprintf('%02d-%02d-%02d', $matches[1], $matches[2], $matches[3])
-            : '00-00-00';
+        throw new \Exception('You need to connect to DB server first. Use connect() before this function.');
     }
 
     public function getErrorCode()

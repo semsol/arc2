@@ -4,6 +4,7 @@
  *
  * @author Benjamin Nowack
  * @license W3C Software License and GPL
+ *
  * @homepage <https://github.com/semsol/arc2>
  *
  * @version 2010-11-16
@@ -12,6 +13,11 @@ ARC2::inc('TurtleParser');
 
 class ARC2_SPARQLParser extends ARC2_TurtleParser
 {
+    /**
+     * @var array<mixed>
+     */
+    public array $bnode_pattern_index;
+
     public function __construct($a, &$caller)
     {
         parent::__construct($a, $caller);
@@ -673,7 +679,7 @@ class ARC2_SPARQLParser extends ARC2_TurtleParser
                     $sub_v = $sub_r[2];
                     $r['operator'] = $op;
                     if ((list($sub_r, $sub_v) = $this->xAdditiveExpression($sub_v)) && $sub_r) {
-                        //$sub_r['operator'] = $op;
+                        // $sub_r['operator'] = $op;
                         $r['patterns'][] = $sub_r;
                         $proceed = 1;
                     }
@@ -707,7 +713,8 @@ class ARC2_SPARQLParser extends ARC2_TurtleParser
                     }
                 }
             } while ($proceed);
-            //return array($r, $sub_v);
+
+            // return array($r, $sub_v);
             return 1 == count($r['patterns']) ? [$r['patterns'][0], $sub_v] : [$r, $sub_v];
         }
 

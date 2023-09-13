@@ -155,7 +155,7 @@ abstract class AbstractAdapterTest extends ARC2_TestCase
         ) ENGINE=MyISAM CHARACTER SET utf8 COLLATE utf8_unicode_ci DELAY_KEY_WRITE = 1';
         $this->fixture->exec($sql);
 
-        $this->assertEquals('utf8_unicode_ci', $this->fixture->getCollation());
+        $this->assertStringContainsString('_unicode_ci', $this->fixture->getCollation());
     }
 
     // setting table not there
@@ -227,8 +227,10 @@ abstract class AbstractAdapterTest extends ARC2_TestCase
 
     public function testGetServerVersion()
     {
-        // check that server version looks like 05-00-05
-        $this->assertEquals(1, preg_match('/\d\d-\d\d-\d\d/', $this->fixture->getServerVersion()));
+        $this->assertEquals(
+            $this->fixture->getConnection()->query('select version()')->fetchColumn(),
+            $this->fixture->getServerVersion()
+        );
     }
 
     /*

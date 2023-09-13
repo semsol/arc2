@@ -55,7 +55,7 @@ class InsertIntoQueryTest extends ARC2_TestCase
         // e.g. file:///var/www/html/pier-and-peer/ARC2/vendor/phpunit/phpunit/phpunit#
         // therefore we build this prefix manually to check later
         $filePrefix = 'file://'.str_replace('tests/db_adapter_depended/store/query', '', __DIR__);
-        $filePrefix .= 'vendor/phpunit/phpunit/phpunit#';
+        $filePrefix .= 'vendor/bin/phpunit#';
 
         $this->assertEquals(
             [
@@ -379,9 +379,9 @@ class InsertIntoQueryTest extends ARC2_TestCase
 
         $this->markTestSkipped(
             'ARC2 does not check the WHERE clause when inserting data. No data added at all.'
-            .PHP_EOL
-            .PHP_EOL.'FYI: https://www.w3.org/Submission/SPARQL-Update/#sec_examples and '
-            .PHP_EOL.'https://github.com/semsol/arc2/wiki/SPARQL-#insert-example'
+            .\PHP_EOL
+            .\PHP_EOL.'FYI: https://www.w3.org/Submission/SPARQL-Update/#sec_examples and '
+            .\PHP_EOL.'https://github.com/semsol/arc2/wiki/SPARQL-#insert-example'
         );
     }
 }

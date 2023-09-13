@@ -1,13 +1,12 @@
-FROM php:7.4-cli
+FROM php:8.2-cli
 
 RUN apt-get update && apt-get install -y curl git gnupg libicu-dev libzip-dev make nano net-tools zip zlib1g-dev
 
-RUN docker-php-ext-install intl mysqli pdo pdo_mysql zip \
-    && docker-php-ext-enable intl mysqli pdo pdo_mysql zip
+RUN docker-php-ext-install intl pdo pdo_mysql zip \
+    && docker-php-ext-enable intl pdo pdo_mysql zip
 
 # install composer globally
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-RUN composer selfupdate
 
 # add custom PHP.ini settings
 RUN mv "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"

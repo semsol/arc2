@@ -12,6 +12,8 @@ ARC2::inc('AtomParser');
 
 class ARC2_StoreAtomLoader extends ARC2_AtomParser
 {
+    public int $t_count = 0;
+
     public function __construct($a, &$caller)
     {
         parent::__construct($a, $caller);

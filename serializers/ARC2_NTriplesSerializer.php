@@ -4,12 +4,20 @@
  *
  * @author Benjamin Nowack
  * @license W3C Software License and GPL
+ *
  * @homepage <https://github.com/semsol/arc2>
  */
 ARC2::inc('RDFSerializer');
 
 class ARC2_NTriplesSerializer extends ARC2_RDFSerializer
 {
+    /**
+     * @var array<mixed>
+     */
+    public array $esc_chars;
+
+    public int $raw;
+
     public function __construct($a, &$caller)
     {
         parent::__construct($a, $caller);
@@ -38,6 +46,7 @@ class ARC2_NTriplesSerializer extends ARC2_RDFSerializer
             if (in_array($term, ['s', 'p'])) {
                 return $this->getTerm(['value' => $v, 'type' => 'uri']);
             }
+
             // assume literal
             return $this->getTerm(['type' => 'literal', 'value' => $v]);
         }
@@ -69,7 +78,7 @@ class ARC2_NTriplesSerializer extends ARC2_RDFSerializer
         }
         $suffix = isset($v['lang']) && $v['lang'] ? '@'.$v['lang'] : '';
         $suffix = isset($v['datatype']) && $v['datatype'] ? '^^'.$this->getTerm($v['datatype']) : $suffix;
-        //return $quot . "object" . utf8_encode($v['value']) . $quot . $suffix;
+
         return $quot.$this->escape($v['value']).$quot.$suffix;
     }
 
@@ -100,7 +109,9 @@ class ARC2_NTriplesSerializer extends ARC2_RDFSerializer
     {
         $r = '';
         // decode, if possible
-        $v = (false === strpos(utf8_decode(str_replace('?', '', $v)), '?')) ? utf8_decode($v) : $v;
+        $str = str_replace('?', '', $v);
+        $str = mb_convert_encoding($str, 'ISO-8859-1', 'UTF-8');
+        $v = (false === str_contains($str, '?')) ? mb_convert_encoding($v, 'ISO-8859-1', 'UTF-8') : $v;
         if ($this->raw) {
             return $v;
         } // no further escaping wanted
@@ -130,7 +141,7 @@ class ARC2_NTriplesSerializer extends ARC2_RDFSerializer
         elseif (function_exists('json_encode')) {
             $r = json_encode($v);
             if ('null' == $r) {
-                $r = json_encode(utf8_encode($v));
+                $r = json_encode(mb_convert_encoding($v, 'UTF-8', mb_list_encodings()));
             }
             // remove boundary quotes
             if ('"' == substr($r, 0, 1)) {
@@ -163,29 +174,29 @@ class ARC2_NTriplesSerializer extends ARC2_RDFSerializer
 
     public function getCharNo($c, $is_encoded = false)
     {
-        $c_utf = $is_encoded ? $c : utf8_encode($c);
+        $c_utf = $is_encoded ? $c : mb_convert_encoding($c, 'UTF-8', mb_list_encodings());
         $bl = strlen($c_utf); /* binary length */
         $r = 0;
         switch ($bl) {
-      case 1:/* 0####### (0-127) */
-        $r = ord($c_utf);
-        break;
-      case 2:/* 110##### 10###### = 192+x 128+x */
-        $r = ((ord($c_utf[0]) - 192) * 64) + (ord($c_utf[1]) - 128);
-        break;
-      case 3:/* 1110#### 10###### 10###### = 224+x 128+x 128+x */
-        $r = ((ord($c_utf[0]) - 224) * 4096) + ((ord($c_utf[1]) - 128) * 64) + (ord($c_utf[2]) - 128);
-        break;
-      case 4:/* 1111#### 10###### 10###### 10###### = 240+x 128+x 128+x 128+x */
-        $r = ((ord($c_utf[0]) - 240) * 262144) + ((ord($c_utf[1]) - 128) * 4096) + ((ord($c_utf[2]) - 128) * 64) + (ord($c_utf[3]) - 128);
-        break;
-    }
+            case 1:/* 0####### (0-127) */
+                $r = ord($c_utf);
+                break;
+            case 2:/* 110##### 10###### = 192+x 128+x */
+                $r = ((ord($c_utf[0]) - 192) * 64) + (ord($c_utf[1]) - 128);
+                break;
+            case 3:/* 1110#### 10###### 10###### = 224+x 128+x 128+x */
+                $r = ((ord($c_utf[0]) - 224) * 4096) + ((ord($c_utf[1]) - 128) * 64) + (ord($c_utf[2]) - 128);
+                break;
+            case 4:/* 1111#### 10###### 10###### 10###### = 240+x 128+x 128+x 128+x */
+                $r = ((ord($c_utf[0]) - 240) * 262144) + ((ord($c_utf[1]) - 128) * 4096) + ((ord($c_utf[2]) - 128) * 64) + (ord($c_utf[3]) - 128);
+                break;
+        }
 
         return $r;
     }
 
     public function getEscapedChar($c, $no)
-    {/*see http://www.w3.org/TR/rdf-testcases/#ntrip_strings */
+    {/* see http://www.w3.org/TR/rdf-testcases/#ntrip_strings */
         if ($no < 9) {
             return '\\u'.sprintf('%04X', $no);
         }  /* #x0-#x8 (0-8) */

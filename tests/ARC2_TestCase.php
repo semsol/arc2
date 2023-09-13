@@ -3,7 +3,6 @@
 namespace Tests;
 
 use PHPUnit\Framework\TestCase;
-use Psr\SimpleCache\CacheInterface;
 
 class ARC2_TestCase extends TestCase
 {
@@ -16,36 +15,28 @@ class ARC2_TestCase extends TestCase
 
     /**
      * Subject under test.
-     *
-     * @var mixed
      */
     protected $fixture;
 
     protected function setUp(): void
     {
+        parent::setUp();
+
         global $dbConfig;
 
         $this->dbConfig = $dbConfig;
-
-        // in case we run with a cache, clear it
-        if (
-            isset($this->dbConfig['cache_instance'])
-            && $this->dbConfig['cache_instance'] instanceof CacheInterface
-        ) {
-            $this->dbConfig['cache_instance']->clear();
-        }
     }
 
-    protected function tearDown(): void
+    /**
+     * Depending on the DB config returns current table prefix. It consists of table prefix and store name, if available.
+     *
+     * @return string
+     */
+    protected function getSqlTablePrefix()
     {
-        // in case we run with a cache, clear it
-        if (
-            isset($this->dbConfig['cache_instance'])
-            && $this->dbConfig['cache_instance'] instanceof CacheInterface
-        ) {
-            $this->dbConfig['cache_instance']->clear();
-        }
+        $prefix = isset($this->dbConfig['db_table_prefix']) ? $this->dbConfig['db_table_prefix'].'_' : '';
+        $prefix .= isset($this->dbConfig['store_name']) ? $this->dbConfig['store_name'].'_' : '';
 
-        parent::tearDown();
+        return $prefix;
     }
 }

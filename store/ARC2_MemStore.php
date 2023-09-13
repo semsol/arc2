@@ -149,7 +149,7 @@ class ARC2_MemStore extends ARC2_Class
         $mappings = ['rdfxml' => 'RDFXML', 'sparqlxml' => 'SPARQLXMLResult', 'turtle' => 'Turtle'];
         if (!$format || !isset($mappings[$format])) {
             return $resp;
-            //return $this->addError('No parser available for "' . $format . '" SPARQL result');
+            // return $this->addError('No parser available for "' . $format . '" SPARQL result');
         }
         /* format parser */
         $suffix = $mappings[$format].'Parser';
@@ -161,9 +161,9 @@ class ARC2_MemStore extends ARC2_Class
         if (in_array($qt, ['ask', 'load', 'insert', 'delete'])) {
             $bid = $parser->getBooleanInsertedDeleted();
             switch ($qt) {
-        case 'ask': return $bid['boolean'];
-        default: return $bid;
-      }
+                case 'ask': return $bid['boolean'];
+                default: return $bid;
+            }
         }
         /* select */
         if (('select' == $qt) && !method_exists($parser, 'getRows')) {
@@ -172,6 +172,7 @@ class ARC2_MemStore extends ARC2_Class
         if ('select' == $qt) {
             return ['rows' => $parser->getRows(), 'variables' => $parser->getVariables()];
         }
+
         /* any other */
         return $parser->getSimpleIndex(0);
     }

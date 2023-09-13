@@ -4,6 +4,7 @@
  *
  * @author Benjamin Nowack <bnowack@semsol.com>
  * @license W3C Software License and GPL
+ *
  * @homepage <https://github.com/semsol/arc2>
  *
  * @version 2010-11-16
@@ -163,7 +164,7 @@ class ARC2_CBJSONParser extends ARC2_JSONParser
                     $this->addT($s, 'http://www.w3.org/2000/01/rdf-schema#label', $v, $s_type, $o_type);
                 }
                 /* dc:identifier */
-        //if ($k == 'permalink') $this->addT($s, 'http://purl.org/dc/elements/1.1/identifier', $v, $s_type, $o_type);
+                // if ($k == 'permalink') $this->addT($s, 'http://purl.org/dc/elements/1.1/identifier', $v, $s_type, $o_type);
             }
             /* structured, single v */
             elseif (!$this->isFlatArray($v)) {
@@ -318,7 +319,7 @@ class ARC2_CBJSONParser extends ARC2_JSONParser
 
     public function getAPIDateXSD($val)
     {
-        //Fri Jan 16 21:11:48 UTC 2009
+        // Fri Jan 16 21:11:48 UTC 2009
         if (preg_match('/^[a-z]+ ([a-z]+) ([0-9]+) ([0-9]{2}\:[0-9]{2}\:[0-9]{2}) UTC ([0-9]{4})/i', $val, $m)) {
             $months = ['Jan' => '01', 'Feb' => '02', 'Mar' => '03', 'Apr' => '04', 'May' => '05', 'Jun' => '06', 'Jul' => '07', 'Aug' => '08', 'Sep' => '09', 'Oct' => '10', 'Nov' => '11', 'Dec' => '12'];
 
@@ -334,7 +335,7 @@ class ARC2_CBJSONParser extends ARC2_JSONParser
         $r = '';
         foreach (['year', 'month', 'day'] as $suffix) {
             $val = $this->v1($prefix.'_'.$suffix, '00', $struct);
-            $r .= ($r ? '-' : '').str_pad($val, 2, '0', STR_PAD_LEFT);
+            $r .= ($r ? '-' : '').str_pad($val, 2, '0', \STR_PAD_LEFT);
         }
         if ('00-00-00' != $r) {
             $this->addT($s, $this->getPropertyURI($prefix.'_date'), $r, $s_type, 'literal');
