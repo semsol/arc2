@@ -112,10 +112,9 @@ class ARC2_RDFXMLParser extends ARC2_RDFParser
             $parser = xml_parser_create_ns($enc, '');
             xml_parser_set_option($parser, \XML_OPTION_SKIP_WHITE, 0);
             xml_parser_set_option($parser, \XML_OPTION_CASE_FOLDING, 0);
-            xml_set_element_handler($parser, 'open', 'close');
-            xml_set_character_data_handler($parser, 'cdata');
-            xml_set_start_namespace_decl_handler($parser, 'nsDecl');
-            xml_set_object($parser, $this);
+            xml_set_element_handler($parser, [$this, 'open'], [$this, 'close']);
+            xml_set_character_data_handler($parser, [$this, 'cData']);
+            xml_set_start_namespace_decl_handler($parser, [$this, 'nsDecl']);
             $this->xml_parser = $parser;
         }
     }
