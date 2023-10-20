@@ -464,7 +464,7 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler
 
     public function bufferIDSQL($tbl, $id, $val, $val_type)
     {
-        $tbl = $tbl.'2val';
+        $tbl .= '2val';
         if ('id2val' == $tbl) {
             $cols = 'id, val, val_type';
             $vals = '('.$id.", '".$this->store->a['db_object']->escape($val)."', ".$val_type.')';
