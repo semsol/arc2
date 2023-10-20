@@ -1,6 +1,6 @@
 name: MariaDB 10.9 Tests
 
-on: push
+on: [push, pull_request]
 
 jobs:
     pdo-mysql:
