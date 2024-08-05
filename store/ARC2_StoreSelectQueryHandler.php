@@ -180,7 +180,7 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler
         ) {
             return $this->addError($this->store->a['db_object']->getErrorMessage());
         }
-        if (false == $this->store->a['db_object']->exec('INSERT INTO '.$tbl.' '."\n".$q_sql)) {
+        if (false === $this->store->a['db_object']->exec('INSERT INTO '.$tbl.' '."\n".$q_sql)) {
             $this->addError($this->store->a['db_object']->getErrorMessage());
         }
 
