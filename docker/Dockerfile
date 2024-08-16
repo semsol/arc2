@@ -10,9 +10,8 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 
 # add custom PHP.ini settings
 RUN mv "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"
-COPY ./custom.ini /usr/local/etc/php/conf.d/custom.ini
+COPY ./includes/custom.ini /usr/local/etc/php/conf.d/custom.ini
 
-RUN rm -rf /var/www/html/*
 WORKDIR /var/www/html/
 
 # adds user "arc2", adds him to group "www-data" and sets his home folder
@@ -25,4 +24,4 @@ RUN chown arc2:www-data /home/arc2
 
 EXPOSE 3306
 
-CMD ["tail -f /dev/null"]
+ENTRYPOINT ["tail", "-f", "/dev/null"]

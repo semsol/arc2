@@ -30,7 +30,7 @@ if (file_exists(__DIR__.'/config.php')) {
         'db_name' => 'arc2_test',
         'db_user' => 'root',
         'db_pwd' => 'Pass123',
-        'db_host' => '127.0.0.1',
+        'db_host' => 'db',
         'db_port' => $_SERVER['DB_PORT'] ?? 3306,
     ];
 

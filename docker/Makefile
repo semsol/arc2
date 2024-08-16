@@ -1,7 +1,7 @@
 default:
 	make build
 	make run
-	docker exec -it --user arc2 docker_arc2_1 bash
+	docker exec -it --user arc2 arc2 bash
 
 build:
 	docker-compose build
