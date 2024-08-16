@@ -62,29 +62,6 @@ class ARC2_Store extends ARC2_Class
         $this->is_win = ('win' == strtolower(substr(\PHP_OS, 0, 3))) ? true : false;
         $this->max_split_tables = $this->v('store_max_split_tables', 10, $this->a);
         $this->split_predicates = $this->v('store_split_predicates', [], $this->a);
-
-        /*
-         * setup cache instance, if required by the user.
-         */
-        if ($this->cacheEnabled()) {
-            // reuse existing cache instance, if it implements Psr\SimpleCache\CacheInterface
-            if (isset($this->a['cache_instance'])
-                && $this->a['cache_instance'] instanceof \Psr\SimpleCache\CacheInterface) {
-                $this->cache = $this->a['cache_instance'];
-
-                // create new cache instance
-            } else {
-                // FYI: https://symfony.com/doc/current/components/cache/adapters/filesystem_adapter.html
-                $this->cache = new \Symfony\Component\Cache\Simple\FilesystemCache('arc2', 0, null);
-            }
-        }
-    }
-
-    public function cacheEnabled()
-    {
-        return isset($this->a['cache_enabled'])
-            && true === $this->a['cache_enabled']
-            && 'pdo' == $this->a['db_adapter'];
     }
 
     public function getName()
@@ -597,25 +574,12 @@ class ARC2_Store extends ARC2_Class
         if (preg_match('/^dump/i', $q)) {
             $infos = ['query' => ['type' => 'dump']];
         } else {
-            // check cache
-            $key = hash('sha1', $q);
-            if ($this->cacheEnabled() && $this->cache->has($key.'_infos')) {
-                $infos = $this->cache->get($key.'_infos');
-                $errors = $this->cache->get($key.'_errors');
-                // no entry found
-            } else {
-                ARC2::inc('SPARQLPlusParser');
-                $p = new ARC2_SPARQLPlusParser($this->a, $this);
-                $p->parse($q, $src);
-                $infos = $p->getQueryInfos();
-                $errors = $p->getErrors();
-
-                // store result in cache
-                if ($this->cacheEnabled()) {
-                    $this->cache->set($key.'_infos', $infos);
-                    $this->cache->set($key.'_errors', $errors);
-                }
-            }
+            // no entry found
+            ARC2::inc('SPARQLPlusParser');
+            $p = new ARC2_SPARQLPlusParser($this->a, $this);
+            $p->parse($q, $src);
+            $infos = $p->getQueryInfos();
+            $errors = $p->getErrors();
         }
 
         if ('infos' == $result_format) {
@@ -631,18 +595,7 @@ class ARC2_Store extends ARC2_Class
             }
             $t1 = ARC2::mtime();
 
-            // if cache is enabled, get/store result
-            $key = hash('sha1', $q);
-            if ($this->cacheEnabled() && $this->cache->has($key)) {
-                $result = $this->cache->get($key);
-            } else {
-                $result = $this->runQuery($infos, $qt, $keep_bnode_ids, $q);
-
-                // store in cache, if enabled
-                if ($this->cacheEnabled()) {
-                    $this->cache->set($key, $result);
-                }
-            }
+            $result = $this->runQuery($infos, $qt, $keep_bnode_ids, $q);
 
             $r = ['query_type' => $qt, 'result' => $result];
             $r['query_time'] = ARC2::mtime() - $t1;
@@ -669,11 +622,6 @@ class ARC2_Store extends ARC2_Class
      */
     public function runQuery($infos, $type, $keep_bnode_ids = 0, $q = '')
     {
-        // invalidate cache, if enabled and a query is executed, which changes the store
-        if ($this->cacheEnabled() && in_array($type, ['load', 'insert', 'delete'])) {
-            $this->cache->clear();
-        }
-
         ARC2::inc('Store'.ucfirst($type).'QueryHandler');
         $cls = 'ARC2_Store'.ucfirst($type).'QueryHandler';
         $h = new $cls($this->a, $this);
@@ -692,7 +640,7 @@ class ARC2_Store extends ARC2_Class
         if ($q && ('select' == $type)) {
             $this->removeQueueTicket($ticket);
         }
-        $trigger_r = $this->processTriggers($type, $infos);
+        $this->processTriggers($type, $infos);
 
         return $r;
     }
