@@ -277,7 +277,7 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler
             $entries = []; // in case an exception gets thrown
 
             $entries = $this->store->a['db_object']->fetchList($v_sql);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->addError($e->getMessage());
         }
 
@@ -1946,7 +1946,6 @@ class ARC2_StoreSelectQueryHandler extends ARC2_StoreQueryHandler
                 if (in_array($col, ['s', 'o'])) {
                     if (strpos($q_sql, '`'.$var_name.' type`')) {
                         $r .= ', '.$nl.'    TMP.`'.$var_name.' type` AS `'.$var_name.' type`';
-                        // $r .= ', ' . $nl . '    CASE TMP.`' . $var_name . ' type` WHEN 2 THEN "literal" WHEN 1 THEN "bnode" ELSE "uri" END AS `' . $var_name . ' type`';
                     } else {
                         $r .= ', '.$nl.'    NULL AS `'.$var_name.' type`';
                     }

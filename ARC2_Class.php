@@ -643,7 +643,7 @@ class ARC2_Class
                 $this->a['db_adapter'] = 'pdo';
                 $this->a['db_pdo_protocol'] = 'mysql';
             }
-            $factory = new \ARC2\Store\Adapter\AdapterFactory();
+            $factory = new ARC2\Store\Adapter\AdapterFactory();
             $this->db_object = $factory->getInstanceFor($this->a['db_adapter'], $this->a);
             if ($con) {
                 $this->db_object->connect($con);

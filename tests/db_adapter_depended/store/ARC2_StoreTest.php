@@ -741,8 +741,8 @@ XML;
             // check for original table
             if (str_contains($table['Tables_in_'.$this->dbConfig['db_name']], $this->dbConfig['store_name'].'_')) {
                 $foundArcPrefix = true;
-                // check for replicated table
             } elseif (str_contains($table['Tables_in_'.$this->dbConfig['db_name']], 'replicate_')) {
+                // check for replicated table
                 $foundReplicatePrefix = true;
             }
         }

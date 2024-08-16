@@ -336,7 +336,7 @@ class ARC2_Store extends ARC2_Class
                 $this->db->fetchRow('SELECT 1 FROM '.$tbl.' LIMIT 1');
 
                 return true;
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 // when using PDO, an exception gets thrown if $tbl does not exist.
             }
         }

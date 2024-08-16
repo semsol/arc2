@@ -163,8 +163,6 @@ class ARC2_CBJSONParser extends ARC2_JSONParser
                 if ('name' == $k) {
                     $this->addT($s, 'http://www.w3.org/2000/01/rdf-schema#label', $v, $s_type, $o_type);
                 }
-                /* dc:identifier */
-                // if ($k == 'permalink') $this->addT($s, 'http://purl.org/dc/elements/1.1/identifier', $v, $s_type, $o_type);
             }
             /* structured, single v */
             elseif (!$this->isFlatArray($v)) {

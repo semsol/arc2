@@ -49,9 +49,8 @@ class PDOAdapter extends AbstractAdapter
         // it assumes that $existingConnection is a PDO connection object
         if (null !== $existingConnection) {
             $this->db = $existingConnection;
-
-            // create your own connection
         } elseif (false === $this->db instanceof \PDO) {
+            // create your own connection
             /*
              * build connection string
              *

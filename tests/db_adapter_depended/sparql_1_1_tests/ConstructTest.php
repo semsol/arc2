@@ -74,9 +74,8 @@ class ConstructTest extends ComplianceTest
             } else {
                 throw new \Exception('Invalid result by query method: '.json_encode($arc2Result));
             }
-
-            // test has to be SUCCESSFUL
         } else {
+            // test has to be SUCCESSFUL
             // get test data
             $data = $this->getTestData($this->testPref.$testName);
 

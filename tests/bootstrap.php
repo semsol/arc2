@@ -56,7 +56,7 @@ if (file_exists(__DIR__.'/config.php')) {
         } else {
             $msg = 'Neither environment variable DB_PDO_PROTOCOL nor $_SERVER["DB_PDO_PROTOCOL"] are set.'
                 .' Possible values are: mysql';
-            throw new \Exception($msg);
+            throw new Exception($msg);
         }
     } else {
         throw new Exception('Neither environment variable DB_ADAPTER nor $_SERVER["DB_ADAPTER"] are set.');
