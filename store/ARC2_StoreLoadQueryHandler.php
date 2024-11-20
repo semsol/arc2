@@ -490,7 +490,7 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler
     public function checkSQLBuffers(
         $force_write = 0,
         $reset_id_buffers = 0,
-        $refresh_lock = 0
+        $refresh_lock = 0,
     ) {
         if (!$this->keep_time_limit) {
             set_time_limit($this->v('time_limit', 60, $this->a));
