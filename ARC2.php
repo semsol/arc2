@@ -46,7 +46,8 @@ class ARC2
     public static function getScriptURI()
     {
         if (isset($_SERVER) && (isset($_SERVER['SERVER_NAME']) || isset($_SERVER['HTTP_HOST']))) {
-            $proto = preg_replace('/^([a-z]+)\/.*$/', '\\1', strtolower($_SERVER['SERVER_PROTOCOL'] ?? 'http'));
+            $server_proto = strtolower($_SERVER['SERVER_PROTOCOL'] ?? 'http');
+            $proto = preg_replace('/^([a-z]+)\/.*$/', '\\1', $server_proto);
             $port = $_SERVER['SERVER_PORT'];
             $server = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME'];
             $script = $_SERVER['SCRIPT_NAME'];
@@ -67,7 +68,8 @@ class ARC2
     public static function getRequestURI()
     {
         if (isset($_SERVER) && isset($_SERVER['REQUEST_URI'])) {
-            return preg_replace('/^([a-z]+)\/.*$/', '\\1', strtolower($_SERVER['SERVER_PROTOCOL'] ?? 'http')).
+            $server_proto = strtolower($_SERVER['SERVER_PROTOCOL'] ?? 'http');
+            return preg_replace('/^([a-z]+)\/.*$/', '\\1', $server_proto).
         '://'.(isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME']).
         (80 != $_SERVER['SERVER_PORT'] ? ':'.$_SERVER['SERVER_PORT'] : '').
         $_SERVER['REQUEST_URI'];
