@@ -2,7 +2,6 @@
 .php_cs.cache
 .phpunit.result.cache
 composer.lock
-docker/docker-compose.yml
 plugins/*
 triggers/*
 tests/coverage/*

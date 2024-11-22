@@ -1,0 +1,46 @@
+version: '3'
+
+services:
+    arc2:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        container_name: arc2
+        volumes:
+            - ./../:/var/www/html/
+        depends_on:
+            - db
+        links:
+          - db:mysql
+
+    db:
+        image: mariadb:10.3.29
+        container_name: db
+        environment:
+            MYSQL_DATABASE: arc2
+            MYSQL_ROOT_PASSWORD: Pass123
+        volumes:
+            # server is empty at the start because it uses RAM to store data
+            - data:/var/cache
+            - data:/var/lib/mysql
+            # for SQL commands to be run after the server starts
+            - ./sql:/docker-entrypoint-initdb.d
+
+    phpmyadmin:
+        image: phpmyadmin/phpmyadmin
+        container_name: phpmyadmin
+        links:
+            - db:mysql
+        ports:
+            - 8002:80
+        environment:
+            MYSQL_USERNAME: root
+            MYSQL_ROOT_PASSWORD: Pass123
+            PMA_HOST: mysql
+            UPLOAD_LIMIT: 2G
+
+volumes:
+    data:
+        driver_opts:
+            type: tmpfs
+            device: tmpfs

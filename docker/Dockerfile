@@ -10,7 +10,7 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 
 # add custom PHP.ini settings
 RUN mv "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"
-COPY ./includes/custom.ini /usr/local/etc/php/conf.d/custom.ini
+COPY ./custom.ini /usr/local/etc/php/conf.d/custom.ini
 
 WORKDIR /var/www/html/
 
