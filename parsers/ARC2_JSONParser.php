@@ -74,9 +74,8 @@ class ARC2_JSONParser extends ARC2_RDFParser
             if ($sub_r = $this->x('\}', $v)) {
                 $v = $sub_r[1];
             }
-        }
-        /* sub-list */
-        elseif ($sub_r = $this->x('\[', $v)) {
+        } elseif ($sub_r = $this->x('\[', $v)) {
+            /* sub-list */
             $v = $sub_r[1];
             while ((list($sub_r, $v) = $this->extractObject($v)) && $sub_r) {
                 $r[] = $sub_r;
@@ -85,9 +84,8 @@ class ARC2_JSONParser extends ARC2_RDFParser
             if ($sub_r = $this->x('\]', $v)) {
                 $v = $sub_r[1];
             }
-        }
-        /* sub-value */
-        elseif ((list($sub_r, $v) = $this->extractValue($v)) && (false !== $sub_r)) {
+        } elseif ((list($sub_r, $v) = $this->extractValue($v)) && (false !== $sub_r)) {
+            /* sub-value */
             $r = $sub_r;
         }
 
@@ -136,7 +134,6 @@ class ARC2_JSONParser extends ARC2_RDFParser
                 $val = preg_replace_callback('/\\\u(.{4})/', function ($matches) {
                     return chr(hexdec($matches[1]));
                 }, $val);
-                // $val = preg_replace_callback('/\\\u00(.{2})', function($matches) { return rawurldecode("%" . $matches[1]); }, $val);
                 /* other escaped chars */
                 $from = ['\\\\', '\r', '\t', '\n', '\"', '\b', '\f', '\/'];
                 $to = ['\\', "\r", "\t", "\n", '"', "\b", "\f", '/'];
@@ -167,7 +164,6 @@ class ARC2_JSONParser extends ARC2_RDFParser
     public function addT($s = '', $p = '', $o = '', $s_type = '', $o_type = '', $o_dt = '', $o_lang = '')
     {
         $o = $this->toUTF8($o);
-        // echo str_replace($this->base, '', "-----\n adding $s / $p / $o\n-----\n");
         $t = ['s' => $s, 'p' => $p, 'o' => $o, 's_type' => $s_type, 'o_type' => $o_type, 'o_datatype' => $o_dt, 'o_lang' => $o_lang];
         if ($this->skip_dupes) {
             $h = md5(serialize($t));

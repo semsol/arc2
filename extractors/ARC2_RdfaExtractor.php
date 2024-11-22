@@ -96,9 +96,8 @@ class ARC2_RdfaExtractor extends ARC2_RDFExtractor
                     } /* patch by masaka */
                 }
             }
-        }
-        /* step 5 */
-        else {
+        } else {
+            /* step 5 */
             foreach (['about', 'src'] as $attr) {
                 if (isset($n['a'][$attr]) && (list($uri, $sub_v) = $this->xURI($n['a'][$attr], $lct['base'], $lct['ns'], '', $lct)) && $uri) {
                     $lct['new_s'] = $uri;

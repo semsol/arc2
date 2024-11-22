@@ -711,9 +711,8 @@ class ARC2_Store extends ARC2_Class
                     }
                 }
             }
-        }
-        /* exact match */
-        else {
+        } else {
+            /* exact match */
             $sql = 'SELECT id
                     FROM '.$this->getTablePrefix().$tbl."
                     WHERE val = BINARY '".$this->db->escape($val)."'

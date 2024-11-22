@@ -157,7 +157,6 @@ class ARC2_RemoteStore extends ARC2_Class
         $mappings = ['rdfxml' => 'RDFXML', 'sparqlxml' => 'SPARQLXMLResult', 'turtle' => 'Turtle'];
         if (!$format || !isset($mappings[$format])) {
             return $resp;
-            // return $this->addError('No parser available for "' . $format . '" SPARQL result');
         }
         /* format parser */
         $suffix = $mappings[$format].'Parser';
@@ -173,15 +172,13 @@ class ARC2_RemoteStore extends ARC2_Class
             } else {
                 $r = $bid;
             }
-        }
-        /* select */
-        elseif (('select' == $qt) && !method_exists($parser, 'getRows')) {
+        } elseif (('select' == $qt) && !method_exists($parser, 'getRows')) {
+            /* select */
             $r = $resp;
         } elseif ('select' == $qt) {
             $r = ['rows' => $parser->getRows(), 'variables' => $parser->getVariables()];
-        }
-        /* any other */
-        else {
+        } else {
+            /* any other */
             $r = $parser->getSimpleIndex(0);
         }
         unset($parser);

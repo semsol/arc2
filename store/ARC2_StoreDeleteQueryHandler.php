@@ -39,13 +39,11 @@ class ARC2_StoreDeleteQueryHandler extends ARC2_StoreQueryHandler
         /* graph(s) only */
         if (!$this->v('construct_triples', [], $this->infos['query'])) {
             $tc = $this->deleteTargetGraphs();
-        }
-        /* graph(s) + explicit triples */
-        elseif (!$this->v('pattern', [], $this->infos['query'])) {
+        } elseif (!$this->v('pattern', [], $this->infos['query'])) {
+            /* graph(s) + explicit triples */
             $tc = $this->deleteTriples();
-        }
-        /* graph(s) + constructed triples */
-        else {
+        } else {
+            /* graph(s) + constructed triples */
             $tc = $this->deleteConstructedGraph();
         }
         $t2 = ARC2::mtime();
