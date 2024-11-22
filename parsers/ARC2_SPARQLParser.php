@@ -837,9 +837,8 @@ class ARC2_SPARQLParser extends ARC2_TurtleParser
             return [$r[1], $r[2]];
         } elseif ($r = $this->x('\<([^\<\>\s\"\|\^`]*)\>', $v)) {
             return [$r[1] ? $r[1] : true, $r[2]];
-        }
-        /* allow reserved chars in obvious IRIs */
-        elseif ($r = $this->x('\<(https?\:[^\s][^\<\>]*)\>', $v)) {
+        } elseif ($r = $this->x('\<(https?\:[^\s][^\<\>]*)\>', $v)) {
+            /* allow reserved chars in obvious IRIs */
             return [$r[1] ? $r[1] : true, $r[2]];
         }
 

@@ -369,9 +369,8 @@ class ARC2
             if (in_array('p', array_keys($v[0]))) {
                 return 'triples';
             }
-        }
-        /* associative array */
-        else {
+        } else {
+            /* associative array */
             /* index */
             foreach ($v as $s => $ps) {
                 if (!is_array($ps)) {

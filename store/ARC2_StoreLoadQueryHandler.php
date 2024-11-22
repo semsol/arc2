@@ -282,7 +282,8 @@ class ARC2_StoreLoadQueryHandler extends ARC2_StoreQueryHandler
         $tbl_prefix = $this->store->getTablePrefix();
         $sub_tbls = ('id' == $tbl)
             ? ['id2val', 's2val', 'o2val']
-            : ('s' == $tbl
+            : (
+                's' == $tbl
                 ? ['s2val', 'id2val', 'o2val']
                 : ['o2val', 'id2val', 's2val']
             );

@@ -423,9 +423,8 @@ class ARC2_Reader extends ARC2_Class
         /* data */
         if ('data' == $s_type) {
             $d = ($d_size > 0) ? substr($s['data'], $s['pos'], $d_size) : '';
-        }
-        /* socket */
-        elseif ('socket' == $s_type) {
+        } elseif ('socket' == $s_type) {
+            /* socket */
             $d = ($d_size > 0) && !feof($s['socket']) ? fread($s['socket'], $d_size) : '';
         }
         $eof = $d ? false : true;

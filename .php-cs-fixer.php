@@ -20,8 +20,7 @@ $config
     ->setFinder($finder)
     ->setRiskyAllowed(true)
     ->setRules([
-        '@Symfony' => true,
-        '@Symfony:risky' => true,
+        '@PSR12' => true,
         'phpdoc_summary' => false,
     ])
 ;

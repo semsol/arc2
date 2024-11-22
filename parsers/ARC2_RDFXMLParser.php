@@ -277,14 +277,12 @@ class ARC2_RDFXMLParser extends ARC2_RDFParser
         if (isset($a[$this->rdf.'ID'])) {
             $s['type'] = 'uri';
             $s['value'] = $this->calcURI('#'.$a[$this->rdf.'ID'], $s['x_base']);
-        }
-        /* about */
-        elseif (isset($a[$this->rdf.'about'])) {
+        } elseif (isset($a[$this->rdf.'about'])) {
+            /* about */
             $s['type'] = 'uri';
             $s['value'] = $this->calcURI($a[$this->rdf.'about'], $s['x_base']);
-        }
-        /* bnode */
-        else {
+        } else {
+            /* bnode */
             $s['type'] = 'bnode';
             if (isset($a[$this->rdf.'nodeID'])) {
                 $s['value'] = '_:'.$a[$this->rdf.'nodeID'];
@@ -301,16 +299,14 @@ class ARC2_RDFXMLParser extends ARC2_RDFParser
                 $this->addT($sup_s['value'], $sup_s['p'], $coll['value'], $sup_s['type'], $coll['type']);
                 $this->addT($coll['value'], $this->rdf.'first', $s['value'], $coll['type'], $s['type']);
                 $this->pushS($coll);
-            }
-            /* new entry in existing coll */
-            elseif (isset($sup_s['is_coll']) && $sup_s['is_coll']) {
+            } elseif (isset($sup_s['is_coll']) && $sup_s['is_coll']) {
+                /* new entry in existing coll */
                 $coll = ['value' => $this->createBnodeID(), 'type' => 'bnode', 'is_coll' => true, 'x_base' => $s['x_base'], 'x_lang' => $s['x_lang']];
                 $this->addT($sup_s['value'], $this->rdf.'rest', $coll['value'], $sup_s['type'], $coll['type']);
                 $this->addT($coll['value'], $this->rdf.'first', $s['value'], $coll['type'], $s['type']);
                 $this->pushS($coll);
-            }
-            /* normal sub-node */
-            elseif (isset($sup_s['p']) && $sup_s['p']) {
+            } elseif (isset($sup_s['p']) && $sup_s['p']) {
+                /* normal sub-node */
                 $this->addT($sup_s['value'], $sup_s['p'], $s['value'], $sup_s['type'], $s['type']);
             }
         }
@@ -328,7 +324,10 @@ class ARC2_RDFXMLParser extends ARC2_RDFParser
         }
         /* any other attrs (skip rdf and xml, except rdf:_, rdf:value, rdf:Seq) */
         foreach ($a as $k => $v) {
-            if (((!str_contains($k, $this->xml)) && (!str_contains($k, $this->rdf))) || preg_match('/(\_[0-9]+|value|Seq|Bag|Alt|Statement|Property|List)$/', $k)) {
+            if (
+                ((!str_contains($k, $this->xml)) && (!str_contains($k, $this->rdf)))
+                || preg_match('/(\_[0-9]+|value|Seq|Bag|Alt|Statement|Property|List)$/', $k)
+            ) {
                 if (strpos($k, ':')) {
                     $this->addT($s['value'], $k, $v, $s['type'], 'literal', '', $s['x_lang']);
                 }
@@ -385,9 +384,8 @@ class ARC2_RDFXMLParser extends ARC2_RDFParser
                 unset($s['p_id']);
             }
             $this->state = 3;
-        }
-        /* named bnode */
-        elseif (isset($a[$this->rdf.'nodeID'])) {
+        } elseif (isset($a[$this->rdf.'nodeID'])) {
+            /* named bnode */
             $o['value'] = '_:'.$a[$this->rdf.'nodeID'];
             $o['type'] = 'bnode';
             $this->addT($s['value'], $s['p'], $o['value'], $s['type'], $o['type']);
@@ -396,9 +394,8 @@ class ARC2_RDFXMLParser extends ARC2_RDFParser
             if (isset($s['p_id'])) {
                 $this->reify($this->calcURI('#'.$s['p_id'], $b), $s['value'], $s['p'], $o['value'], $s['type'], $o['type']);
             }
-        }
-        /* parseType */
-        elseif (isset($a[$this->rdf.'parseType'])) {
+        } elseif (isset($a[$this->rdf.'parseType'])) {
+            /* parseType */
             if ('Literal' === $a[$this->rdf.'parseType']) {
                 $s['o_xml_level'] = 0;
                 $s['o_xml_data'] = '';
@@ -421,9 +418,8 @@ class ARC2_RDFXMLParser extends ARC2_RDFParser
                 $s['o_is_coll'] = true;
                 $this->state = 4;
             }
-        }
-        /* sub-node or literal */
-        else {
+        } else {
+            /* sub-node or literal */
             $s['o_cdata'] = '';
             if (isset($a[$this->rdf.'datatype'])) {
                 $s['o_datatype'] = $a[$this->rdf.'datatype'];

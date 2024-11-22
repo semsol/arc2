@@ -173,18 +173,16 @@ class ARC2_AtomParser extends ARC2_LegacyXMLParser
                 /* content handling */
                 if (in_array($k, [$this->rss.'description', $this->content.'encoded'])) {
                     $v = $this->getNodeContent($info);
-                }
-                /* source handling */
-                elseif ($k == $this->dc.'source') {
+                } elseif ($k == $this->dc.'source') {
+                    /* source handling */
                     $sub_nodes = $this->node_index[$info['id']];
                     foreach ($sub_nodes as $sub_pos => $sub_info) {
                         if ('id' == $sub_info['tag']) {
                             $v = trim($sub_info['cdata']);
                         }
                     }
-                }
-                /* link handling */
-                elseif ($k == $this->rss.'link') {
+                } elseif ($k == $this->rss.'link') {
+                    /* link handling */
                     if ($link_type = $this->v('type', '', $info['a'])) {
                         $k2 = $this->dc.'format';
                         if (!isset($sub_index[$v])) {
@@ -195,9 +193,8 @@ class ARC2_AtomParser extends ARC2_LegacyXMLParser
                         }
                         $sub_index[$v][$k2][] = ['value' => $link_type, 'type' => 'literal'];
                     }
-                }
-                /* author handling */
-                elseif ($k == $this->dc.'creator') {
+                } elseif ($k == $this->dc.'creator') {
+                    /* author handling */
                     $sub_nodes = $this->node_index[$info['id']];
                     foreach ($sub_nodes as $sub_pos => $sub_info) {
                         if ('name' == $sub_info['tag']) {
@@ -212,21 +209,18 @@ class ARC2_AtomParser extends ARC2_LegacyXMLParser
                             $r[$k2][] = ['value' => $v2, 'type' => 'uri'];
                         }
                     }
-                }
-                /* date handling */
-                elseif (in_array($k, [$this->dc.'date', $this->dct.'modified'])) {
+                } elseif (in_array($k, [$this->dc.'date', $this->dct.'modified'])) {
+                    /* date handling */
                     if (!preg_match('/^[0-9]{4}/', $v) && ($sub_v = strtotime($v)) && (-1 != $sub_v)) {
                         $tz = date('Z', $sub_v); /* timezone offset */
                         $sub_v -= $tz; /* utc */
                         $v = date('Y-m-d\TH:i:s\Z', $sub_v);
                     }
-                }
-                /* tag handling */
-                elseif ($k == $this->dc.'subject') {
+                } elseif ($k == $this->dc.'subject') {
+                    /* tag handling */
                     $v = $this->v('term', '', $info['a']);
-                }
-                /* other attributes in closed tags */
-                elseif (!$v && ('closed' == $info['state']) && $info['a']) {
+                } elseif (!$v && ('closed' == $info['state']) && $info['a']) {
+                    /* other attributes in closed tags */
                     foreach ($info['a'] as $sub_k => $sub_v) {
                         if (!preg_match('/(xmlns|\:|type)/', $sub_k)) {
                             $v = $sub_v;

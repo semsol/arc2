@@ -163,21 +163,21 @@ class ARC2_CBJSONParser extends ARC2_JSONParser
                 if ('name' == $k) {
                     $this->addT($s, 'http://www.w3.org/2000/01/rdf-schema#label', $v, $s_type, $o_type);
                 }
-            }
-            /* structured, single v */
-            elseif (!$this->isFlatArray($v)) {
-                if ($o_type = $this->getStructType($v, $k)) {/* known type */
+            } elseif (!$this->isFlatArray($v)) {
+                /* structured, single v */
+                if ($o_type = $this->getStructType($v, $k)) {
+                    /* known type */
                     $o = $this->getResourceID($v, $o_type);
                     $this->addT($s, $p, $o, $s_type, 'uri');
                     $this->addT($o, $this->rdf.'type', $this->default_ns.$this->camelCase($o_type), 'uri', 'uri');
-                } else {/* unknown type */
+                } else {
+                    /* unknown type */
                     $o = $this->createSubURI($s, $k, $pos);
                     $this->addT($s, $p, $o, $s_type, 'uri');
                     $this->extractResourceRDF($v, $o);
                 }
-            }
-            /* value list */
-            else {
+            } else {
+                /* value list */
                 foreach ($v as $sub_pos => $sub_v) {
                     $this->extractResourceRDF([$k => $sub_v], $s, $sub_pos);
                 }
