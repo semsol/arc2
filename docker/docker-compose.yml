@@ -4,23 +4,20 @@ services:
     arc2:
         build:
             context: .
-            dockerfile: Dockerfile
         container_name: arc2
         volumes:
-            - ./../:/var/www/html/
+            - ./../:/home/arc2/code
         depends_on:
             - db
-        links:
-          - db:mysql
 
     db:
-        image: mariadb:10.3.29
+        image: mariadb:lts
         container_name: db
         environment:
             MYSQL_DATABASE: arc2
             MYSQL_ROOT_PASSWORD: Pass123
         volumes:
-            # server is empty at the start because it uses RAM to store data
+            # server is empty at the start because it uses RAM to store data (faster DB-access)
             - data:/var/cache
             - data:/var/lib/mysql
             # for SQL commands to be run after the server starts
