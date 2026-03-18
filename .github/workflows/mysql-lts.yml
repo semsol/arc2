@@ -1,6 +1,6 @@
 name: MySQL LTS Tests
 
-on: [push, pull_request]
+on: push
 
 jobs:
     pdo-mysql:
