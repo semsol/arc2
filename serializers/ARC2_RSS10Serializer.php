@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ARC2 RSS 1.0 Serializer.
  *
