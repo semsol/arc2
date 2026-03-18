@@ -1,10 +1,10 @@
-name: MySQL 5.5 Tests
+name: MySQL LTS Tests
 
 on: [push, pull_request]
 
 jobs:
     pdo-mysql:
-        name: MySQL 5.5 Tests - PHP ${{ matrix.php }} PDO mysql
+        name: MySQL LTS Tests - PHP ${{ matrix.php }} PDO mysql
         runs-on: ubuntu-latest
 
         env:
@@ -12,18 +12,15 @@ jobs:
             DB_PDO_PROTOCOL: mysql
 
         strategy:
-            # if one of the matrix-entries break, all entries getting canceled.
-            fail-fast: true
+            fail-fast: false
             matrix:
                 php:
-                    - 8.0
-                    - 8.1
-                    - 8.2
-                    - 8.3
+                    - 8.4
+                    - 8.5
 
         services:
             testdb:
-                image: mysql:5.5
+                image: mysql:lts
                 env:
                     MYSQL_ROOT_PASSWORD: Pass123
                     MYSQL_DATABASE: arc2_test
