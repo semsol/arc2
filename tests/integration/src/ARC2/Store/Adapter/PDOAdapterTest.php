@@ -4,7 +4,7 @@ namespace Tests\integration\src\ARC2\Store\Adapter;
 
 use ARC2\Store\Adapter\PDOAdapter;
 
-class PDOAdapterTest extends AbstractAdapterTest
+class PDOAdapterTest extends AbstractAdapterTestCase
 {
     protected function checkAdapterRequirements()
     {

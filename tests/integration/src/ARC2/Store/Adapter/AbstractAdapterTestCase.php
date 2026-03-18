@@ -4,7 +4,10 @@ namespace Tests\integration\src\ARC2\Store\Adapter;
 
 use Tests\ARC2_TestCase;
 
-abstract class AbstractAdapterTest extends ARC2_TestCase
+/**
+ * @codeCoverageIgnore
+ */
+abstract class AbstractAdapterTestCase extends ARC2_TestCase
 {
     abstract protected function checkAdapterRequirements();
 

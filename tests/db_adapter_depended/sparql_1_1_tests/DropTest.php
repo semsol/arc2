@@ -9,7 +9,7 @@ namespace Tests\db_adapter_depended\sparql_1_1_tests;
  *
  * Tests are located in the w3c-tests folder.
  */
-class DropTest extends ComplianceTest
+class DropTest extends ComplianceTestCase
 {
     protected function setUp(): void
     {
