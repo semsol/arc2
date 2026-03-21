@@ -1,27 +1,19 @@
-FROM php:8.2-cli
+FROM php:8.4-cli
 
-RUN apt-get update && apt-get install -y curl git gnupg libicu-dev libzip-dev make nano net-tools zip zlib1g-dev
-
-RUN docker-php-ext-install intl pdo pdo_mysql zip \
+RUN apt-get update && apt-get install -y \
+    curl git gnupg libicu-dev libzip-dev make nano net-tools zip zlib1g-dev \
+    && rm -rf /var/lib/apt/lists/* \
+    && docker-php-ext-install intl pdo pdo_mysql zip \
     && docker-php-ext-enable intl pdo pdo_mysql zip
 
-# install composer globally
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
 
-# add custom PHP.ini settings
-RUN mv "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"
-COPY ./custom.ini /usr/local/etc/php/conf.d/custom.ini
+RUN groupadd -g 1000 arc2 && \
+    useradd -m -u 1000 -g arc2 -G www-data -s /bin/bash arc2
 
-WORKDIR /var/www/html/
+COPY ./entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
 
-# adds user "arc2", adds him to group "www-data" and sets his home folder
-# for more background information see:
-# https://medium.com/@mccode/understanding-how-uid-and-gid-work-in-docker-containers-c37a01d01cf
-RUN useradd -r --home /home/arc2 -u 1000 arc2
-RUN usermod -a -G www-data arc2
-RUN mkdir /home/arc2
-RUN chown arc2:www-data /home/arc2
+WORKDIR /home/arc2/code
 
-EXPOSE 3306
-
-ENTRYPOINT ["tail", "-f", "/dev/null"]
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]

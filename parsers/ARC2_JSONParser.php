@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ARC2 JSON Parser
  * Does not extract triples, needs sub-class for RDF extraction.

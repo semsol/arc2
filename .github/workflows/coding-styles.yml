@@ -1,6 +1,6 @@
 name: "Coding Styles"
 
-on: [push, pull_request]
+on: push
 
 jobs:
     tests:
@@ -11,7 +11,7 @@ jobs:
             fail-fast: true
             matrix:
                 php:
-                    - 8.2
+                    - 8.4
 
         steps:
             -   name: Checkout

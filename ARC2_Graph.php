@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ARC2 Graph object.
  *

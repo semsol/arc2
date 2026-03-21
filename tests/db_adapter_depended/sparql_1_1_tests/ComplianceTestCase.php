@@ -11,7 +11,7 @@ use Tests\ARC2_TestCase;
  *
  * Tests are located in the w3c-tests folder.
  */
-abstract class ComplianceTest extends ARC2_TestCase
+abstract class ComplianceTestCase extends ARC2_TestCase
 {
     /**
      * @var ARC2_Store
